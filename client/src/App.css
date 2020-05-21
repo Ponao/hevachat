@@ -1,0 +1,91 @@
+.form {
+    
+}
+
+.input-field {
+    padding: 3px 0;
+    color: #008FF7;
+    width: 260px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(85, 102, 119, 0.3);
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 22px;
+    transition: all 0.2s;
+    display: block;
+}
+
+.input-field:focus {
+    border-bottom: 1px solid #008FF7;
+}
+
+.button-gray, .button-blue {
+    padding: 0 20px;
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    width: 260px;
+    height: 40px;
+    border-radius: 50px;
+    border: none;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    transition: all 0.2s;
+}
+
+.button-gray {
+    background: #EDF0F3;
+    color: #008FF7;
+}
+
+.button-blue {
+    background: #008FF7;
+    color: #fff;
+}
+
+.button-gray:hover {
+    background: #008FF7;
+    color: #fff;
+}
+
+.button-blue:hover {
+    background: #fff;
+    color: #008FF7;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #008FF7;
+    color: #fff;
+    border-radius: 50px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.sidebar {
+    border-right: 1px #ededed solid;
+    height: calc(100vh - 60px);
+}
+
+.sidebar-title {
+    color: #333333;
+    font-size: 24px;
+    font-weight: 900;
+    margin: 25px 0;
+    padding: 0 20px;
+}
+
+.modal-title {
+    margin-top: 22px;
+    margin-bottom: 20px;
+    color: #333333;
+    font-weight: 800;
+    font-size: 18px;
+    text-align: center;
+}
