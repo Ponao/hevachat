@@ -11,5 +11,6 @@ const UserController = require('../controllers/UserController')
 // Get the user for this user
 router.get('/me', verifyToken, UserController.user);
 router.post('/update-room-lang', verifyToken, UserController.updateRoomLang);
+router.post('/test', verifyToken, UserController.test);
 
 module.exports = router;

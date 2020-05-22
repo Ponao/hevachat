@@ -1,6 +1,10 @@
 // App
+import 'react-app-polyfill/ie9';
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -9,6 +13,7 @@ import {
     BrowserRouter as Router,
 } from "react-router-dom"
 import Modal from "react-modal";
+
 
 // Redux
 import store from './Redux/store'

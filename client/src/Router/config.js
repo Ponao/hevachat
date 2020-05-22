@@ -6,6 +6,7 @@ import Register from '../Pages/Auth/Register'
 
 import Languages from '../Pages/User/Languages'
 import Rooms from '../Pages/User/Rooms';
+import Room from '../Pages/User/Room';
 import Messages from '../Pages/User/Messages';
 import Notifications from '../Pages/User/Notifications';
 
@@ -44,6 +45,13 @@ const routes = [
         type: 'user',
         title: 'Rooms',
         component: () => <Rooms />
+    },
+    {
+        path: '/rooms/:id',
+        exact: true,
+        type: 'user',
+        title: '',
+        component: () => <Room />
     },
     {
         path: '/messages',

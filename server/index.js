@@ -19,18 +19,9 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser');
 const path = require('path');
 const historyApiFallback = require('connect-history-api-fallback');
+const {initSocket} = require('./controllers/SocketController')
+
 // const errors = require('./middleware/errors');
-
-// If produciton
-if(process.env.MODE == 'production') {
-  var https = require("https")
-  const fs = require("fs")
-
-  var sslCerts = {
-    key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
-  }
-}
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -61,22 +52,34 @@ app
   // Error middleware
 //   .use(errors);
 
-
 // Starts the HYPER10N server
 function startServer() {
   // Start the Express server
   if(process.env.MODE == 'development') {
-    app.listen(process.env.PORT, err => {
-      if (err) {
-        console.log(err);
-        return;
-      }
+    const http = require("http").createServer(app)
+    
+    const io = require('socket.io')(http)
+    initSocket(io)
+
+    http.listen(process.env.PORT, () => {
       console.log(`⚡️ HEVACHAT server started: http://localhost:${process.env.PORT}`);
     });
   }
 
   if(process.env.MODE == 'production') {
-    https.createServer(sslCerts, app).listen(8080);
+    const fs = require("fs")
+
+    var sslCerts = {
+      key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
+      cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
+    }
+
+    const https = require("https").createServer(sslCerts, app)
+
+    const io = require('socket.io')(https)
+    initSocket(io)
+
+    https.listen(8080);
   }
 }
 

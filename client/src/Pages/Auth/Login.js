@@ -1,6 +1,6 @@
 // App
 import React from 'react'
-import { CookiesProvider, withCookies } from 'react-cookie'
+import { withCookies } from 'react-cookie'
 import '../../Css/Auth/Login.css'
 
 // Router

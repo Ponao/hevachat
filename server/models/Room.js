@@ -15,6 +15,8 @@ const RoomSchema = new Schema({
   ownerId: { type: String },
   createdAt: { type: Date, default: Date.now },
   isPrivate: { type: Boolean, default: false },
+  color: { type: String },
+  users: { type: Array },
   buff: Buffer
 });
 

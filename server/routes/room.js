@@ -6,12 +6,13 @@
 
 const router = require('express').Router();
 const verifyToken = require('../middleware/verifyToken');
-const RoomControllet = require('../controllers/RoomControllet')
+const RoomController = require('../controllers/RoomController')
 
 // Get the user for this user
-router.get('/get-all', verifyToken, RoomControllet.getAll);
-router.post('/create', verifyToken, RoomControllet.create);
-router.post('/delete', verifyToken, RoomControllet.delete);
-router.post('/edit', verifyToken, RoomControllet.edit);
+router.post('/get-all', verifyToken, RoomController.getAll);
+router.post('/get', verifyToken, RoomController.get);
+router.post('/create', verifyToken, RoomController.create);
+router.post('/delete', verifyToken, RoomController.delete);
+router.post('/edit', verifyToken, RoomController.edit);
 
 module.exports = router;

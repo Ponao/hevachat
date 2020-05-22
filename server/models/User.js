@@ -11,10 +11,20 @@ const Schema = mongoose.Schema;
 const NUM_ROUNDS = 12;
 
 const UserSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  },
   email: { type: String },
   password: { type: String, select: false },
-  createdAt: { type: Date, default: Date.now },
   roomLang: { type: String, default: 'eng' },
+  online: { type: Boolean, default: true },
+  onlineAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+  dialogs: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'Dialog' }
+  ],
+  color: { type: String },
   buff: Buffer
 });
 

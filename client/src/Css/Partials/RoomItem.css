@@ -1,0 +1,55 @@
+.room-item {
+    padding: 0 20px;
+    display: flex;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.room-item .user-avatar {
+    display: flex;
+}
+
+.room-item p {
+    display: flex;
+    font-weight: 600;
+    font-size: 16px;
+    color: #008FF7;
+    margin: 0 0 0 12px;
+    line-height: 22px;
+}
+
+.room-item .users {
+    display: flex;
+    margin-left: 12px;
+}
+
+.room-item .users .user-avatar {
+    margin-right: 2px;
+}
+
+.theme-header {
+    height: 60px;
+    border-bottom: 1px #ededed solid;
+    display: flex;
+}
+
+.theme-sidebar {
+    height: calc(100vh - 60px);
+    display: table;
+    width: 100%;
+}
+
+.theme-screen {
+    height: 100vh;
+    background-color: #556677;
+}
+
+.theme-title {
+    display: flex;
+    font-size: 16px;
+    color: #008FF7;
+    margin: 0;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+}

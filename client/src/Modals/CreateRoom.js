@@ -9,6 +9,10 @@ import { withStyles } from '@material-ui/core/styles';
 
 // Redux
 import { connect } from 'react-redux'
+import * as roomsActions from '../Redux/actions/rooms'
+import { bindActionCreators } from 'redux'
+
+import SocketController from '../Controllers/SocketController';
 
 const customStylesModal = {
     overlay: {
@@ -66,14 +70,13 @@ class CreateRoom extends React.Component {
             body: JSON.stringify({
                 title: this.state.title,
                 isPrivate: this.state.isPrivate,
-                lang: 'rus'
+                lang: this.props.user.roomLang
             })
         })
         .then((response) => response.json())
-        .then((data) => {
-            if(!data.error) {
-
-            }
+        .then((room) => {
+            this.props.roomsActions.roomsAdd(room)
+            SocketController.createRoom({room, lang: this.props.user.roomLang})
         });
     }
     
@@ -119,4 +122,10 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(CreateRoom)
+function mapDispatchToProps(dispatch) {
+    return {
+        roomsActions: bindActionCreators(roomsActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateRoom)

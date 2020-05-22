@@ -1,6 +1,7 @@
 // App
 import React from "react";
 import { withCookies } from "react-cookie";
+import SocketController from '../Controllers/SocketController'
 
 // Router
 import { Switch, Route, Redirect, withRouter } from "react-router-dom";
@@ -51,6 +52,7 @@ class AppRouter extends React.Component {
       })
         .then((response) => response.json())
         .then((user) => {
+          SocketController.init(apiToken)
           this.props.userActions.loginUser(user, apiToken);
           this.setState({isRender: true})
         });
