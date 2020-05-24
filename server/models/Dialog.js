@@ -13,6 +13,7 @@ const DialogSchema = new Schema({
     users: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     ],
+    messages: { type: Array, default: [] },
     createdAt: { type: Date, default: Date.now },
     buff: Buffer
 });

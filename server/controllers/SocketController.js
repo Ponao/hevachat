@@ -2,14 +2,15 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken')
 
 let idCounter = 0;
+let io = false
 
 function nextUniqueId() {
     idCounter++;
     return idCounter.toString();
 }
 
-
-function initSocket(io) {
+function initSocket(initIo) {
+    io = initIo
     io.on('connection', (socket) => {
         let user = false;
         let activeLang = false;
@@ -36,7 +37,7 @@ function initSocket(io) {
                 return;
             }
 
-            socket.join(`notifications.${userVerify.data.userId}`)
+            socket.join(`${userVerify.data.userId}`)
 
             // Set online status for user
             user = await User.findById(userVerify.data.userId)
@@ -96,7 +97,45 @@ function initSocket(io) {
         socket.on('deleteRoom', ({roomId, lang}) => {
             socket.to(`language.${lang}`).emit('deleteRoom', roomId)
         })
+
+        // Messages in rooms
+        socket.on('sendMessageRoom', ({roomId, message}) => {
+            socket.to(`room.${roomId}`).emit('sendMessageRoom', message)
+        })
+
+        socket.on('editMessageRoom', ({roomId, message}) => {
+            socket.to(`room.${roomId}`).emit('editMessageRoom', message)
+        })
+
+        socket.on('deleteMessageRoom', ({roomId, messageId}) => {
+            socket.to(`room.${roomId}`).emit('deleteMessageRoom', messageId)
+        })
+
+        // Messages in users
+        socket.on('sendMessageUser', ({userId, message}) => {
+            socket.to(`${userId}`).emit('sendMessageUser', message)
+        })
+
+        socket.on('editMessageUser', ({userId, message}) => {
+            socket.to(`${userId}`).emit('editMessageRoom', message)
+        })
+
+        socket.on('deleteMessageUser', ({userId, messageId}) => {
+            socket.to(`${userId}`).emit('deleteMessageRoom', messageId)
+        })
     })
 }
 
-module.exports = {initSocket}
+function sendMessageRoom({roomId, message, socketId}) {
+    io.sockets.connected[socketId].to(`room.${roomId}`).emit('sendMessageRoom', message)
+}
+
+function deleteMessageRoom({roomId, messageIds, socketId}) {
+    io.sockets.connected[socketId].to(`room.${roomId}`).emit('deleteMessageRoom', messageIds)
+}
+
+module.exports = {
+    initSocket, 
+    sendMessageRoom, 
+    deleteMessageRoom
+}

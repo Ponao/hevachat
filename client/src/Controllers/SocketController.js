@@ -4,7 +4,9 @@ import {
     ROOMS_ADD,
     ROOMS_JOIN_ROOM,
     ROOMS_USER_JOIN_ROOM,
-    ROOMS_USER_LEAVE_ROOM
+    ROOMS_USER_LEAVE_ROOM,
+    ROOMS_ADD_MESSAGE,
+    ROOMS_DELETE_MESSAGE
 } from '../Redux/constants'
 
 let socket = null
@@ -25,6 +27,7 @@ export default {
         })
 
         socket.on('joinRoom', ({roomId, user}) => {
+            console.log(user)
             store.dispatch({
                 type: ROOMS_USER_JOIN_ROOM,
                 payload: {roomId, user}
@@ -37,6 +40,23 @@ export default {
                 payload: {roomId, userId}
             })
         })
+
+        socket.on('sendMessageRoom', (message) => {
+            store.dispatch({
+                type: ROOMS_ADD_MESSAGE,
+                payload: message
+            })
+        })
+
+        socket.on('deleteMessageRoom', (messageIds) => {
+            store.dispatch({
+                type: ROOMS_DELETE_MESSAGE,
+                payload: messageIds
+            })
+        })
+    },
+    getSocketId: () => {
+        return socket.id
     },
     joinLang: lang => {
         if(activeLang)
@@ -53,6 +73,9 @@ export default {
     },
     leaveRoom: ({roomId, lang}) => {
         socket.emit('leaveRoom', {roomId, lang})
+    },
+    sendMessageRoom: ({roomId, message}) => {
+        socket.emit('sendMessageRoom', {roomId, message})
     }
 }
 

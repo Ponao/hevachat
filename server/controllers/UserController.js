@@ -41,30 +41,5 @@ module.exports = {
         } catch (e) {
             return next(new Error(e));
         }
-    },
-
-    test: async (req, res, next) => {
-        // Get this account as JSON
-        const { user } = res.locals;
-
-        let message = new Message({
-            user: user,
-            text: 'TEST',
-        })
-
-        await message.save()
-
-        console.log(message)
-
-        try {
-            if (message) {
-                return res.json(message);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
-        } catch (e) {
-            return next(new Error(e));
-        }
     }
 }

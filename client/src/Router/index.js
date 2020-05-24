@@ -29,13 +29,11 @@ class AppRouter extends React.Component {
     isRender: false
   }
 
-  componentWillMount() {
-      this.props.history.listen(() => {
-          setTitle(this.props.history.location.pathname, routes);
-      });
-  }
-
   componentDidMount() {
+    this.props.history.listen(() => {
+      setTitle(this.props.history.location.pathname, routes);
+    });
+    
     setTitle(this.props.history.location.pathname, routes);
     
     const { cookies } = this.props;

@@ -14,14 +14,15 @@ const MessageSchema = new Schema({
     text: { type: String, default: '' },
     images: { type: Array, default: [] },
     sounds: { type: Array, default: [] },
+    files: { type: Array, default: [] },
     recentMessages: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
     ],
     isRead: { type: Boolean, default: false },
     isEdit: { type: Boolean, default: false },
+    isDelete: { type: Boolean, default: false },
     pushId: { type: String, default: '' },
-    dialogId: { type: String, default: '' },
-    roomId: { type: String, default: '' },
+    dialogId: { type: String },
     createdAt: { type: Date, default: Date.now },
     buff: Buffer
 });

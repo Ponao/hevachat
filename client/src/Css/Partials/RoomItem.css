@@ -35,7 +35,7 @@
 
 .theme-sidebar {
     height: calc(100vh - 60px);
-    display: table;
+    display: flex;
     width: 100%;
 }
 

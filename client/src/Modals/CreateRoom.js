@@ -85,7 +85,7 @@ class CreateRoom extends React.Component {
             isOpen={this.props.isOpen}
             onRequestClose={() => {this.props.close()}}
             style={customStylesModal}
-            contentLabel="Example Modal"
+            contentLabel="Create room"
         >
             <h2 className="modal-title">New room</h2>
 

@@ -15,7 +15,7 @@ class UserHeader extends React.Component {
         return (
             <div className="col-md-3 user-header">
                 <ul>
-                    <li><Avatar /></li>
+                    <li><Avatar name="RS" /></li>
                     <li><NavLink to="/messages"><ChatBubbleOutlineIcon style={{color: '#CCD1D6'}} /></NavLink></li>
                     <li><NavLink to="/rooms"><AppsIcon style={{color: '#CCD1D6'}} /></NavLink></li>
                     <li><NavLink to="/notifications"><NotificationsNoneIcon style={{color: '#CCD1D6'}} /></NavLink></li>

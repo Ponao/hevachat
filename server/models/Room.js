@@ -13,6 +13,7 @@ const RoomSchema = new Schema({
   lang: { type: String },
   title: { type: String },
   ownerId: { type: String },
+  dialog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dialog' },
   createdAt: { type: Date, default: Date.now },
   isPrivate: { type: Boolean, default: false },
   color: { type: String },

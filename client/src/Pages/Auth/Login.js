@@ -12,6 +12,7 @@ import {
 import { connect } from 'react-redux'
 import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
+import SocketController from '../../Controllers/SocketController'
 
 class Login extends React.Component {
     state = {
@@ -48,6 +49,8 @@ class Login extends React.Component {
                     cookies.set('apiToken', data.token, { path: '/' })
 
                     this.props.userActions.loginUser(data.user, data.token)
+
+                    SocketController.init(data.token)
                 }
 
                 this.setState({isFetching: false})
