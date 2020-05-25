@@ -6,7 +6,9 @@ import {CSSTransitionGroup} from 'react-transition-group'
 // Material
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import SendIcon from '@material-ui/icons/Send';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 class InputMessage extends React.Component {
     state = {
@@ -15,7 +17,7 @@ class InputMessage extends React.Component {
 
     render() {
         return (
-            <>
+            <div className="dialog-input">
                 <IconButton component={'label'} className="btn-add-files">
                     <AttachFileIcon style={{transform: 'rotate(45deg)', color: '#008FF7'}} />
 
@@ -31,10 +33,17 @@ class InputMessage extends React.Component {
 
                 <textarea className="col input-message" id="input-message" 
                     onKeyDown={(e) => {
-                        if (e.keyCode == 13 && !e.shiftKey) {
+                        if(e.keyCode === 38 && !this.props.isEdit) {
+                            this.props.setLastEditMessage()
+                        }
+
+                        if (e.keyCode === 13 && !e.shiftKey) {
                             e.preventDefault()
                             if(/\S/.test(this.props.text) || !!this.props.attachedRecentMessages.length) {
-                                this.props.sendMessage()
+                                if(!this.props.isEdit)
+                                    this.props.sendMessage()
+                                else 
+                                    this.props.sendEditMessage()
                                 let inputMessage = document.getElementById('input-message')
                                 inputMessage.style.maxHeight = "60px";
                             }
@@ -59,7 +68,7 @@ class InputMessage extends React.Component {
 
                 {!this.props.text && <div className="placeholder">Write message...</div>}
 
-                <CSSTransitionGroup 
+                {!this.props.isEdit && <CSSTransitionGroup 
                     transitionName="btn-send-message"
                     transitionEnterTimeout={100}
                     transitionLeaveTimeout={100}>
@@ -70,12 +79,57 @@ class InputMessage extends React.Component {
                         }} className="btn-send-message">
                         <SendIcon style={{color: '#008FF7'}} />
                     </IconButton>}
-                </CSSTransitionGroup>
+                </CSSTransitionGroup>}
+
+                {this.props.isEdit && <CSSTransitionGroup 
+                    transitionName="btn-send-message"
+                    transitionEnterTimeout={100}
+                    transitionLeaveTimeout={100}>
+                     {(
+                        JSON.stringify({
+                            text: this.props.editMessage.text,
+                            images: this.props.editMessage.images,
+                            sounds: this.props.editMessage.sounds,
+                            files: this.props.editMessage.files,
+                            attachedRecentMessages: this.props.editMessage.recentMessages,
+                        }) !== 
+                        JSON.stringify({
+                            text: this.props.text,
+                            images: this.props.images,
+                            sounds: this.props.sounds,
+                            files: this.props.files,
+                            attachedRecentMessages: this.props.attachedRecentMessages
+                        })) && <IconButton ref={(node) => {
+                        if (node) {
+                            node.style.setProperty("margin-right", "0", "important");
+                        }
+                        }} 
+                        onClick={() => {
+                            this.props.sendEditMessage()
+                            let inputMessage = document.getElementById('input-message')
+                            inputMessage.style.maxHeight = "60px";
+                        }} className="btn-send-message">
+                        <EditOutlinedIcon style={{color: '#008FF7'}} />
+                    </IconButton>}
+
+                    <IconButton ref={(node) => {
+                        if (node) {
+                            node.style.setProperty("margin-left", "0", "important");
+                        }
+                        }} 
+                        onClick={() => {
+                            this.props.cancelEditMessage()
+                            let inputMessage = document.getElementById('input-message')
+                            inputMessage.style.maxHeight = "60px";
+                        }} className="btn-send-message">
+                        <CloseIcon style={{color: '#008FF7'}} />
+                    </IconButton>
+                </CSSTransitionGroup>}
 
                 <ReactResizeDetector handleHeight onResize={(width, inputMessageHeight) => {
                     this.setState({inputMessageHeight})
                 }} />
-            </>
+            </div>
         )
     }
 }

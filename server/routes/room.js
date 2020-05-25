@@ -16,5 +16,7 @@ router.post('/delete', verifyToken, RoomController.delete);
 router.post('/edit', verifyToken, RoomController.edit);
 router.post('/send-message', verifyToken, RoomController.sendMessage);
 router.post('/delete-message', verifyToken, RoomController.deleteMessage);
+router.post('/read-messages', verifyToken, RoomController.readMessages);
+router.post('/edit-message', verifyToken, RoomController.editMessage);
 
 module.exports = router;

@@ -10,14 +10,24 @@ const User = require('../models/User');
 module.exports = async (req, res, next) => {
     // Check if an `Authorization` header was included
     const header = req.headers.authorization
-    if (!header || !header.startsWith('Bearer')) {
+    const {apiToken} = req.body
+    if ((!header || !header.startsWith('Bearer')) && !apiToken) {
         // Failed: no token provided
         const err = new Error('No `Authorization` header provided.')
         err.authFailed = true
         return next(err)
     }
 
-    const token = header.replace(/^Bearer /, '')
+    let token
+
+    if (header && header.startsWith('Bearer')) {
+        token = header.replace(/^Bearer /, '')
+    }
+    
+    if(apiToken) {
+        token = apiToken
+    }
+    
     let user = null
     try {
         user = jwt.verify(token, process.env.JWT_SECRET)

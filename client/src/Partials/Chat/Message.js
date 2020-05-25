@@ -62,7 +62,10 @@ class Message extends React.Component {
                         this.props.onSelect(this.props.message)
                     }
                 }}
-                style={{background: (this.props.message.isLoading || this.props.message.isError) ? '#fff' : '', cursor: (this.props.message.isLoading || this.props.message.isError) ? 'default' : ''}}
+                style={{
+                    background: (this.props.message.isLoading || this.props.message.isError) ? (this.props.message.user._id !== this.props.user._id && !this.props.message.isRead) ? '#EFF4F8' : '#fff' : '', 
+                    cursor: (this.props.message.isLoading || this.props.message.isError) ? 'default' : ''
+                }}
             >
                 {
                     (isFirst || isHistoryDate) && 
@@ -74,7 +77,7 @@ class Message extends React.Component {
                     <div style={{width: 46}} />
                 }
 
-                {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
+                {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span style={{display: this.props.selected ? "block" : 'none'}} className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
                     {this.props.selected && <CheckIcon style={{
                         color: '#fff', 
                         fontSize: 16,

@@ -25,10 +25,12 @@
     "jwt-decode": "^2.2.0",
     "mongoose": "^5.9.15",
     "morgan": "^1.9.1",
+    "multer": "^1.4.2",
     "nodemailer": "^6.4.6",
     "parse5": "^6.0.0",
     "socket-io": "^1.0.0",
     "socket.io": "^2.3.0",
+    "socket.io-redis": "^5.2.0",
     "stripe": "^8.44.0",
     "webfontloader": "^1.6.28"
   },

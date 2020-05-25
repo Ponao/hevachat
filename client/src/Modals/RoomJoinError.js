@@ -4,8 +4,8 @@ import Modal from 'react-modal';
 
 // Redux
 import { connect } from 'react-redux'
-import * as roomsActions from '../Redux/actions/rooms'
-import { bindActionCreators } from 'redux'
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import { withRouter } from 'react-router-dom';
 
 const customStylesModal = {
     overlay: {
@@ -21,10 +21,12 @@ const customStylesModal = {
         left                  : '50%',
         right                 : 'auto',
         bottom                : 'auto',
+        minWidth              : '300px',
         marginRight           : '-50%',
         transform             : 'translate(-50%, -50%)',
         borderRadius          : '10px',
-        boxShadow             : '0px 5px 30px rgba(0, 0, 0, 0.16)'
+        boxShadow             : '0px 5px 30px rgba(0, 0, 0, 0.16)',
+        textAlign             : 'center'
     }
 };
 
@@ -33,9 +35,14 @@ class RoomJoinError extends React.Component {
         return <Modal
             isOpen={this.props.isOpen}
             style={customStylesModal}
-            contentLabel="Create room"
+            contentLabel="Error join room"
         >
-            <h2 className="modal-title">{this.props.rooms.activeRoom.error.msg}</h2>
+            <ErrorOutlineIcon style={{color: '#FF3333', fontSize: 60}} />
+            <h2 className="modal-title">Error</h2>
+            <p className="modal-text">{this.props.rooms.activeRoom.error.msg}</p>
+            <button className="button-blue" type="submit" style={{width: 'max-content'}} onClick={() => {
+                this.props.history.goBack()
+            }}>Back</button>
         </Modal>
     }
 }
@@ -46,4 +53,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(RoomJoinError)
+export default connect(mapStateToProps)(withRouter(RoomJoinError))

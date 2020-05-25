@@ -8,7 +8,7 @@ const Room = require('../models/Room');
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
 
-const {sendMessageRoom, deleteMessageRoom} = require('./SocketController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom} = require('./SocketController')
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -72,6 +72,8 @@ module.exports = {
                     ]
                 }
             ])
+            .sort({createdAt: 'DESC'})
+            .limit(25)
             
         try {
             return res.json(room);
@@ -149,15 +151,37 @@ module.exports = {
 
     sendMessage: async (req, res, next) => {
         const { user } = res.locals;
-        const { text, dialogId, socketId, roomId, recentMessages } = req.body;        
+        let { text, dialogId, socketId, roomId, recentMessages } = req.body;
+        
+        if(!!recentMessages.length)
+            recentMessages = recentMessages.slice(',')
+        else
+            recentMessages = []
 
         let message = new Message()
-        
-        message.text = text,
-        message.user = user,
-        message.dialogId = dialogId,
-        
 
+        let images = []
+
+        if(req.files)
+            for (let i = 0; i < 10; i++) {
+                let fileName = randomString(24)
+
+                if(!req.files['images'+i])
+                    break
+
+                req.files['images'+i].mv('./uploads/'+fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
+                    if (err)
+                    return res.status(500).send(err);
+                });
+                
+                images.push(process.env.API_URL + '/media/' + fileName + '.' + req.files['images'+i].name.split('.').pop())
+            }
+        
+        message.text = text
+        message.user = user
+        message.dialogId = dialogId
+        message.images = images
+        
         message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
             {
                 path: 'user',
@@ -198,18 +222,77 @@ module.exports = {
     },
 
     editMessage: async (req, res, next) => {
+        const { user } = res.locals;
+        const { _id, text, dialogId, socketId, roomId, recentMessages } = req.body;        
+
+        let message = await Message.findById(_id)
         
+        message.text = text
+        message.user = user
+        message.dialogId = dialogId
+        message.isEdit = true
+
+        message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
+            {
+                path: 'user',
+                select: ['_id', 'email', 'name', 'online', 'color']
+            },
+            {
+                path: 'recentMessages', 
+                populate: [
+                    {
+                        path: 'user',
+                        select: ['_id', 'email', 'name', 'online', 'color']
+                    }, 
+                    {
+                        path: 'recentMessages',
+                        populate: {
+                            path: 'user',
+                            select: ['_id', 'email', 'name', 'online', 'color']
+                        }
+                    }
+                ]
+            }
+        ])
+        
+        await message.save()
+
+        editMessageRoom({roomId, socketId, message})
+
+        try {
+            if (message) {
+                return res.json(message);
+            }
+            const err = new Error(`User ${userId} not found.`);
+            err.notFound = true;
+            return next(err);
+        } catch (e) {
+            return next(new Error(e));
+        }
     },
 
     deleteMessage: async (req, res, next) => {
         const { user } = res.locals;
         const { socketId, roomId, messageIds } = req.body;
 
-        let result = await Message.updateMany({_id: {'$in': messageIds}, user: {_id: user._id}}, {"$set":{"isDelete": true}})
-        
-        if(result.nModified === messageIds.length) {
+        let result = await Message.deleteMany({_id: {'$in': messageIds}, user: {_id: user._id}})
+
+        if(result.deletedCount === messageIds.length) {
             deleteMessageRoom({roomId, socketId, messageIds})
         }
+    },
+
+    readMessages: async (req, res, next) => {
+        const { user } = res.locals;
+        const { socketId, roomId, dialogId } = req.body;
+
+        let result = await Message.updateMany({dialogId, 'user': { "$ne": user._id } }, {"$set":{"isRead": true}})
+        
+        if(result.nModified) {
+            readMessageRoom({roomId, socketId})
+        }
+
+        res.json({dasd: 123})
     },
 }
 
@@ -217,3 +300,13 @@ function randomInteger(min, max) {
     let rand = min + Math.random() * (max + 1 - min);
     return Math.floor(rand);
 }
+
+function randomString(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }

@@ -134,8 +134,18 @@ function deleteMessageRoom({roomId, messageIds, socketId}) {
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('deleteMessageRoom', messageIds)
 }
 
+function readMessageRoom({roomId, socketId}) {
+    io.sockets.connected[socketId].to(`room.${roomId}`).emit('readMessagesRoom', roomId)
+}
+
+function editMessageRoom({roomId, message, socketId}) {
+    io.sockets.connected[socketId].to(`room.${roomId}`).emit('editMessageRoom', message)
+}
+
 module.exports = {
     initSocket, 
     sendMessageRoom, 
-    deleteMessageRoom
+    deleteMessageRoom,
+    readMessageRoom,
+    editMessageRoom
 }

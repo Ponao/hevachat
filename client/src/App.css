@@ -90,6 +90,11 @@
     text-align: center;
 }
 
+.modal-text {
+    color: #667788;
+    font-size: 14;
+}
+
 .dialog-container {
     display: flex;
     width: 100%;
@@ -349,6 +354,7 @@
     display: flex;
     align-items: flex-end;
     position: relative;
+    z-index: 3;
 }
 
 .dialog-input .input-message {
@@ -368,6 +374,19 @@
     color: #008FF7;
     left: 60px;
     pointer-events: none;
+}
+
+.unread-messages-count {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    background-color: #008FF7;
+    top: -5px;
+    right: -5px;
+    line-height: 20px;
+    border-radius: 50px;
+    text-align: center;
 }
 
 .btn-add-files, .btn-send-message, .back-btn {
@@ -404,7 +423,25 @@
     position: absolute;
 }
 
-.btn-send-message-enter svg, .message-status-transition-enter {
+.scroll-to-bottom-enter {
+    transform: translateY(61px)!important;
+}
+
+.scroll-to-bottom-enter.scroll-to-bottom-enter-active {
+    transform: translateY(0)!important;
+    transition: transform 100ms ease-in!important;
+}
+
+.scroll-to-bottom-leave {
+    transform: translateY(0)!important;
+}
+
+.scroll-to-bottom-leave.scroll-to-bottom-leave-active {
+    transform: translateY(61px)!important;
+    transition: transform 100ms ease-in!important;
+}
+
+.btn-send-message-enter svg {
     transform: scale(0);
 }
 

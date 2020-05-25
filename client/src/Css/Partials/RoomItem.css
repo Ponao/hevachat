@@ -1,8 +1,11 @@
 .room-item {
-    padding: 0 20px;
-    display: flex;
-    margin-bottom: 20px;
+    padding: 10px 20px!important;
+    display: flex!important;
     cursor: pointer;
+    width: 100%!important;
+    text-transform: unset!important;
+    justify-content: unset!important;
+    color: #008FF7!important;
 }
 
 .room-item .user-avatar {

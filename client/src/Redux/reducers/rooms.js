@@ -13,7 +13,8 @@ import {
     ROOMS_EDIT_MESSAGE,
     ROOMS_READ_MESSAGE,
     ROOMS_JOIN_ERROR,
-    ROOMS_DELETE_MESSAGE
+    ROOMS_DELETE_MESSAGE,
+    ROOMS_READ_MESSAGES
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -70,7 +71,7 @@ const rooms = (state = INITIAL_STATE, action) => {
         case ROOMS_EDIT_MESSAGE: 
             return { ...state, activeRoom: { ...state.activeRoom, dialog: { ...state.activeRoom.dialog, messages: state.activeRoom.dialog.messages.map(message => 
                 action.payload._id === message._id ? 
-                { ...message, ...action.payload } :
+                { ...message, ...action.payload, isEdit: true } :
                 message
             ) } } }
         case ROOMS_DELETE_MESSAGE:
@@ -80,6 +81,18 @@ const rooms = (state = INITIAL_STATE, action) => {
                 })
             ]
             } } }
+        case ROOMS_READ_MESSAGE:
+            return { ...state, activeRoom: { ...state.activeRoom, dialog: { ...state.activeRoom.dialog, messages: state.activeRoom.dialog.messages.map(message => 
+                !message.isRead && message.user._id === action.payload ? 
+                { ...message, isRead: true } :
+                message
+            ) } } }
+        case ROOMS_READ_MESSAGES:
+            return { ...state, activeRoom: { ...state.activeRoom, dialog: { ...state.activeRoom.dialog, messages: state.activeRoom.dialog.messages.map(message => 
+                !message.isRead && message.user._id !== action.payload ? 
+                { ...message, isRead: true } :
+                message
+            ) } } }
         default: 
             return state
     }

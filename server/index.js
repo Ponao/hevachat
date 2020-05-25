@@ -46,7 +46,7 @@ app
   .use('/api/user', userRoutes)
   .use('/api/room', roomRoutes)
   // Serve static files
-  .use(express.static(path.join(__dirname, '../client')))
+  .use('/media', express.static(path.join(__dirname, './uploads')))
   // Enable history API
   .use(historyApiFallback())
   // Error middleware
@@ -59,6 +59,10 @@ function startServer() {
     const http = require("http").createServer(app)
     
     const io = require('socket.io')(http)
+    const redisAdapter = require('socket.io-redis');
+
+    io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+
     initSocket(io)
 
     http.listen(process.env.PORT, () => {
