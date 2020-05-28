@@ -6,6 +6,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import { getHM } from '../../Controllers/TimeController';
 import Linkify from 'react-linkify';
 import Button from '@material-ui/core/Button';
+import MusicNoteIcon from '@material-ui/icons/MusicNote';
+import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+
+import PerfectScrollbar from 'react-perfect-scrollbar'
 
 const componentDecorator = (href, text, key) => (
     <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
@@ -16,7 +20,10 @@ const componentDecorator = (href, text, key) => (
 class Attachment extends React.Component {
     render() {
         return (
-            <div className="dialog-attachment">
+            <PerfectScrollbar 
+                className="dialog-attachment" 
+            >
+            <div style={{width: '100%', display: 'flex', flexWrap: 'wrap'}}>
                 {!!this.props.recentMessages.length && <div className="message-attachment">
                     <Button className="btn-cancel-select" style={{width: 60}} onClick={() => {this.props.unSelectRecentMessages()}}>
                         <CloseIcon style={{color: '#99AABB'}} />
@@ -52,7 +59,36 @@ class Attachment extends React.Component {
                         </div>
                     })}
                 </div>}
+
+                {!!this.props.sounds.length && <div className="sound-attachment">
+                    {this.props.sounds.map((sound, index, sounds) => {
+                        return <div key={index} className="sound-container">
+                            <Button className="btn-cancel-select" style={{minWidth: 60}} onClick={() => {this.props.removeSound(sound.id)}}>
+                                <CloseIcon style={{color: '#99AABB'}} />
+                            </Button>
+
+                            <MusicNoteIcon style={{color: '#008FF7'}} />
+
+                            <p className="sound-attachment-name">{sound.name}</p>
+                        </div>
+                    })}
+                </div>}
+
+                {!!this.props.files.length && <div className="sound-attachment">
+                    {this.props.files.map((file, index, files) => {
+                        return <div key={index} className="sound-container">
+                            <Button className="btn-cancel-select" style={{minWidth: 60}} onClick={() => {this.props.removeFile(file.id)}}>
+                                <CloseIcon style={{color: '#99AABB'}} />
+                            </Button>
+
+                            <InsertDriveFileOutlinedIcon style={{color: '#008FF7'}} />
+
+                            <p className="sound-attachment-name">{file.name}</p>
+                        </div>
+                    })}
+                </div>}
             </div>
+            </PerfectScrollbar>
         )
     }
 }

@@ -10,11 +10,13 @@ import {
     ROOMS_READ_MESSAGE,
     ROOMS_JOIN_ERROR,
     ROOMS_DELETE_MESSAGE,
-    ROOMS_READ_MESSAGES
+    ROOMS_READ_MESSAGES,
+    ROOMS_LOAD_MESSAGES,
+    ROOMS_SET_LOADING
 } from '../constants'
 import SocketController from '../../Controllers/SocketController';
 import store from '../store';
-import { randomInteger } from '../../Controllers/FunctionsController';
+import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
 
 export const roomsGet = (apiToken, lang) => (dispatch) => {
     fetch(`http://localhost:8000/api/room/get-all`, {
@@ -59,6 +61,8 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
         .then(response => response.json())
         .then(room => {
             if(room.error) {
+                setForceTitle('Error')
+
                 dispatch({
                     type: ROOMS_JOIN_ERROR,
                     payload: room.errors[0]
@@ -68,9 +72,12 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
             }
             SocketController.joinRoom({roomId: room._id, lang: room.lang})
             room.dialog.messages = room.dialog.messages.reverse()
+
+            setForceTitle(room.title)
+
             dispatch({
                 type: ROOMS_JOIN_ROOM,
-                payload: room
+                payload: {room, canLoad: room.dialog.messages.length === 50}
             })
         })
         .catch((err) => {
@@ -92,11 +99,25 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
     let formData = new FormData()
     let _id = randomInteger(0, 1000000)
     let images = []
+    let files = []
+    let sounds = []
 
     for (let i = 0; i < message.images.length; i++) {
         formData.append('images'+i, message.images[i].file)
+        message.images[i].file = false
+        images.push(message.images[i])
+    }
 
-        images.push(message.images[i].path)
+    for (let i = 0; i < message.files.length; i++) {
+        formData.append('files'+i, message.files[i].file)
+        message.files[i].file = false
+        files.push(message.files[i])
+    }
+
+    for (let i = 0; i < message.sounds.length; i++) {
+        formData.append('sounds'+i, message.sounds[i].file)
+        message.sounds[i].file = false
+        sounds.push(message.sounds[i])
     }
 
     let localMessage = {
@@ -104,8 +125,8 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
         user: store.getState().user,
         text: message.text,
         images,
-        sounds: [],
-        files: [],
+        sounds,
+        files,
         isLoading: true,
         isError: false,
         isRead: false,
@@ -159,13 +180,53 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
 }
 
 export const editMessage = (message, apiToken) => (dispatch) => {
+    let formData = new FormData()
+
+    let images = []
+    let files = []
+    let sounds = []
+
+    let oldImages = []
+    let oldFiles = []
+    let oldSounds = []
+
+    for (let i = 0; i < message.images.length; i++) {
+        if(message.images[i].file) {
+            formData.append('images'+i, message.images[i].file)
+
+            images.push(message.images[i])
+        } else {
+            oldImages.push(message.images[i].id)
+        }
+    }
+
+    for (let i = 0; i < message.files.length; i++) {
+        if(message.files[i].file) {
+            formData.append('files'+i, message.files[i].file)
+
+            files.push(message.files[i])
+        } else {
+            oldFiles.push(message.files[i].id)
+        }
+    }
+
+    for (let i = 0; i < message.sounds.length; i++) {
+        if(message.sounds[i].file) {
+            formData.append('sounds'+i, message.sounds[i].file)
+
+            sounds.push(message.sounds[i])
+        } else {
+            oldSounds.push(message.sounds[i].id)
+        }        
+    }
+
     let localMessage = {
         _id: message._id,
         user: store.getState().user,
         text: message.text,
-        images: [],
-        sounds: [],
-        files: [],
+        images: message.images,
+        sounds: message.sounds,
+        files: message.files,
         isLoading: true,
         isError: false,
         recentMessages: message.recentMessages,
@@ -185,15 +246,23 @@ export const editMessage = (message, apiToken) => (dispatch) => {
     message.recentMessages = recentMessages
     message.socketId = SocketController.getSocketId()
     message.roomId = store.getState().rooms.activeRoom._id
+    
+    formData.append('_id', message._id)
+    formData.append('text', message.text)
+    formData.append('recentMessages', message.recentMessages)
+    formData.append('roomId', message.roomId)
+    formData.append('dialogId', message.dialogId)
+    formData.append('socketId', SocketController.getSocketId())
+    formData.append('oldImages', oldImages)
+    formData.append('oldSounds', oldSounds)
+    formData.append('oldFiles', oldFiles)
 
     fetch(`http://localhost:8000/api/room/edit-message`, {
             method: "post",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${apiToken}`,
             },
-            body: JSON.stringify(message)
+            body: formData
         })
         .then(response => response.json())
         .then(messageRes => {
@@ -240,6 +309,85 @@ export const deleteMessage = ({roomId, deleteMessages}, apiToken) => (dispatch) 
         })
 }
 
+export const deleteLocalMessage = (_id) => (dispatch) => {
+    dispatch({
+        type: ROOMS_DELETE_MESSAGE,
+        payload: [_id]
+    })
+}
+
+export const retrySendMessage = (message, apiToken) => (dispatch) => {
+    let formData = new FormData()
+    let images = []
+
+    let localMessage = {
+        _id: message._id,
+        user: store.getState().user,
+        text: message.text,
+        images: message.images,
+        sounds: [],
+        files: [],
+        isLoading: true,
+        isError: false,
+        recentMessages: message.recentMessages,
+        createdAt: Date.now(),
+    }
+
+    dispatch({
+        type: ROOMS_DELETE_MESSAGE,
+        payload: [message._id]
+    })
+
+    dispatch({
+        type: ROOMS_ADD_MESSAGE,
+        payload: localMessage
+    })
+
+    for (let i = 0; i < message.images.length; i++) {
+        formData.append('images'+i, message.images[i].file)
+
+        images.push(message.images[i].path)
+    }
+
+    let recentMessages = []
+
+    message.recentMessages.map(m => {
+        recentMessages.push(m._id)
+    })
+
+    message.recentMessages = recentMessages
+    message.socketId = SocketController.getSocketId()
+
+    formData.append('text', message.text)
+    formData.append('recentMessages', message.recentMessages)
+    formData.append('roomId', message.roomId)
+    formData.append('dialogId', message.dialogId)
+    formData.append('socketId', SocketController.getSocketId())
+
+    fetch(`http://localhost:8000/api/room/send-message`, {
+            method: "post",
+            headers: {
+                // 'Accept': 'application/json',
+                // 'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiToken}`,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(messageRes => {
+            dispatch({
+                type: ROOMS_SUCCESS_MESSAGE,
+                payload: {_id: message._id, _newId: messageRes._id}
+            })
+        })
+        .catch(() => {
+            dispatch({
+                type: ROOMS_ERROR_MESSAGE,
+                payload: message._id
+            })
+        })
+}
+
 export const readMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch) => {
     let readMessages = store.getState().rooms.activeRoom.dialog.messages.filter(x => !x.isRead && x.user._id !== userId)
 
@@ -262,8 +410,7 @@ export const readMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch)
                 },
                 body: JSON.stringify({
                     dialogId,
-                    roomId,
-                    socketId: SocketController.getSocketId()
+                    roomId
                 })
             })
             .then()
@@ -271,4 +418,35 @@ export const readMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch)
                 
             })
     }
+}
+
+export const loadMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch) => {
+    let lastMessage = store.getState().rooms.activeRoom.dialog.messages[0]
+
+    dispatch({
+        type: ROOMS_SET_LOADING
+    })
+
+    fetch(`http://localhost:8000/api/room/load-messages`, {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiToken}`,
+            },
+            body: JSON.stringify({
+                dialogId,
+                lastMessageId: lastMessage._id
+            })
+        })
+        .then(response => response.json())
+        .then(messages => {
+            dispatch({
+                type: ROOMS_LOAD_MESSAGES,
+                payload: {messages: messages.reverse(), canLoad: messages.length  === 50}
+            })
+        })
+        .catch(() => {
+            
+        })
 }

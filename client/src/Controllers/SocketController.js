@@ -8,7 +8,9 @@ import {
     ROOMS_ADD_MESSAGE,
     ROOMS_DELETE_MESSAGE,
     ROOMS_READ_MESSAGE,
-    ROOMS_EDIT_MESSAGE
+    ROOMS_EDIT_MESSAGE,
+    ROOMS_ADD_TYPER,
+    ROOMS_REMOVE_TYPER
 } from '../Redux/constants'
 
 let socket = null
@@ -70,6 +72,22 @@ export default {
                 payload: message
             })
         })
+
+        socket.on('typingRoom', user => {
+            if(!store.getState().rooms.activeRoom.typers.find(x => x._id === user._id)) {
+                store.dispatch({
+                    type: ROOMS_ADD_TYPER,
+                    payload: user
+                })
+    
+                setTimeout(() => {
+                    store.dispatch({
+                        type: ROOMS_REMOVE_TYPER,
+                        payload: user._id
+                    })
+                }, 2500)
+            }
+        })
     },
     getSocketId: () => {
         return socket.id
@@ -92,6 +110,9 @@ export default {
     },
     sendMessageRoom: ({roomId, message}) => {
         socket.emit('sendMessageRoom', {roomId, message})
+    },
+    typingRoom: (roomId) => {
+        socket.emit('typingRoom', roomId)
     }
 }
 

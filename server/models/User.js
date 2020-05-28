@@ -15,12 +15,12 @@ const UserSchema = new Schema({
     first: String,
     last: String
   },
-  email: { type: String },
+  email: { type: String, select: false },
   password: { type: String, select: false },
-  roomLang: { type: String, default: 'eng' },
+  roomLang: { type: String, default: 'eng', select: false },
   online: { type: Boolean, default: true },
   onlineAt: { type: Date, default: Date.now },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, select: false },
   dialogs: [
     { type: mongoose.Schema.Types.ObjectId, ref: 'Dialog' }
   ],

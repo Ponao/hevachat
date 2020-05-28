@@ -65,7 +65,7 @@ module.exports = {
 
     try {
       // Get the user for this email address
-      const user = await User.findOne({email}).select('+password');
+      const user = await User.findOne({email}).select('+password').select('+email').select('+roomLang');
       if (user) {
         const verifiedPassword = await bcrypt.compare(password, user.password);
 

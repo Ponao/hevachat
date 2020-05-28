@@ -17,7 +17,7 @@ const RoomSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   isPrivate: { type: Boolean, default: false },
   color: { type: String },
-  users: { type: Array },
+  users: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User' } ],
   buff: Buffer
 });
 

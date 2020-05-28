@@ -12,9 +12,15 @@ const Schema = mongoose.Schema;
 const MessageSchema = new Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     text: { type: String, default: '' },
-    images: { type: Array, default: [] },
-    sounds: { type: Array, default: [] },
-    files: { type: Array, default: [] },
+    images: [
+        { type: Object }
+    ],
+    sounds: [
+        { type: Object }
+    ],
+    files: [
+        { type: Object }
+    ],
     recentMessages: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
     ],

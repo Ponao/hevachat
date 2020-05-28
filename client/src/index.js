@@ -13,6 +13,7 @@ import {
     BrowserRouter as Router,
 } from "react-router-dom"
 import Modal from "react-modal";
+import { ToastContainer } from 'react-toastify';
 
 
 // Redux
@@ -26,6 +27,7 @@ ReactDOM.render(
         <Provider store={store}>
             <Router>
                 <App />
+                <ToastContainer />
             </Router>
         </Provider>
     </CookiesProvider>,

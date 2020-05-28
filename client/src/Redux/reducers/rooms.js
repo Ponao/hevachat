@@ -14,7 +14,11 @@ import {
     ROOMS_READ_MESSAGE,
     ROOMS_JOIN_ERROR,
     ROOMS_DELETE_MESSAGE,
-    ROOMS_READ_MESSAGES
+    ROOMS_READ_MESSAGES,
+    ROOMS_ADD_TYPER,
+    ROOMS_REMOVE_TYPER,
+    ROOMS_LOAD_MESSAGES,
+    ROOMS_SET_LOADING
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -32,7 +36,7 @@ const rooms = (state = INITIAL_STATE, action) => {
         case ROOMS_ADD:
             return { ...state, rooms: [ action.payload, ...state.rooms ]  }
         case ROOMS_JOIN_ROOM:
-            return { ...state, activeRoom: action.payload }
+            return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false} }
         case ROOMS_JOIN_ERROR:
             return { ...state, activeRoom: { error: action.payload } }
         case ROOMS_LEAVE_ROOM:
@@ -93,6 +97,16 @@ const rooms = (state = INITIAL_STATE, action) => {
                 { ...message, isRead: true } :
                 message
             ) } } }
+        case ROOMS_SET_LOADING:
+            return { ...state, activeRoom: { ...state.activeRoom, canLoad: false, isLoading: true } }
+        case ROOMS_LOAD_MESSAGES:
+            return { ...state, activeRoom: { ...state.activeRoom, isLoading: false, canLoad: action.payload.canLoad, dialog: { ...state.activeRoom.dialog, messages: [...action.payload.messages, ...state.activeRoom.dialog.messages] } } }
+        case ROOMS_ADD_TYPER: 
+            return { ...state, activeRoom: { ...state.activeRoom, typers: [ action.payload, ...state.activeRoom.typers ] } }
+        case ROOMS_REMOVE_TYPER: 
+            return { ...state, activeRoom: { ...state.activeRoom, typers: [ ...state.activeRoom.typers.filter(user => {        
+                return user._id !== action.payload
+            }) ] } }
         default: 
             return state
     }

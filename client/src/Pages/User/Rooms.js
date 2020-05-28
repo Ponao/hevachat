@@ -14,8 +14,12 @@ import { bindActionCreators } from 'redux'
 
 // Material
 import Fab from '@material-ui/core/Fab';
+import Skeleton from '@material-ui/lab/Skeleton';
 import AddIcon from '@material-ui/icons/Add';
-import { withStyles } from '@material-ui/core'
+import { withStyles, Tooltip } from '@material-ui/core'
+import showLoading from '../../Partials/Loading'
+
+const skeletonCount = 20
 
 const fabStyles = theme => ({
     root: {
@@ -60,16 +64,22 @@ class Rooms extends React.Component {
                 <div className="col-md-3 sidebar">
                     <h2 className="sidebar-title">Rooms</h2>
 
-                    {this.props.rooms.isFetching && <>LOADING</>}
-                    {this.props.rooms.rooms.map(room => {
+                    {this.props.rooms.isFetching && showLoading(<div className="room-item">
+                        <Skeleton variant="circle" width={40} height={40} />
+                        <Skeleton variant="text" style={{marginLeft: 12, flex: '1 1'}} />
+                    </div>)}
+
+                    {this.props.rooms.rooms.map((room, index) => {
                         return (
-                            <RoomItem key={room._id} room={room} />
+                            <RoomItem key={index} room={room} />
                         )
                     })}
 
-                    <CustomFab color="primary" size="small" aria-label="add" onClick={() => {this.setState({isOpenCreateRoom: true})}}>
-                        <AddIcon />
-                    </CustomFab>
+                    <Tooltip title="Create room" placement="top">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {this.setState({isOpenCreateRoom: true})}}>
+                            <AddIcon />
+                        </CustomFab>
+                    </Tooltip>
                 </div>
                 <div className="col-md-9">
                     CONTENT

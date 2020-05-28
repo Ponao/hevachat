@@ -12,11 +12,17 @@ import DoneIcon from '@material-ui/icons/Done';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
+import GetAppIcon from '@material-ui/icons/GetApp';
+
+import Audio from './Audio';
 
 import Linkify from 'react-linkify'
 
 // Redux
 import { connect } from 'react-redux'
+import ActionMenu from '../ActionMenu'
+import { randomInteger } from '../../Controllers/FunctionsController'
 
 const componentDecorator = (href, text, key) => (
     <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
@@ -25,8 +31,14 @@ const componentDecorator = (href, text, key) => (
 );
 
 class Message extends React.Component {
+    state = {
+        randomId: randomInteger(0, 100000)
+    }
+
     render() {
         let isHistoryDate = true
+        let moreHour = false
+
         if(this.props.messages[this.props.index-1]) {
             let date1 = new Date(this.props.message.createdAt);
             let date2 = new Date(this.props.messages[this.props.index-1].createdAt);
@@ -38,19 +50,24 @@ class Message extends React.Component {
             ) {
                 isHistoryDate = false
             }
+
+            let diffHours = Math.abs(date1 - date2) / 36e5;
+            
+            if(diffHours > 1) {
+                moreHour = true
+            }
         }
-        
 
         let isFirst = (
-            (this.props.messages[this.props.index-1] && 
+            ((this.props.messages[this.props.index-1] && 
             this.props.messages[this.props.index-1].user._id !== this.props.message.user._id) || 
-            !this.props.messages[this.props.index-1]
+            !this.props.messages[this.props.index-1]) || moreHour
         )
 
         return (<>
             {isHistoryDate && <div className="history-date">{timeAt(new Date(this.props.message.createdAt))}</div>}
 
-            <div 
+            <div
                 className={`message ${this.props.selected ? 'selected' : ''}`} 
                 onClick={(e) => {
                     if(this.props.message.isLoading || this.props.message.isError)
@@ -63,21 +80,25 @@ class Message extends React.Component {
                     }
                 }}
                 style={{
-                    background: (this.props.message.isLoading || this.props.message.isError) ? (this.props.message.user._id !== this.props.user._id && !this.props.message.isRead) ? '#EFF4F8' : '#fff' : '', 
-                    cursor: (this.props.message.isLoading || this.props.message.isError) ? 'default' : ''
+                    background: (this.props.message.isLoading || this.props.message.isError) ? '#fff' : (this.props.message.user._id !== this.props.user._id && !this.props.message.isRead) ? '#EFF4F8' : '', 
+                    cursor: (this.props.message.isLoading || this.props.message.isError) ? 'default' : '',
+                    padding: this.props.isRecent ? '8px 14px 8px 6px' : ''
                 }}
             >
                 {
-                    (isFirst || isHistoryDate) && 
-                    <Avatar style={{width: 32, height: 32}} name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
+                    (isFirst || isHistoryDate) && !this.props.isRecent && 
+                    <Avatar style={{
+                        width: 32, 
+                        height: 32,
+                    }} name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
                 }
 
                 {
-                    (!isFirst && !isHistoryDate) &&
+                    (!isFirst && !isHistoryDate && !this.props.isRecent) &&
                     <div style={{width: 46}} />
                 }
 
-                {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span style={{display: this.props.selected ? "block" : 'none'}} className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
+                {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
                     {this.props.selected && <CheckIcon style={{
                         color: '#fff', 
                         fontSize: 16,
@@ -99,9 +120,13 @@ class Message extends React.Component {
                     {this.props.message.text && <p className="message-text">
                         <Linkify componentDecorator={componentDecorator}>
                             {this.props.message.text.replace(/&nbsp;/g, '')
-                            .replace(/&amp;/g, '&')
-                            .replace(/&gt;/g, '>')
-                            .replace(/&lt;/g, '<')}
+                                .replace(/&amp;/g, '&')
+                                .replace(/&gt;/g, '>')
+                                .replace(/&lt;/g, '<')
+                                // .replace(/(\r\n|\n|\r)/gm, "")
+                                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
+                                .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
+                            }
                         </Linkify>
                     </p>}
 
@@ -127,21 +152,52 @@ class Message extends React.Component {
                                 return null
 
                             if(isBlur)
-                                return <div key={index} className="image" style={{width}} onClick={(e) => {
-                                    e.stopPropagation()
-                                    this.props.openSlider(images)
-                                }}>
-                                    <div className="image-blur">
+                                return <div key={index} className="image" style={{width}}>
+                                    <div className="image-blur" onClick={(e) => {
+                                        e.stopPropagation()
+                                        this.props.openSlider(images)
+                                    }}>
                                         <span>{`+${images.length-3}`}</span>
-                                        <img key={index} src={image} alt={`From user`} />
+                                        <img key={index} src={image.path} alt={image.name} />
                                     </div>
                                 </div>
 
                             return  <div key={index} className="image" style={{width}}>
-                                <img src={image} alt={`From user`} />
+                                <img onClick={(e) => {
+                                    e.stopPropagation()
+                                    this.props.openSlider(images)
+                                }} src={image.path} alt={image.name} />
                             </div>
                         })}
                     </div>}
+
+                    {!!this.props.message.sounds.length && <div className="message-sounds">
+                        {this.props.message.sounds.map((sound, index, images) => {
+                            return <Audio
+                                key={index}
+                                fileName={sound.name}
+                                src={sound.path}
+                            />
+                        })}
+                    </div>}
+                    
+                    
+                    {!!this.props.message.files.length && <div className="message-files">
+                        {this.props.message.files.map((file, index, images) => {
+                            return <div className="message-file" key={index} onClick={(e) => {
+                                e.stopPropagation()
+                                window.open(file.path, '_self');
+                            }}>
+                                <InsertDriveFileOutlinedIcon className="file-icon" style={{color: '#008FF7'}} />
+                                <div className="message-file-info">
+                                    <p className="message-file-name">{file.name}</p>
+                                    <p className="message-file-size">{file.size > 999 ? (file.size / 1000).toFixed(1) + ' mb' : Math.ceil(file.size) + ' kb'}</p>
+                                </div>
+                                <GetAppIcon className="download-icon" style={{color: '#008FF7'}} />
+                            </div>
+                        })}
+                    </div>}
+                    
 
                     {!!this.props.message.recentMessages.length && this.props.countRecent < 2 && <div className="message-recent">
                         {this.props.message.recentMessages.map((message, index, messages) => {
@@ -154,12 +210,22 @@ class Message extends React.Component {
                     <CSSTransitionGroup 
                         transitionName="message-status-transition"
                         transitionEnterTimeout={100}
-                        transitionLeaveTimeout={1}>
+                        transitionLeaveTimeout={0}>
                         {this.props.message.user._id === this.props.user._id && this.props.message.isLoading && <QueryBuilderIcon style={{color: '#B8C3CF'}} />}
                         {!this.props.message.isLoading && !this.props.message.isError && this.props.message.isEdit && <EditOutlinedIcon style={{color: '#B8C3CF'}} />}
                         {this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
                         {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
-                        {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError && <ErrorOutlineIcon style={{color: '#FF3333'}} />}
+                        {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError && <>
+                            <ActionMenu actions={[
+                                {text: 'Retry', action: () => {
+                                    this.props.retrySendMessage(this.props.message)
+                                }},
+                                {text: 'Delete', action: () => {
+                                    this.props.deleteLocalMessage(this.props.message._id)
+                                }},
+                            ]} from={'message-error-actions-'+this.state.randomId} />
+                            <ErrorOutlineIcon className='error' id={'message-error-actions-'+this.state.randomId} style={{color: '#FF3333'}} />
+                        </>}
                     </CSSTransitionGroup>
                 </div>}
             </div>

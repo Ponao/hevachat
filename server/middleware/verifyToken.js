@@ -46,6 +46,6 @@ module.exports = async (req, res, next) => {
     }
 
     // Success: include decoded data in the request
-    res.locals.user = await User.findById(user.data.userId)
+    res.locals.user = await User.findById(user.data.userId).select('+email').select('+roomLang')
     return next()
 }

@@ -13,16 +13,7 @@ import * as userActions from "../Redux/actions/user";
 import { bindActionCreators } from "redux";
 
 import NoMatch from '../Pages/NoMatch'
-
-function setTitle(path, routeArray) {
-	var pageTitle;
-	for (var i=0; i < routeArray.length; i++) {
-		if (routeArray[i].path === path) {
-			pageTitle = 'Hevachat | ' + routeArray[i].title;
-		}
-	}
-	document.title = (pageTitle) ? pageTitle : 'Hevachat';
-}
+import { setTitle } from "../Controllers/FunctionsController";
 
 class AppRouter extends React.Component {
   state = {
@@ -53,7 +44,10 @@ class AppRouter extends React.Component {
           SocketController.init(apiToken)
           this.props.userActions.loginUser(user, apiToken);
           this.setState({isRender: true})
-        });
+        })
+        .catch(() => {
+          this.setState({isRender: true})
+        })
     } else {
       this.setState({isRender: true})
     }

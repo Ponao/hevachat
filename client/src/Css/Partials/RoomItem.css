@@ -6,6 +6,7 @@
     text-transform: unset!important;
     justify-content: unset!important;
     color: #008FF7!important;
+    border-radius: 0!important;
 }
 
 .room-item .user-avatar {

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
 let idCounter = 0;
@@ -56,10 +57,15 @@ function initSocket(initIo) {
 
                 if(activeLang && activeRoomId) {
                     socket.to(`language.${activeLang}`).emit('leaveRoom', {userId: user._id, roomId: activeRoomId})
+
+                    let room = await Room.findById(activeRoomId).populate('users')
+
+                    room.users = room.users.filter(x => x._id === user._id)
+
+                    await room.save()
                 }
             }
         })
-        
 
         // Join and leave from Room and Language
         socket.on('joinLang', lang => {
@@ -67,9 +73,16 @@ function initSocket(initIo) {
             activeLang = lang
         })
 
-        socket.on('joinRoom', ({roomId, lang}) => {
+        socket.on('joinRoom', async ({roomId, lang}) => {
             socket.to(`language.${lang}`).emit('joinRoom', {roomId, user})
             socket.join(`room.${roomId}`)
+
+            let room = await Room.findById(roomId).populate('users')
+
+            room.users.push(user)
+
+            await room.save()
+
             activeRoomId = roomId
             activeLang = lang
         })
@@ -79,9 +92,16 @@ function initSocket(initIo) {
             activeLang = false
         })
 
-        socket.on('leaveRoom', ({roomId, lang}) => {
+        socket.on('leaveRoom', async ({roomId, lang}) => {
             socket.to(`language.${lang}`).emit('leaveRoom', {userId: user._id, roomId})
             socket.leave(`room.${roomId}`)
+
+            let room = await Room.findById(roomId).populate('users')
+
+            room.users = room.users.filter(x => x._id === user._id)
+
+            await room.save()
+
             activeRoomId = 0
         })
 
@@ -111,6 +131,10 @@ function initSocket(initIo) {
             socket.to(`room.${roomId}`).emit('deleteMessageRoom', messageId)
         })
 
+        socket.on('typingRoom', roomId => {
+            socket.to(`room.${roomId}`).emit('typingRoom', user)
+        })
+
         // Messages in users
         socket.on('sendMessageUser', ({userId, message}) => {
             socket.to(`${userId}`).emit('sendMessageUser', message)
@@ -134,8 +158,8 @@ function deleteMessageRoom({roomId, messageIds, socketId}) {
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('deleteMessageRoom', messageIds)
 }
 
-function readMessageRoom({roomId, socketId}) {
-    io.sockets.connected[socketId].to(`room.${roomId}`).emit('readMessagesRoom', roomId)
+function readMessageRoom({roomId}) {
+    io.to(`room.${roomId}`).emit('readMessagesRoom', roomId)
 }
 
 function editMessageRoom({roomId, message, socketId}) {

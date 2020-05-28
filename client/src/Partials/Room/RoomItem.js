@@ -19,8 +19,8 @@ class RoomItem extends React.Component {
                     <div>
                         <p>{this.props.room.isPrivate && <LockOutlinedIcon />}{this.props.room.title}</p>
                         <div className="users">
-                            {this.props.room.users.map(user => {
-                                return <Avatar style={{width: 16, height: 16, fontSize: 8,backgroundColor: `rgb(${user.color})`}} name={user.name.first.charAt(0)+user.name.last.charAt(0)} />
+                            {this.props.room.users.map((user, index) => {
+                                return <Avatar key={index} style={{width: 16, height: 16, fontSize: 8,backgroundColor: `rgb(${user.color})`}} name={user.name.first.charAt(0)+user.name.last.charAt(0)} />
                             })}
                         </div>
                     </div>

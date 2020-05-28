@@ -12,12 +12,25 @@ import CloseIcon from '@material-ui/icons/Close';
 
 class InputMessage extends React.Component {
     state = {
-        inputMessageHeight: 0
+        inputMessageHeight: 0,
+        text: ''
+    }
+
+    setText(text) {
+        this.setState({text})
+    }
+
+    componentDidUpdate() {
+        if(this.props.isEdit) {
+            if(!/\S/.test(this.state.text) && !this.props.attachedRecentMessages.length && !this.props.images.length && !this.props.files.length && !this.props.sounds.length) {
+                this.props.cancelEditMessage()
+            }
+        }
     }
 
     render() {
         return (
-            <div className="dialog-input">
+            <div className={`dialog-input ${this.props.isShow ? '': 'd-none'}`}>
                 <IconButton component={'label'} className="btn-add-files">
                     <AttachFileIcon style={{transform: 'rotate(45deg)', color: '#008FF7'}} />
 
@@ -33,17 +46,21 @@ class InputMessage extends React.Component {
 
                 <textarea className="col input-message" id="input-message" 
                     onKeyDown={(e) => {
-                        if(e.keyCode === 38 && !this.props.isEdit) {
+                        if(e.keyCode === 38 && !this.props.isEdit && !this.state.text.length) {
                             this.props.setLastEditMessage()
                         }
 
                         if (e.keyCode === 13 && !e.shiftKey) {
                             e.preventDefault()
-                            if(/\S/.test(this.props.text) || !!this.props.attachedRecentMessages.length) {
-                                if(!this.props.isEdit)
-                                    this.props.sendMessage()
-                                else 
-                                    this.props.sendEditMessage()
+                            if(/\S/.test(this.state.text) || !!this.props.attachedRecentMessages.length) {
+                                if(!this.props.isEdit) {
+                                    this.props.sendMessage(this.state.text)
+                                    this.setState({text: ''})
+                                }
+                                else {
+                                    this.props.sendEditMessage(this.state.text)
+                                    this.setState({text: ''})
+                                }
                                 let inputMessage = document.getElementById('input-message')
                                 inputMessage.style.maxHeight = "60px";
                             }
@@ -61,19 +78,21 @@ class InputMessage extends React.Component {
                         }
                     }}
                     onChange={(e) => {
-                        this.props.setText(e.target.value)
+                        this.props.typing(e.target.value, this.state.text)
+                        this.setState({text: e.target.value})
                     }}
-                    value={this.props.text}
+                    value={this.state.text}
                 ></textarea>
 
-                {!this.props.text && <div className="placeholder">Write message...</div>}
+                {!this.state.text && <div className="placeholder">Write message...</div>}
 
                 {!this.props.isEdit && <CSSTransitionGroup 
                     transitionName="btn-send-message"
                     transitionEnterTimeout={100}
                     transitionLeaveTimeout={100}>
-                     {(/\S/.test(this.props.text) || !!this.props.files.length || !!this.props.images.length|| !!this.props.sounds.length || !!this.props.attachedRecentMessages.length) && <IconButton onClick={() => {
-                            this.props.sendMessage()
+                     {(/\S/.test(this.state.text) || !!this.props.files.length || !!this.props.images.length|| !!this.props.sounds.length || !!this.props.attachedRecentMessages.length) && <IconButton onClick={() => {
+                            this.props.sendMessage(this.state.text)
+                            this.setState({text: ''})
                             let inputMessage = document.getElementById('input-message')
                             inputMessage.style.maxHeight = "60px";
                         }} className="btn-send-message">
@@ -94,7 +113,7 @@ class InputMessage extends React.Component {
                             attachedRecentMessages: this.props.editMessage.recentMessages,
                         }) !== 
                         JSON.stringify({
-                            text: this.props.text,
+                            text: this.state.text,
                             images: this.props.images,
                             sounds: this.props.sounds,
                             files: this.props.files,
@@ -105,7 +124,8 @@ class InputMessage extends React.Component {
                         }
                         }} 
                         onClick={() => {
-                            this.props.sendEditMessage()
+                            this.props.sendEditMessage(this.state.text)
+                            this.setState({text: ''})
                             let inputMessage = document.getElementById('input-message')
                             inputMessage.style.maxHeight = "60px";
                         }} className="btn-send-message">
