@@ -16,6 +16,7 @@ import {
 } from '../constants'
 import SocketController from '../../Controllers/SocketController';
 import store from '../store';
+import WebRtcController from '../../Controllers/WebRtcController'
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
 
 export const roomsGet = (apiToken, lang) => (dispatch) => {
@@ -36,6 +37,8 @@ export const roomsGet = (apiToken, lang) => (dispatch) => {
             type: ROOMS_GET,
             payload: rooms
         })
+
+        SocketController.joinLang(lang)
     });
 }
 
@@ -70,8 +73,12 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
                 
                 return
             }
-            SocketController.joinRoom({roomId: room._id, lang: room.lang})
+
             room.dialog.messages = room.dialog.messages.reverse()
+
+            room.users.map(x => {
+                x.speaking = false
+            })
 
             setForceTitle(room.title)
 
@@ -79,6 +86,9 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
                 type: ROOMS_JOIN_ROOM,
                 payload: {room, canLoad: room.dialog.messages.length === 50}
             })
+            
+            SocketController.joinRoom({roomId: room._id, lang: room.lang})
+            WebRtcController.connectRoom(room._id)
         })
         .catch((err) => {
             dispatch({
@@ -90,6 +100,7 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
 
 export const leaveRoom = (roomId, lang) => (dispatch) => {
     SocketController.leaveRoom({roomId, lang})
+    WebRtcController.leaveRoom()
     dispatch({
         type: ROOMS_LEAVE_ROOM
     })

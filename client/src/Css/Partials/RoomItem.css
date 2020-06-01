@@ -48,6 +48,12 @@
     background-color: #556677;
 }
 
+.theme-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
 .theme-title {
     display: flex;
     font-size: 16px;
@@ -56,4 +62,13 @@
     align-items: center;
     cursor: pointer;
     font-weight: 600;
+    width: 100%;
+}
+
+.theme-online-counter {
+    width: 100%;
+    color: #99AABB;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
 }

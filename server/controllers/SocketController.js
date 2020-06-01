@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
+const {roomOnIceCandidate, roomOfferSdp, stop} = require('./WebRtcController')
+
 let idCounter = 0;
 let io = false
 
@@ -21,7 +23,7 @@ function initSocket(initIo) {
         // Check user token
         let disconnectTimer = setTimeout(() => {
             socket.disconnect('Unauthorized');
-        }, 1000)
+        }, 10000)
     
         socket.on('auth', async apiToken => {
             clearTimeout(disconnectTimer)
@@ -38,7 +40,7 @@ function initSocket(initIo) {
                 return;
             }
 
-            socket.join(`${userVerify.data.userId}`)
+            socket.join(`${String(user._id)}`)
 
             // Set online status for user
             user = await User.findById(userVerify.data.userId)
@@ -57,12 +59,15 @@ function initSocket(initIo) {
 
                 if(activeLang && activeRoomId) {
                     socket.to(`language.${activeLang}`).emit('leaveRoom', {userId: user._id, roomId: activeRoomId})
+                    socket.to(`room.${activeRoomId}`).emit('leaveInRoom', user._id)
 
                     let room = await Room.findById(activeRoomId).populate('users')
-
-                    room.users = room.users.filter(x => x._id === user._id)
+                    
+                    room.users = room.users.filter(x => String(x._id) != String(user._id))
 
                     await room.save()
+
+                    stop(activeRoomId, user._id)
                 }
             }
         })
@@ -73,13 +78,19 @@ function initSocket(initIo) {
             activeLang = lang
         })
 
-        socket.on('joinRoom', async ({roomId, lang}) => {
+        socket.on('joinRoom', async ({roomId, lang, userId}) => {
             socket.to(`language.${lang}`).emit('joinRoom', {roomId, user})
             socket.join(`room.${roomId}`)
+            socket.to(`room.${roomId}`).emit('joinInRoom', user)
 
             let room = await Room.findById(roomId).populate('users')
 
-            room.users.push(user)
+            if(user)
+                room.users.push(user)
+            else {
+                let userS = await User.findById(userId)
+                room.users.push(userS)
+            }
 
             await room.save()
 
@@ -95,10 +106,13 @@ function initSocket(initIo) {
         socket.on('leaveRoom', async ({roomId, lang}) => {
             socket.to(`language.${lang}`).emit('leaveRoom', {userId: user._id, roomId})
             socket.leave(`room.${roomId}`)
+            socket.to(`room.${roomId}`).emit('leaveInRoom', user._id)
+
+            stop(roomId, user._id)
 
             let room = await Room.findById(roomId).populate('users')
 
-            room.users = room.users.filter(x => x._id === user._id)
+            room.users = room.users.filter(x => String(x._id) != String(user._id))
 
             await room.save()
 
@@ -147,6 +161,26 @@ function initSocket(initIo) {
         socket.on('deleteMessageUser', ({userId, messageId}) => {
             socket.to(`${userId}`).emit('deleteMessageRoom', messageId)
         })
+
+        // Room conference
+        socket.on('roomIceCandidate', ({roomId, candidate}) => {
+            roomOnIceCandidate(roomId, user._id, candidate)
+        })
+
+        socket.on('roomOfferSdp', ({roomId, offerSdp}) => {
+            roomOfferSdp(roomId, user._id, offerSdp, socket, (error, answerSdp) => {
+                if(error) return console.log(error)
+                socket.emit('roomAnswerSdp', answerSdp)
+            })
+        })
+
+        socket.on('roomSpeaking', (roomId) => {
+            socket.to(`room.${roomId}`).emit('roomSpeaking', user._id)
+        })
+
+        socket.on('roomStopSpeaking', (roomId) => {
+            socket.to(`room.${roomId}`).emit('roomStopSpeaking', user._id)
+        })
     })
 }
 
@@ -155,6 +189,7 @@ function sendMessageRoom({roomId, message, socketId}) {
 }
 
 function deleteMessageRoom({roomId, messageIds, socketId}) {
+    console.log(roomId)
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('deleteMessageRoom', messageIds)
 }
 

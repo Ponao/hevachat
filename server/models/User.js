@@ -21,9 +21,6 @@ const UserSchema = new Schema({
   online: { type: Boolean, default: true },
   onlineAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now, select: false },
-  dialogs: [
-    { type: mongoose.Schema.Types.ObjectId, ref: 'Dialog' }
-  ],
   color: { type: String },
   buff: Buffer
 });

@@ -1,10 +1,7 @@
 // App
 import React from 'react'
 import Message from './Message'
-import {CSSTransitionGroup} from 'react-transition-group'
 
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import PerfectScrollbar from 'react-perfect-scrollbar'
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
@@ -35,7 +32,8 @@ const CustomFab = withStyles(fabStyles)(Fab);
 class Dialog extends React.Component {
     state = {
         showFabToBottom: false,
-        activePage: false
+        activePage: false,
+        scrollTop: 0
     }
 
     scrollToBottom() {
@@ -55,7 +53,7 @@ class Dialog extends React.Component {
 
     focusPage() {
         let active
-        if(this.messagesBlock.getScrollTop() + this.messagesBlock.getClientHeight() < this.messagesBlock.getScrollHeight()) {
+        if(this.messagesBlock && this.messagesBlock.getScrollTop() + this.messagesBlock.getClientHeight() < this.messagesBlock.getScrollHeight()) {
             active = false
         } else {
             active = true
@@ -103,9 +101,22 @@ class Dialog extends React.Component {
             if(this.state.showFabToBottom)
                 this.setState({showFabToBottom: false})
         }
+
+        if(JSON.stringify(prevProps.messages[0]) !== JSON.stringify(this.props.messages[0])) {
+            this.messagesBlock.scrollTop(this.messagesBlock.getScrollHeight() - this.state.scrollTop - 4)
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if(nextState.scrollTop !== this.state.scrollTop) {
+            return false
+        }
+
+        return true
     }
 
     onScroll() {
+        this.setState({scrollTop: this.messagesBlock.getScrollHeight() - this.messagesBlock.getScrollTop()})
         if(this.messagesBlock.getScrollTop() + this.messagesBlock.getClientHeight() < this.messagesBlock.getScrollHeight() - 100) {
             if(!this.state.showFabToBottom)
                 this.setState({showFabToBottom: true})
@@ -145,32 +156,32 @@ class Dialog extends React.Component {
                     className="dialog scroll"
                     autoHide
                 >
-                        {this.props.rooms.activeRoom.isLoading && <div className="dialog-loading">
-                            <LinearProgress style={{backgroundColor: '#EFF4F8'}} />
-                        </div>}
+                    {this.props.rooms.activeRoom.isLoading && <div className="dialog-loading">
+                        <LinearProgress style={{backgroundColor: '#EFF4F8'}} />
+                    </div>}
+                    <div className="offset-top"></div>
+                    {this.props.messages.map((message, index, messages) => {
+                        return <Message 
+                            countRecent={0}
+                            isRecent={false}
+                            openSlider={(sliderImages) => {this.props.openSlider(sliderImages)}}
+                            selected={this.props.recentMessages.find(x => x._id === message._id)}
+                            canSelect={!!this.props.recentMessages.length}
+                            key={index} 
+                            deleteLocalMessage={(_id) => {this.props.deleteLocalMessage(_id)}}
+                            retrySendMessage={(message) => {this.props.retrySendMessage(message)}}
+                            index={index}
+                            message={message} 
+                            messages={messages} 
+                            onSelect={(message) => {this.props.onSelect(message)}} 
+                            unSelect={(id) => {this.props.unSelect(id)}}
+                        />
+                    })}
 
-                        {this.props.messages.map((message, index, messages) => {
-                            return <Message 
-                                countRecent={0}
-                                isRecent={false}
-                                openSlider={(sliderImages) => {this.props.openSlider(sliderImages)}}
-                                selected={this.props.recentMessages.find(x => x._id === message._id)}
-                                canSelect={!!this.props.recentMessages.length}
-                                key={index} 
-                                deleteLocalMessage={(_id) => {this.props.deleteLocalMessage(_id)}}
-                                retrySendMessage={(message) => {this.props.retrySendMessage(message)}}
-                                index={index}
-                                message={message} 
-                                messages={messages} 
-                                onSelect={(message) => {this.props.onSelect(message)}} 
-                                unSelect={(id) => {this.props.unSelect(id)}}
-                            />
-                        })}
-
-                        <div className="dialog-typers">
-                            {!!this.props.rooms.activeRoom.typers.length && <p className="typing">{this.viewTypers()} typing</p>}
-                            {!this.props.rooms.activeRoom.typers.length && <p style={{height: 18}}></p>}
-                        </div>
+                    {this.props.type === 'room' && <div className="dialog-typers">
+                        {!!this.props.rooms.activeRoom.typers.length && <p className="typing">{this.viewTypers()} typing</p>}
+                        {!this.props.rooms.activeRoom.typers.length && <p style={{height: 18}}></p>}
+                    </div>}
                 </Scrollbars>
 
                 <CustomFab className={`scroll-to-bottom ${this.state.showFabToBottom ? 'active' : ''}`} color="primary" size="small" aria-label="add" onClick={() => {this.scrollToBottom()}}>

@@ -10,15 +10,19 @@ import {
     ROOMS_READ_MESSAGE,
     ROOMS_EDIT_MESSAGE,
     ROOMS_ADD_TYPER,
-    ROOMS_REMOVE_TYPER
+    ROOMS_REMOVE_TYPER,
+    ROOMS_SET_SPEAKING_STATUS,
+    ROOMS_USER_JOIN_IN_ROOM,
+    ROOMS_USER_LEAVE_IN_ROOM
 } from '../Redux/constants'
+import WebRtcController from './WebRtcController'
 
 let socket = null
 let activeLang = false
 
 export default { 
     init: (apiToken) => {
-        socket = io('http://localhost:8000')
+        socket = io('http://localhost:8000', {transports: ['websocket', 'polling', 'flashsocket']})
         socket.on('connect', () => {
             socket.emit('auth', apiToken)
         })
@@ -37,10 +41,24 @@ export default {
             })
         })
 
+        socket.on('joinInRoom', (user) => {
+            store.dispatch({
+                type: ROOMS_USER_JOIN_IN_ROOM,
+                payload: user
+            })
+        })
+
         socket.on('leaveRoom', ({roomId, userId}) => {
             store.dispatch({
                 type: ROOMS_USER_LEAVE_ROOM,
                 payload: {roomId, userId}
+            })
+        })
+
+        socket.on('leaveInRoom', (userId) => {
+            store.dispatch({
+                type: ROOMS_USER_LEAVE_IN_ROOM,
+                payload: userId
             })
         })
 
@@ -88,6 +106,28 @@ export default {
                 }, 2500)
             }
         })
+
+        socket.on('roomAnswerSdp', answerSdp => {
+            WebRtcController.onRoomAnswerSdp(answerSdp)
+        })
+
+        socket.on('roomOnIceCandidate', candidate => {
+            WebRtcController.roomOnIceCandidate(candidate)
+        })
+
+        socket.on('roomSpeaking', userId => {
+            store.dispatch({
+                type: ROOMS_SET_SPEAKING_STATUS,
+                payload: {userId, speaking: true}
+            })
+        })
+
+        socket.on('roomStopSpeaking', userId => {
+            store.dispatch({
+                type: ROOMS_SET_SPEAKING_STATUS,
+                payload: {userId, speaking: false}
+            })
+        })
     },
     getSocketId: () => {
         return socket.id
@@ -103,7 +143,8 @@ export default {
         socket.emit('createRoom', {room, lang})
     },
     joinRoom: ({roomId, lang}) => {
-        socket.emit('joinRoom', {roomId, lang})
+        socket.emit('joinRoom', {roomId, lang, userId: store.getState().user._id})
+        // console.log(123)
     },
     leaveRoom: ({roomId, lang}) => {
         socket.emit('leaveRoom', {roomId, lang})
@@ -113,6 +154,20 @@ export default {
     },
     typingRoom: (roomId) => {
         socket.emit('typingRoom', roomId)
+    },
+
+    // Room conference
+    sendRoomIceCandidate: ({roomId, candidate}) => {
+        socket.emit('roomIceCandidate', {roomId, candidate})
+    },
+    sendRoomOfferSdp: ({roomId, offerSdp}) => {
+        socket.emit('roomOfferSdp', {roomId, offerSdp})
+    },
+    sendRoomSpeaking: ({roomId}) => {
+        socket.emit('roomSpeaking', roomId)
+    },
+    sendRoomStopSpeaking: ({roomId}) => {
+        socket.emit('roomStopSpeaking', roomId)
     }
 }
 

@@ -39,12 +39,16 @@ module.exports = {
         
         let room = await Room.findOne({_id: id}).populate('users').populate('dialog');
 
+        // room.users.push(user)
+            
         if(room === null) {
             const err = {};
             err.param = `all`;
             err.msg = `room_delete_or_not_found`;
             return res.status(401).json({ error: true, errors: [err] });
         }
+
+        // await room.save()
 
         let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
 
@@ -78,7 +82,6 @@ module.exports = {
             ])
             .sort({createdAt: 'DESC'})
             .limit(50)
-            
         try {
             return res.json(room);
         } catch (e) {
@@ -478,10 +481,11 @@ module.exports = {
         const { socketId, roomId, messageIds } = req.body;
 
         let result = await Message.updateMany({_id: {'$in': messageIds}, 'user': { _id: user._id } }, {"$set":{"isDelete": true}})
-
-        if(result.deletedCount === messageIds.length) {
+  
+        if(result.nModified === messageIds.length) {
             deleteMessageRoom({roomId, socketId, messageIds})
         }
+        res.json({dasd: 123})
     },
 
     readMessages: async (req, res, next) => {

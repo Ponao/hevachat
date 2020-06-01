@@ -4,11 +4,13 @@ import { Redirect } from "react-router-dom";
 import Login from '../Pages/Auth/Login'
 import Register from '../Pages/Auth/Register'
 
-import Languages from '../Pages/User/Languages'
-import Rooms from '../Pages/User/Rooms';
+import Languages from '../Sidebar/Languages'
+import Rooms from '../Sidebar/Rooms';
 import Room from '../Pages/User/Room';
-import Messages from '../Pages/User/Messages';
-import Notifications from '../Pages/User/Notifications';
+import Messages from '../Sidebar/Messages';
+import Notifications from '../Sidebar/Notifications';
+import Main from '../Pages/User/Main';
+import Dialog from '../Pages/User/Dialog';
 
 const routes = [
     {
@@ -30,7 +32,7 @@ const routes = [
         exact: true,
         type: 'user',
         title: 'Home',
-        component: () => <Redirect to="/languages" />
+        component: () => <Main />
     },
     {
         path: '/languages',
@@ -40,11 +42,11 @@ const routes = [
         component: () => <Languages />
     },
     {
-        path: '/rooms',
+        path: '/chats/:id',
         exact: true,
         type: 'user',
-        title: 'Rooms',
-        component: () => <Rooms />
+        title: '',
+        component: () => <Dialog />
     },
     {
         path: '/rooms/:id',
@@ -52,20 +54,6 @@ const routes = [
         type: 'user',
         title: '',
         component: () => <Room />
-    },
-    {
-        path: '/messages',
-        exact: true,
-        type: 'user',
-        title: 'Messages',
-        component: () => <Messages />
-    },
-    {
-        path: '/notifications',
-        exact: true,
-        type: 'user',
-        title: 'Notifications',
-        component: () => <Notifications />
     },
 ]
 

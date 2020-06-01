@@ -16,7 +16,7 @@ const customStylesModal = {
         right: 0,
         bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.25)',
-        zIndex: 3
+        zIndex: 4
     },
     content : {
         top                   : '50%',
@@ -40,8 +40,8 @@ class Slider extends React.Component {
     }
 
     render() {
-        return this.props.isOpen && <Modal
-            isOpen={this.props.isOpen}
+        return <Modal
+            isOpen={true}
             onRequestClose={() => {this.props.close()}}
             style={customStylesModal}
             contentLabel="Slider"

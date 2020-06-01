@@ -1,15 +1,15 @@
 // App
 import React from 'react'
-import {PageSettings} from '../PageSettings'
+import {PageSettings} from '../Pages/PageSettings'
 
 // Redux
 import { connect } from 'react-redux'
-import * as userActions from '../../Redux/actions/user'
-import * as roomsActions from '../../Redux/actions/rooms'
+import * as userActions from '../Redux/actions/user'
+import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom'
 
-import SocketController from '../../Controllers/SocketController'
+import SocketController from '../Controllers/SocketController'
 
 class Languages extends React.Component {
     static contextType = PageSettings;
@@ -25,7 +25,7 @@ class Languages extends React.Component {
     updateRoomLang(lang) {
         this.props.userActions.updateRoomLang(lang)
 
-        this.props.history.push('/rooms')
+        this.props.history.push('/')
 
         this.props.roomsActions.roomsGet(this.props.user.apiToken, lang)
 
@@ -47,7 +47,6 @@ class Languages extends React.Component {
     render() {
         return (
             <> 
-                <div className="col-md-9"></div>
                 <div className="col-md-3 sidebar">
                     <h2 className="sidebar-title">Language</h2>
 
@@ -57,9 +56,6 @@ class Languages extends React.Component {
                     <span style={{color: this.props.user.roomLang === 'rus' ? 'red' : '#000'}} onClick={() => {
                         this.updateRoomLang('rus')
                     }}>Russian</span>
-                </div>
-                <div className="col-md-9">
-                    
                 </div>
             </>
         )

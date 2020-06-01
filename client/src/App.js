@@ -4,7 +4,7 @@ import './App.css'
 import {PageSettings} from './Pages/PageSettings'
 
 // Partials
-import UserHeader from './Partials/UserHeader'
+import UserSidebar from './Partials/UserSidebar'
 
 // Router
 import AppRouter from './Router'
@@ -29,7 +29,7 @@ class App extends React.Component {
             <PageSettings.Provider value={this.state}>
                 <div className="container-fluid">
                     <div className="row">
-                        {this.state.userHeader && <UserHeader />}
+                        {this.state.userHeader && <UserSidebar />}
                         <AppRouter />
                     </div>
                 </div>

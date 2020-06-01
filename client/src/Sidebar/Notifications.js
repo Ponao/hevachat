@@ -1,9 +1,9 @@
 // App
 import React from 'react'
 
-import {PageSettings} from '../PageSettings'
+import {PageSettings} from '../Pages/PageSettings'
 
-class Messages extends React.Component {
+class Notifications extends React.Component {
     static contextType = PageSettings;
 
     componentDidMount() {
@@ -17,16 +17,12 @@ class Messages extends React.Component {
     render() {
         return (
             <> 
-                <div className="col-md-9"></div>
                 <div className="col-md-3 sidebar">
-                    <h2 className="sidebar-title">Messages</h2>
-                </div>
-                <div className="col-md-9">
-                    CONTENT
+                    <h2 className="sidebar-title">Notifications</h2>
                 </div>
             </>
         )
     }
 }
 
-export default Messages
+export default Notifications

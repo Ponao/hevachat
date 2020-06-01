@@ -15,13 +15,13 @@ class RoomItem extends React.Component {
         return (
             <Link style={{textDecoration: 'none'}} to={`/rooms/${this.props.room._id}`}>
                 <Button className="room-item" title={`Room ${this.props.room.title}`}>
-                    <Avatar style={{width: 40, height: 40, backgroundColor: `rgb(${this.props.room.color})`}} name={this.props.room.title.charAt(0)} />
+                    <Avatar style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.room.color})`}} name={this.props.room.title.charAt(0)} />
                     <div>
                         <p>{this.props.room.isPrivate && <LockOutlinedIcon />}{this.props.room.title}</p>
                         <div className="users">
-                            {this.props.room.users.map((user, index) => {
-                                return <Avatar key={index} style={{width: 16, height: 16, fontSize: 8,backgroundColor: `rgb(${user.color})`}} name={user.name.first.charAt(0)+user.name.last.charAt(0)} />
-                            })}
+                            {this.props.room.users.map((user, index) => 
+                                <Avatar key={index} style={{width: 16, height: 16, fontSize: 8, backgroundColor: `rgb(${user.color})`}} name={user.name.first.charAt(0)+user.name.last.charAt(0)} />
+                            )}
                         </div>
                     </div>
                 </Button>

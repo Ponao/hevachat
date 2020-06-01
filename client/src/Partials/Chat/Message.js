@@ -30,7 +30,7 @@ const componentDecorator = (href, text, key) => (
     </a>
 );
 
-class Message extends React.Component {
+class Message extends React.PureComponent {
     state = {
         randomId: randomInteger(0, 100000)
     }

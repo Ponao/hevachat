@@ -71,6 +71,7 @@
 .sidebar {
     border-right: 1px #ededed solid;
     height: calc(100vh - 60px);
+    order: 3;
 }
 
 .sidebar-title {
@@ -136,6 +137,7 @@
 .dialog-empty p {
     margin-top: 10px;
     color: #999999;
+    text-align: center;
 }
 
 .message {
@@ -529,6 +531,7 @@
 .image-attachment .image-container img {
     border-radius: 5px;
     height: 60px;
+    background-color: #EFF4F8;
 }
 
 .sound-attachment {
@@ -710,7 +713,11 @@
 }
 
 .btn-cancel-select {
-    width: 60px!important;
+    width: 60px;
+}
+
+.dialog-input .btn-cancel-select {
+    max-width: 48px;
 }
 
 .scroll .track-vertical {
@@ -721,6 +728,7 @@
     height: 100%;
     transition: all .2s;
     padding: 0 2px;
+    z-index: 4;
 }
 
 .scroll .track-vertical:hover {
@@ -790,4 +798,144 @@
 
 .dialog-loading .MuiLinearProgress-bar {
     background-color: #008FF7!important;
+}
+
+
+.media-options {
+    width: 100%;
+    text-align: center;
+    height: 60px;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.media-options .media-option {
+    box-shadow: none!important;
+    width: 40px!important;
+    height: 40px!important;
+    margin: 0 4px;
+}
+
+.media-options .media-option.reject {
+    background-color: #FF3333!important;
+}
+
+.media-options .media-option.active {
+    background-color: #008FF7!important;
+}
+
+.theme-members > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.member {
+    display: flex;
+    width: 25%;
+    position: relative;
+}
+
+.member .speaking {
+    position: absolute;
+    background-color: #35E551;
+    width: 10px;
+    height: 10px;
+    border-radius: 50px;
+    border: 2px solid #fff;
+    top: 15px;
+    right: 20px;
+}
+
+.member:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+.dialog > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.dialog .offset-top {
+    margin-top: auto
+}
+
+.theme-members > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-self: flex-end;
+}
+
+.dialog-item {
+    padding: 10px 20px!important;
+    display: flex!important;
+    cursor: pointer;
+    width: 100%!important;
+    text-transform: unset!important;
+    justify-content: unset!important;
+    color: #008FF7!important;
+    border-radius: 0!important;
+}
+
+.dialog-item .user-avatar {
+    display: flex;
+}
+
+.dialog-item .user-name {
+    display: flex;
+    font-weight: 600;
+    font-size: 16px;
+    color: #008FF7;
+    margin: 0 0 0 12px;
+    line-height: 22px;
+}
+
+.dialog-item .last-message {
+    display: flex;
+    font-size: 14px;
+    color: #667788;
+    margin: 0 0 0 12px;
+    line-height: 16px;
+}
+
+.dialog-item .users {
+    display: flex;
+    margin-left: 12px;
+}
+
+.dialog-item .users .user-avatar {
+    margin-right: 2px;
+}
+
+.dialog-header {
+    align-items: center;
+    padding-left: 16px;
+    display: flex;
+    border-bottom: 1px solid #EFF4F8;
+}
+
+.dialog-header .user-avatar {
+    display: flex;
+}
+
+.dialog-header .user-name {
+    display: flex;
+    font-weight: 600;
+    font-size: 16px;
+    color: #008FF7;
+    margin: 0 0 0 12px;
+    line-height: 22px;
+}
+
+.dialog-header .last-message {
+    display: flex;
+    font-size: 14px;
+    color: #667788;
+    margin: 0 0 0 12px;
+    line-height: 16px;
 }

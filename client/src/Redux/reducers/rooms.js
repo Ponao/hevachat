@@ -18,7 +18,11 @@ import {
     ROOMS_ADD_TYPER,
     ROOMS_REMOVE_TYPER,
     ROOMS_LOAD_MESSAGES,
-    ROOMS_SET_LOADING
+    ROOMS_SET_LOADING,
+    ROOMS_SET_REMOTE_STREAM,
+    ROOMS_SET_SPEAKING_STATUS,
+    ROOMS_USER_LEAVE_IN_ROOM,
+    ROOMS_USER_JOIN_IN_ROOM
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -36,9 +40,17 @@ const rooms = (state = INITIAL_STATE, action) => {
         case ROOMS_ADD:
             return { ...state, rooms: [ action.payload, ...state.rooms ]  }
         case ROOMS_JOIN_ROOM:
-            return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false} }
+            return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false, remoteStream: false} }
         case ROOMS_JOIN_ERROR:
             return { ...state, activeRoom: { error: action.payload } }
+        case ROOMS_USER_LEAVE_IN_ROOM:
+            return { ...state, activeRoom: { ...state.activeRoom, users: [
+                ...state.activeRoom.users.filter(user => {                        
+                    return user._id !== action.payload
+                })
+            ] } }
+        case ROOMS_USER_JOIN_IN_ROOM:
+            return { ...state, activeRoom: { ...state.activeRoom, users: [ ...state.activeRoom.users, action.payload ] } }
         case ROOMS_LEAVE_ROOM:
             return { ...state, activeRoom: false }
         case ROOMS_USER_JOIN_ROOM:
@@ -97,6 +109,8 @@ const rooms = (state = INITIAL_STATE, action) => {
                 { ...message, isRead: true } :
                 message
             ) } } }
+        case ROOMS_SET_REMOTE_STREAM:
+            return { ...state, activeRoom: { ...state.activeRoom, remoteStream: action.payload } }
         case ROOMS_SET_LOADING:
             return { ...state, activeRoom: { ...state.activeRoom, canLoad: false, isLoading: true } }
         case ROOMS_LOAD_MESSAGES:
@@ -107,6 +121,12 @@ const rooms = (state = INITIAL_STATE, action) => {
             return { ...state, activeRoom: { ...state.activeRoom, typers: [ ...state.activeRoom.typers.filter(user => {        
                 return user._id !== action.payload
             }) ] } }
+        case ROOMS_SET_SPEAKING_STATUS: 
+            return { ...state, activeRoom: { ...state.activeRoom, users: state.activeRoom.users.map(user => 
+                user._id === action.payload.userId ?
+                { ...user, speaking: action.payload.speaking } :
+                user
+            ) } }
         default: 
             return state
     }

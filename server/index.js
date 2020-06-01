@@ -27,6 +27,7 @@ const {initSocket} = require('./controllers/SocketController')
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const roomRoutes = require('./routes/room');
+const dialogRoutes = require('./routes/dialog');
 
 // Use Express as our web server
 const app = express();
@@ -34,17 +35,18 @@ const app = express();
 app
   // Parse JSON
   .use(bodyParser.json())
-  // Cors
-  .use(cors())
   // Enable files upload
   .use(fileUpload({
     createParentPath: true
   }))
   .use(morgan('dev'))
+  // Cors
+  .use(cors())
   // Enable routes
   .use('/auth', authRoutes)
   .use('/api/user', userRoutes)
   .use('/api/room', roomRoutes)
+  .use('/api/dialog', dialogRoutes)
   // Serve static files
   .use('/media', express.static(path.join(__dirname, './uploads')))
   // Enable history API
@@ -59,6 +61,7 @@ function startServer() {
     const http = require("http").createServer(app)
     
     const io = require('socket.io')(http)
+
     const redisAdapter = require('socket.io-redis');
 
     io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));

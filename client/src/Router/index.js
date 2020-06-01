@@ -42,6 +42,7 @@ class AppRouter extends React.Component {
         .then((response) => response.json())
         .then((user) => {
           SocketController.init(apiToken)
+          // SocketController.joinLang(user.roomLang)
           this.props.userActions.loginUser(user, apiToken);
           this.setState({isRender: true})
         })
@@ -54,7 +55,7 @@ class AppRouter extends React.Component {
   }
 
   render() {
-    return this.state.isRender && (
+    return this.state.isRender && (<>
       <Switch>
           {routes.map((route, index) => {
               switch (route.type) {
@@ -86,7 +87,7 @@ class AppRouter extends React.Component {
           {/* Auth routes end */}
 
           <Route component={NoMatch} />
-      </Switch>
+      </Switch></>
     );
   }
 

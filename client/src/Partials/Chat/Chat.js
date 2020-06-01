@@ -18,6 +18,7 @@ import SocketController from '../../Controllers/SocketController'
 import { randomInteger } from '../../Controllers/FunctionsController';
 
 let waitFastRead = false
+let waitDraft = false
 
 class Chat extends React.Component {
     constructor(props) {
@@ -39,8 +40,18 @@ class Chat extends React.Component {
         canTyping: true
     }
 
+    componentDidMount() {
+        let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
+        
+        if(drafts['draft-'+this.props.dialogId])
+            this.inputMessage.current.setText(drafts['draft-'+this.props.dialogId])
+    }
+
     sendMessage(text) {
         if(/\S/.test(text) || !!this.state.attachedRecentMessages.length || !!this.state.images.length || !!this.state.files.length|| !!this.state.sounds.length) {
+            let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
+            drafts['draft-'+this.props.dialogId] = ''
+            localStorage.setItem('drafts', JSON.stringify(drafts));
             switch (this.props.type) {
                 case 'room': 
                     this.props.roomsActions.sendMessage({
@@ -187,14 +198,14 @@ class Chat extends React.Component {
     setLastEditMessage() {
         let lastMyMessage = this.props.messages.slice().reverse().find(x => x.user._id === this.props.user._id)
 
-        lastMyMessage.images.map(x => {
-            x.id = randomInteger(0, 10000)
+        lastMyMessage.images.map((x, i) => {
+            x.id = i
         })
-        lastMyMessage.sounds.map(x => {
-            x.id = randomInteger(0, 10000)
+        lastMyMessage.sounds.map((x, i) => {
+            x.id = i
         })
-        lastMyMessage.files.map(x => {
-            x.id = randomInteger(0, 10000)
+        lastMyMessage.files.map((x, i) => {
+            x.id = i
         })
 
         if(lastMyMessage) {
@@ -305,7 +316,18 @@ class Chat extends React.Component {
         this.setState({sounds, files, images})
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if(this.state.canTyping !== nextState.canTyping) {
+            return false
+        }
+
+        return true
+    }
+
     typing(newText, prevText) {
+        if(waitDraft)
+            clearTimeout(waitDraft)
+
         if(newText > prevText) {
             if(this.state.canTyping) {
                 this.setState({canTyping: false})
@@ -317,13 +339,21 @@ class Chat extends React.Component {
                 }, 2500)
             }
         }
+
+        if(!this.state.isEdit) {
+            waitDraft = setTimeout(() => {
+                let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
+                drafts['draft-'+this.props.dialogId] = newText
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+            }, 500);
+        }
     }
 
     render() {
         return (
         <>
             <div className="dialog-container">
-                <Slider images={this.state.sliderImages} isOpen={this.state.isOpenSlider} close={() => {this.setState({isOpenSlider: false, sliderImages: []})}} />
+                {this.state.isOpenSlider && <Slider images={this.state.sliderImages} close={() => {this.setState({isOpenSlider: false, sliderImages: []})}} />}
 
                 <Dialog 
                     loadMessages={() => {this.loadMessages()}}
@@ -331,6 +361,7 @@ class Chat extends React.Component {
                     deleteLocalMessage={(_id) => {this.deleteLocalMessage(_id)}}
                     messages={this.props.messages}
                     to={this.props.to}
+                    type={this.props.type}
                     unRead={this.props.messages.filter(x => !x.isRead && x.user._id !== this.props.user._id)}
                     recentMessages={this.state.recentMessages}
                     openSlider={(sliderImages) => {this.setState({sliderImages, isOpenSlider: true})}}
