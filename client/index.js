@@ -11,10 +11,10 @@ app.get('/*', function(req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const sslCerts = {
-    key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
-}
+// const sslCerts = {
+//     key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
+//     cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
+// }
 
 http.createServer(app).listen(443);
 
