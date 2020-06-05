@@ -16,7 +16,7 @@ app.get('/*', function(req, res) {
 //     cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
 // }
 
-http.createServer(app).listen(443);
+http.createServer(app).listen(80);
 
 // Redirect from http port 80 to https
 // const http = require('http');
