@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import { Scrollbars } from 'react-custom-scrollbars';
 
 const componentDecorator = (href, text, key) => (
     <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
@@ -20,10 +20,7 @@ const componentDecorator = (href, text, key) => (
 class Attachment extends React.Component {
     render() {
         return (
-            <PerfectScrollbar 
-                className="dialog-attachment" 
-            >
-            <div style={{width: '100%', display: 'flex', flexWrap: 'wrap'}}>
+            <div className="dialog-attachment">
                 {!!this.props.recentMessages.length && <div className="message-attachment">
                     <Button className="btn-cancel-select" style={{width: 60}} onClick={() => {this.props.unSelectRecentMessages()}}>
                         <CloseIcon style={{color: '#99AABB'}} />
@@ -88,7 +85,6 @@ class Attachment extends React.Component {
                     })}
                 </div>}
             </div>
-            </PerfectScrollbar>
         )
     }
 }

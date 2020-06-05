@@ -8,16 +8,17 @@ const Room = require('../models/Room');
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
 
-const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom} = require('./SocketController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId} = require('./SocketController')
+const {getUserExistById, addUserRoom} = require('./WebRtcController')
 
 module.exports = {
     getAll: async (req, res, next) => {
         const { user } = res.locals;
         const { lang } = req.body;
 
-        const rooms = await Room.find({lang: lang}).populate('users').sort({createdAt: 'DESC'});
-
         try {
+            const rooms = await Room.find({lang: lang}).populate('users').sort({createdAt: 'DESC'});
+
             return res.json(rooms);
         } catch (e) {
             return next(new Error(e));
@@ -26,63 +27,76 @@ module.exports = {
 
     get: async (req, res, next) => {
         const { user } = res.locals;
-        let { id } = req.body;
+        let { id, socketId } = req.body;
 
-        id = id + ''
+        try {
+            if(!findBySocketId(socketId)) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `something_goes_wrong`;
+                return res.status(401).json({ error: true, errors: [err] });
+            }
 
-        if(id.length !== 24) {
-            const err = {};
-            err.param = `all`;
-            err.msg = `room_not_found`;
-            return res.status(401).json({ error: true, errors: [err] });
-        }
-        
-        let room = await Room.findOne({_id: id}).populate('users').populate('dialog');
+            id = id + ''
 
-        // room.users.push(user)
+            if(!id.match(/^[0-9a-fA-F]{24}$/)) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `room_not_found`;
+                return res.status(401).json({ error: true, errors: [err] });
+            }
             
-        if(room === null) {
-            const err = {};
-            err.param = `all`;
-            err.msg = `room_delete_or_not_found`;
-            return res.status(401).json({ error: true, errors: [err] });
-        }
+            let room = await Room.findOne({_id: id}).populate('users').populate('dialog');
+                
+            if(room === null) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `room_delete_or_not_found`;
+                return res.status(401).json({ error: true, errors: [err] });
+            }
 
-        // await room.save()
+            if(getUserExistById(user._id)) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `have_active_call`;
+                return res.status(401).json({ error: true, errors: [err] });
+            } else {
+                addUserRoom(room._id, user._id, socketId)
+            }
 
-        let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
+            let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
 
-        if(result.nModified) {
-            readMessageRoom({roomId: id})
-        }
+            if(result.nModified) {
+                readMessageRoom({roomId: id})
+            }
 
-        room.dialog.messages = await Message
-            .find({dialogId: room.dialog._id, isDelete: false})
-            .populate([
-                {
-                    path: 'user',
-                    select: ['_id', 'email', 'name', 'online', 'color']
-                },
-                {
-                    path: 'recentMessages', 
-                    populate: [
-                        {
-                            path: 'user',
-                            select: ['_id', 'email', 'name', 'online', 'color']
-                        }, 
-                        {
-                            path: 'recentMessages',
-                            populate: {
+            room.dialog.messages = await Message
+                .find({dialogId: room.dialog._id, isDelete: false})
+                .populate([
+                    {
+                        path: 'user',
+                        select: ['_id', 'email', 'name', 'online', 'color']
+                    },
+                    {
+                        path: 'recentMessages', 
+                        populate: [
+                            {
                                 path: 'user',
                                 select: ['_id', 'email', 'name', 'online', 'color']
+                            }, 
+                            {
+                                path: 'recentMessages',
+                                populate: {
+                                    path: 'user',
+                                    select: ['_id', 'email', 'name', 'online', 'color']
+                                }
                             }
-                        }
-                    ]
-                }
-            ])
-            .sort({createdAt: 'DESC'})
-            .limit(50)
-        try {
+                        ]
+                    }
+                ])
+                .sort({createdAt: 'DESC'})
+                .limit(50)
+        
             return res.json(room);
         } catch (e) {
             return next(new Error(e));
@@ -93,34 +107,34 @@ module.exports = {
         const { user } = res.locals;
         let { dialogId, lastMessageId } = req.body;
 
-        let messages = await Message
-            .find({dialogId, isDelete: false, _id: { $lte: lastMessageId }})
-            .populate([
-                {
-                    path: 'user',
-                    select: ['_id', 'email', 'name', 'online', 'color']
-                },
-                {
-                    path: 'recentMessages', 
-                    populate: [
-                        {
-                            path: 'user',
-                            select: ['_id', 'email', 'name', 'online', 'color']
-                        }, 
-                        {
-                            path: 'recentMessages',
-                            populate: {
+        try {
+            let messages = await Message
+                .find({dialogId, isDelete: false, _id: { $lte: lastMessageId }})
+                .populate([
+                    {
+                        path: 'user',
+                        select: ['_id', 'email', 'name', 'online', 'color']
+                    },
+                    {
+                        path: 'recentMessages', 
+                        populate: [
+                            {
                                 path: 'user',
                                 select: ['_id', 'email', 'name', 'online', 'color']
+                            }, 
+                            {
+                                path: 'recentMessages',
+                                populate: {
+                                    path: 'user',
+                                    select: ['_id', 'email', 'name', 'online', 'color']
+                                }
                             }
-                        }
-                    ]
-                }
-            ])
-            .sort({createdAt: 'DESC'})
-            .limit(50)
+                        ]
+                    }
+                ])
+                .sort({createdAt: 'DESC'})
+                .limit(50)
 
-        try {
             return res.json(messages);
         } catch (e) {
             return next(new Error(e));
@@ -132,29 +146,24 @@ module.exports = {
         const { user } = res.locals;
         const { lang, title, isPrivate } = req.body;
 
-        const dialog = new Dialog()
-        await dialog.save()
-        
-        const room = new Room()
-
-        let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
-
-        room.title = title
-        room.lang = lang
-        room.isPrivate = isPrivate
-        room.ownerId = user._id
-        room.dialog = dialog
-        room.color = colors[randomInteger(0,7)]        
-
-        await room.save()
-
         try {
-            if (room) {
-                return res.json(room);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
+            const dialog = new Dialog()
+            await dialog.save()
+            
+            const room = new Room()
+
+            let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
+
+            room.title = title
+            room.lang = lang
+            room.isPrivate = isPrivate
+            room.ownerId = user._id
+            room.dialog = dialog
+            room.color = colors[randomInteger(0,7)]        
+
+            await room.save()
+
+            return res.json(room);
         } catch (e) {
             return next(new Error(e));
         }
@@ -168,12 +177,8 @@ module.exports = {
         try {
             user.roomLang = lang;
             await user.save()
-            if (user) {
-                return res.json(user);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
+
+            return res.json(user);
         } catch (e) {
             return next(new Error(e));
         }
@@ -182,13 +187,9 @@ module.exports = {
     edit: async (req, res, next) => {
         // Get this account as JSON
         const { user } = res.locals;
+
         try {
-            if (user) {
-                return res.json(user);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
+            return res.json(user);
         } catch (e) {
             return next(new Error(e));
         }
@@ -198,127 +199,122 @@ module.exports = {
         const { user } = res.locals;
         let { text, dialogId, socketId, roomId, recentMessages } = req.body;
         
-        if(!/\S/.test(text) && !recentMessages.length && !req.files) {
-            let err = {};
-            err.param = `all`;
-            err.msg = `empty_message`;
-            return res.status(401).json({ error: true, errors: [err] });
-        }
-
-        if(recentMessages)
-            recentMessages = recentMessages.split(',')
-        else
-            recentMessages = []
-
-        let message = new Message()
-
-        let images = []
-        let sounds = []
-        let files = []
-
-        if(req.files) {
-            let maxCount = 10
-            let nowCount = 1
-
-            for (let i = 0; i < 10; i++) {
-                let fileName = randomString(24)
-
-                if(!req.files['images'+i] || nowCount >= maxCount)
-                    break
-
-                req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                images.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
-                    name: req.files['images'+i].name
-                })
-                nowCount++
+        try {
+            if(!/\S/.test(text) && !recentMessages.length && !req.files) {
+                let err = {};
+                err.param = `all`;
+                err.msg = `empty_message`;
+                return res.status(401).json({ error: true, errors: [err] });
             }
 
-            for (let i = 0; i < 10; i++) {
-                let fileName = randomString(24)
+            if(recentMessages)
+                recentMessages = recentMessages.split(',')
+            else
+                recentMessages = []
 
-                if(!req.files['sounds'+i] || nowCount >= maxCount)
-                    break
+            let message = new Message()
 
-                req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                sounds.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
-                    name: req.files['sounds'+i].name
-                })
-                nowCount++
+            let images = []
+            let sounds = []
+            let files = []
+
+            if(req.files) {
+                let maxCount = 10
+                let nowCount = 1
+
+                for (let i = 0; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['images'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    images.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
+                        name: req.files['images'+i].name
+                    })
+                    nowCount++
+                }
+
+                for (let i = 0; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['sounds'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    sounds.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                        name: req.files['sounds'+i].name
+                    })
+                    nowCount++
+                }
+
+                for (let i = 0; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['files'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    files.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                        name: req.files['files'+i].name,
+                        size: req.files['files'+i].size / 1000
+                    })
+                    nowCount++
+                }
             }
-
-            for (let i = 0; i < 10; i++) {
-                let fileName = randomString(24)
-
-                if(!req.files['files'+i] || nowCount >= maxCount)
-                    break
-
-                req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                files.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
-                    name: req.files['files'+i].name,
-                    size: req.files['files'+i].size / 1000
-                })
-                nowCount++
-            }
-        }
-        
-        message.text = text
-            .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
-            .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
-        message.user = user
-        message.dialogId = dialogId
-        message.images = images
-        message.sounds = sounds
-        message.files = files
-        
-        message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
-            {
-                path: 'user',
-                select: ['_id', 'email', 'name', 'online', 'color']
-            },
-            {
-                path: 'recentMessages', 
-                populate: [
-                    {
-                        path: 'user',
-                        select: ['_id', 'email', 'name', 'online', 'color']
-                    }, 
-                    {
-                        path: 'recentMessages',
-                        populate: {
+            
+            message.text = text
+                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
+                .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
+            message.user = user
+            message.dialogId = dialogId
+            message.images = images
+            message.sounds = sounds
+            message.files = files
+            
+            message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
+                {
+                    path: 'user',
+                    select: ['_id', 'email', 'name', 'online', 'color']
+                },
+                {
+                    path: 'recentMessages', 
+                    populate: [
+                        {
                             path: 'user',
                             select: ['_id', 'email', 'name', 'online', 'color']
+                        }, 
+                        {
+                            path: 'recentMessages',
+                            populate: {
+                                path: 'user',
+                                select: ['_id', 'email', 'name', 'online', 'color']
+                            }
                         }
-                    }
-                ]
-            }
-        ])
-        
-        await message.save()
+                    ]
+                }
+            ])
+            
+            await message.save()
 
-        sendMessageRoom({roomId, socketId, message})
+            sendMessageRoom({roomId, socketId, message})
 
-        try {
-            if (message) {
-                return res.json(message);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
+            return res.json(message);
         } catch (e) {
             return next(new Error(e));
         }
@@ -328,149 +324,151 @@ module.exports = {
         const { user } = res.locals;
         let { _id, text, oldImages, oldSounds, oldFiles, dialogId, socketId, roomId, recentMessages } = req.body;    
         
-        if(!/\S/.test(text) && !recentMessages.length && !req.files) {
-            let err = {};
-            err.param = `all`;
-            err.msg = `empty_message`;
-            return res.status(401).json({ error: true, errors: [err] });
-        }
-
-        if(oldImages)
-            oldImages = oldImages.split(',')
-        else
-            oldImages = []
-        
-        if(oldSounds)
-            oldSounds = oldSounds.split(',')
-        else
-            oldSounds = []
-
-        if(oldFiles)
-            oldFiles = oldFiles.split(',')
-        else
-            oldFiles = []
-
-        if(recentMessages)
-            recentMessages = recentMessages.split(',')
-        else
-            recentMessages = []
-
-        let message = await Message.findById(_id)
-
-        message.images = message.images.filter((x, i) => oldImages.find(y => y !== i))
-        message.files = message.files.filter((x, i) => oldFiles.find(y => y !== i))
-        message.sounds = message.sounds.filter((x, i) => oldSounds.find(y => y !== i))
-
-        if(req.files) {
-            let maxCount = 10
-            let nowCount = message.images.length + message.files.length + message.sounds.length
-
-            let imageI = 0
-            if(oldImages.length)
-                imageI = oldImages.length
-            for (let i = imageI; i < 10; i++) {
-                let fileName = randomString(24)
-
-                if(!req.files['images'+i] || nowCount >= maxCount)
-                    break
-
-                req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                message.images.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
-                    name: req.files['images'+i].name
-                })
-                nowCount++
+        try {
+            if(!/\S/.test(text) && !recentMessages.length && !oldImages.length && !oldSounds.length && !oldFiles.length && !req.files) {
+                let err = {};
+                err.param = `all`;
+                err.msg = `empty_message`;
+                return res.status(401).json({ error: true, errors: [err] });
             }
 
-            let soundI = 0
-            if(oldSounds.length)
-                soundI = oldSounds.length
-            for (let i = soundI; i < 10; i++) {
-                let fileName = randomString(24)
+            if(oldImages)
+                oldImages = oldImages.split(',')
+            else
+                oldImages = []
+            
+            if(oldSounds)
+                oldSounds = oldSounds.split(',')
+            else
+                oldSounds = []
 
-                if(!req.files['sounds'+i] || nowCount >= maxCount)
-                    break
+            if(oldFiles)
+                oldFiles = oldFiles.split(',')
+            else
+                oldFiles = []
 
-                req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                message.sounds.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
-                    name: req.files['sounds'+i].name
-                })
-                nowCount++
+            if(recentMessages)
+                recentMessages = recentMessages.split(',')
+            else
+                recentMessages = []
+
+            let message = await Message.findOne({_id, 'user': {_id: user._id}})
+
+            if(!message) {
+                let err = {};
+                err.param = `all`;
+                err.msg = `message_not_found`;
+                return res.status(401).json({ error: true, errors: [err] });
             }
 
-            let fileI = 0
-            if(oldFiles.length)
-                fileI = oldFiles.length
-            for (let i = fileI; i < 10; i++) {
-                let fileName = randomString(24)
+            message.images = message.images.filter((x, i) => oldImages.find(y => String(y) === String(i)))
+            message.files = message.files.filter((x, i) => oldFiles.find(y => String(y) === String(i)))
+            message.sounds = message.sounds.filter((x, i) => oldSounds.find(y => String(y) === String(i)))
 
-                if(!req.files['files'+i] || nowCount >= maxCount)
-                    break
+            if(req.files) {
+                let maxCount = 10
+                let nowCount = message.images.length + message.files.length + message.sounds.length
 
-                req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
-                    if (err)
-                    return res.status(500).send(err);
-                });
-                
-                message.files.push({
-                    path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
-                    name: req.files['files'+i].name,
-                    size: req.files['files'+i].size / 1000
-                })
-                nowCount++
+                let imageI = 0
+                if(oldImages.length)
+                    imageI = oldImages.length
+                for (let i = imageI; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['images'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    message.images.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
+                        name: req.files['images'+i].name
+                    })
+                    nowCount++
+                }
+
+                let soundI = 0
+                if(oldSounds.length)
+                    soundI = oldSounds.length
+                for (let i = soundI; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['sounds'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    message.sounds.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                        name: req.files['sounds'+i].name
+                    })
+                    nowCount++
+                }
+
+                let fileI = 0
+                if(oldFiles.length)
+                    fileI = oldFiles.length
+                for (let i = fileI; i < 10; i++) {
+                    let fileName = randomString(24)
+
+                    if(!req.files['files'+i] || nowCount >= maxCount)
+                        break
+
+                    req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
+                        if (err)
+                        return res.status(500).send(err);
+                    });
+                    
+                    message.files.push({
+                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                        name: req.files['files'+i].name,
+                        size: req.files['files'+i].size / 1000
+                    })
+                    nowCount++
+                }
             }
-        }
-        
-        message.text = text
-            .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
-            .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
-        message.user = user
-        message.dialogId = dialogId
-        message.isEdit = true
+            
+            message.text = text
+                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
+                .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
+            message.user = user
+            message.dialogId = dialogId
+            message.isEdit = true
 
-        message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
-            {
-                path: 'user',
-                select: ['_id', 'email', 'name', 'online', 'color']
-            },
-            {
-                path: 'recentMessages', 
-                populate: [
-                    {
-                        path: 'user',
-                        select: ['_id', 'email', 'name', 'online', 'color']
-                    }, 
-                    {
-                        path: 'recentMessages',
-                        populate: {
+            message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
+                {
+                    path: 'user',
+                    select: ['_id', 'email', 'name', 'online', 'color']
+                },
+                {
+                    path: 'recentMessages', 
+                    populate: [
+                        {
                             path: 'user',
                             select: ['_id', 'email', 'name', 'online', 'color']
+                        }, 
+                        {
+                            path: 'recentMessages',
+                            populate: {
+                                path: 'user',
+                                select: ['_id', 'email', 'name', 'online', 'color']
+                            }
                         }
-                    }
-                ]
-            }
-        ])
-        
-        await message.save()
+                    ]
+                }
+            ])
+            
+            await message.save()
 
-        editMessageRoom({roomId, socketId, message})
+            editMessageRoom({roomId, socketId, message})
 
-        try {
-            if (message) {
-                return res.json(message);
-            }
-            const err = new Error(`User ${userId} not found.`);
-            err.notFound = true;
-            return next(err);
+            return res.json(message);
         } catch (e) {
             return next(new Error(e));
         }
@@ -480,25 +478,33 @@ module.exports = {
         const { user } = res.locals;
         const { socketId, roomId, messageIds } = req.body;
 
-        let result = await Message.updateMany({_id: {'$in': messageIds}, 'user': { _id: user._id } }, {"$set":{"isDelete": true}})
-  
-        if(result.nModified === messageIds.length) {
-            deleteMessageRoom({roomId, socketId, messageIds})
+        try {
+            let result = await Message.updateMany({_id: {'$in': messageIds}, 'user': { _id: user._id } }, {"$set":{"isDelete": true}})
+    
+            if(result.nModified === messageIds.length) {
+                deleteMessageRoom({roomId, socketId, messageIds})
+            }
+
+            return next()
+        } catch (e) {
+            return next(new Error(e));
         }
-        res.json({dasd: 123})
     },
 
     readMessages: async (req, res, next) => {
         const { user } = res.locals;
         const { roomId, dialogId } = req.body;
+        try {
+            let result = await Message.updateMany({dialogId, 'user': { "$ne": user._id } }, {"$set":{"isRead": true}})
+            
+            if(result.nModified) {
+                readMessageRoom({roomId})
+            }
 
-        let result = await Message.updateMany({dialogId, 'user': { "$ne": user._id } }, {"$set":{"isRead": true}})
-        
-        if(result.nModified) {
-            readMessageRoom({roomId})
+            return next()
+        } catch (e) {
+            return next(new Error(e));
         }
-
-        // res.json({dasd: 123})
     },
 }
 

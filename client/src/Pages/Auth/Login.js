@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
 import SocketController from '../../Controllers/SocketController'
+import {urlApi} from '../../config'
 
 class Login extends React.Component {
     state = {
@@ -29,7 +30,7 @@ class Login extends React.Component {
         if(this.state.email && this.state.password) {
             this.setState({isFetching: true})
 
-            fetch(`http://localhost:8000/auth/login`, {
+            fetch(`${urlApi}/auth/login`, {
                 method: "post",
                 headers: {
                     'Accept': 'application/json',
@@ -48,7 +49,7 @@ class Login extends React.Component {
                     const { cookies } = this.props
                     cookies.set('apiToken', data.token, { path: '/' })
 
-                    this.props.userActions.loginUser(data.user, data.token)
+                    this.props.userActions.loginUser(data.user, data.dialogs, data.token)
 
                     SocketController.init(data.token)
                 }

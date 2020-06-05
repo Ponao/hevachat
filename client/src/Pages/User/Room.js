@@ -19,6 +19,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import Fab from '@material-ui/core/Fab';
 import { withStyles } from '@material-ui/core'
 import WebRtcController from '../../Controllers/WebRtcController'
+import SocketController from '../../Controllers/SocketController'
 import MusicOffIcon from '@material-ui/icons/MusicOff';
 import CallEndIcon from '@material-ui/icons/CallEnd';
 import { randomInteger } from '../../Controllers/FunctionsController'
@@ -71,7 +72,13 @@ class Room extends React.Component {
     componentDidMount() {
         this.context.toggleHeader(false)
 
-        this.props.roomsActions.joinRoom({id: this.props.match.params.id, apiToken: this.props.user.apiToken})
+        let waitSocket = setInterval(() => {
+            if(SocketController.getSocketId()) {
+                this.props.roomsActions.joinRoom({id: this.props.match.params.id, apiToken: this.props.user.apiToken})
+                clearInterval(waitSocket)
+            }
+        }, 100);
+        
     }
 
     componentWillUnmount() {

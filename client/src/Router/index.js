@@ -14,7 +14,7 @@ import { bindActionCreators } from "redux";
 
 import NoMatch from '../Pages/NoMatch'
 import { setTitle } from "../Controllers/FunctionsController";
-
+import {urlApi} from '../config'
 class AppRouter extends React.Component {
   state = {
     isRender: false
@@ -31,7 +31,7 @@ class AppRouter extends React.Component {
     let apiToken = cookies.get("apiToken");
 
     if (apiToken) {
-      fetch(`http://localhost:8000/api/user/me`, {
+      fetch(`${urlApi}/api/user/me`, {
         method: "get",
         headers: {
           Accept: "application/json",
@@ -40,10 +40,10 @@ class AppRouter extends React.Component {
         },
       })
         .then((response) => response.json())
-        .then((user) => {
+        .then(({user, dialogs, noReadCount}) => {
           SocketController.init(apiToken)
           // SocketController.joinLang(user.roomLang)
-          this.props.userActions.loginUser(user, apiToken);
+          this.props.userActions.loginUser(user, dialogs, noReadCount, apiToken);
           this.setState({isRender: true})
         })
         .catch(() => {

@@ -41,7 +41,7 @@ class RoomJoinError extends React.Component {
             <h2 className="modal-title">Error</h2>
             <p className="modal-text">{this.props.rooms.activeRoom.error.msg}</p>
             <button className="button-blue" type="submit" style={{width: 'max-content'}} onClick={() => {
-                this.props.history.push('/rooms')
+                this.props.history.push('/')
             }}>Back</button>
         </Modal>
     }

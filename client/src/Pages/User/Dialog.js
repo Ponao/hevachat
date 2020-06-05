@@ -14,10 +14,11 @@ import RoomItem from '../../Partials/Room/RoomItem'
 import Fab from '@material-ui/core/Fab';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AddIcon from '@material-ui/icons/Add';
-import { withStyles, Tooltip } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import showLoading from '../../Partials/Loading'
 import Avatar from '../../Partials/User/Avatar';
 import Chat from '../../Partials/Chat/Chat';
+import SearchIcon from '@material-ui/icons/Search';
 
 const fabStyles = theme => ({
     root: {
@@ -39,26 +40,29 @@ class Dialog extends React.Component {
     state = {
         showBtnAdd: true,
         scrollTop: 0,
-        userId: ''
     }
 
     componentDidMount() {
         this.context.toggleHeader(true)
 
-        this.setState({userId: this.props.match.params.id})
+        if(!this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id)) {
+            this.props.dialogsActions.dialogGet(this.props.match.params.id, this.props.user.apiToken)
+        } else {
+            if(!this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id).getted)
+                this.props.dialogsActions.dialogLoad(this.props.match.params.id, this.props.user.apiToken)
+        }
     }
-
     componentWillUnmount() {
         this.context.toggleHeader(false)
     }
 
-    render() {       
-        let dialog = this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.state.userId)
+    render() {    
+        let dialog = this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id)
 
         return (
             <> 
-                <div className="col-md-9 dialog-header" style={{order: 2}}>
-                    {dialog && <><Avatar style={{
+                {dialog && !dialog.isNotFound && <><div className="col-xl-9 col-lg-6 col-md-6 dialog-header" style={{order: 2}}>
+                     <><Avatar style={{
                         width: 32, 
                         height: 32, 
                         fontSize: 14, 
@@ -68,16 +72,32 @@ class Dialog extends React.Component {
                     <div className="user-info">
                         <p className="user-name">{`${dialog.user.name.first} ${dialog.user.name.last}`}</p>
                         <p className="last-message">Last message</p>
-                    </div></>}
+                    </div></>
                 </div>
-                <div className="col-md-9" style={{order: 4}}>
-                    {dialog && <Chat 
-                        messages={dialog.messages} 
+                <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>
+                    <Chat 
+                        messages={dialog.messages}
+                        loading={dialog && !dialog.getted} 
                         type="dialog" 
+                        userName={dialog.user.name.first}
+                        typing={dialog.typing}
+                        userId={dialog.user._id}
                         to={dialog.user.name.first} 
                         dialogId={dialog._id}
-                    />}
-                </div>            
+                        dialog={dialog}
+                    />
+                </div></>}
+
+                {dialog && dialog.isNotFound && <>
+                    <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 2}}></div>
+                    <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>
+                        <div className="data-empty">
+                            <SearchIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                            <p>User not found</p>
+                        </div>
+                    </div>
+                </>}     
             </>
         )
     }

@@ -20,6 +20,18 @@ class InputMessage extends React.Component {
         this.setState({text})
     }
 
+    onPaste(event) {
+        let items = (event.clipboardData || event.originalEvent.clipboardData).items
+        
+        for (let index = 0; index < items.length; index++) {
+            if (items[index].kind === 'file') {
+                let file = items[index].getAsFile()
+
+                this.props.addFile(file, true)
+            }
+        }
+    }
+
     componentDidUpdate() {
         if(this.props.isEdit) {
             if(!/\S/.test(this.state.text) && !this.props.attachedRecentMessages.length && !this.props.images.length && !this.props.files.length && !this.props.sounds.length) {
@@ -44,7 +56,7 @@ class InputMessage extends React.Component {
                     />
                 </IconButton>
 
-                <textarea className="col input-message" id="input-message" 
+                <textarea className="col input-message" id="input-message" onPaste={(e) => {this.onPaste(e)}}
                     onKeyDown={(e) => {
                         if(e.keyCode === 38 && !this.props.isEdit && !this.state.text.length) {
                             this.props.setLastEditMessage()
@@ -52,7 +64,7 @@ class InputMessage extends React.Component {
 
                         if (e.keyCode === 13 && !e.shiftKey) {
                             e.preventDefault()
-                            if(/\S/.test(this.state.text) || !!this.props.attachedRecentMessages.length) {
+                            if(/\S/.test(this.state.text) || !!this.props.attachedRecentMessages.length  || !!this.props.images.length || !!this.props.files.length || !!this.props.sounds.length) {
                                 if(!this.props.isEdit) {
                                     this.props.sendMessage(this.state.text)
                                     this.setState({text: ''})

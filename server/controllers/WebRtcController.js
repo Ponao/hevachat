@@ -7,6 +7,29 @@ let wsKurentoUri = 'ws://192.168.10.10:8888/kurento'
 let candidatesQueues = {}
 let Rooms = {}
 
+function getUserExistById(id) {
+    for (let [key, room] of Object.entries(Rooms)) {
+        for (let [key, user] of Object.entries(room.users)) {
+            if(String(user._id) === String(id)) {
+                return user
+            }
+        }
+    }
+
+    return false
+}
+
+function addUserRoom(roomId, userId, socketId) {
+    if(!Rooms[roomId])
+        Rooms[roomId] = {_id: roomId, users: {}, MediaPipeline: null}
+    
+    Rooms[roomId].users[userId] = {
+        _id: userId,
+        socketId,
+        webRtcEndpoint: false
+    }
+}
+
 // Recover kurentoClient for the first time.
 function getKurentoClient(callback) {
     if (kurentoClient !== null) {
@@ -41,13 +64,7 @@ function roomOnIceCandidate(roomId, userId, _candidate) {
 function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
     clearCandidatesQueue(userId);
 
-    if(!Rooms[roomId])
-        Rooms[roomId] = {users: {}, MediaPipeline: null}
     
-    Rooms[roomId].users[userId] = {
-        id: userId,
-        webRtcEndpoint: false
-    }
 
     if(Rooms[roomId].MediaPipeline) {
         connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
@@ -141,8 +158,26 @@ const stop = async (roomId, userId) => {
     }
 }
 
+function stopBySocketId(socketId) {
+    for (let [key, room] of Object.entries(Rooms)) {
+        for (let [key, user] of Object.entries(room.users)) {
+            if(user.socketId == socketId) {
+                if(Rooms[room._id].users[user._id].webRtcEndpoint)
+                    Rooms[room._id].users[user._id].webRtcEndpoint.release();
+
+                delete Rooms[room._id].users[user._id]
+
+                return
+            }
+        }
+    }
+}
+
 module.exports = {
     roomOnIceCandidate,
     roomOfferSdp,
-    stop
+    stop,
+    getUserExistById,
+    stopBySocketId,
+    addUserRoom
 }

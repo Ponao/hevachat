@@ -17,6 +17,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { withStyles, Tooltip } from '@material-ui/core'
 import showLoading from '../Partials/Loading'
 import DialogItem from '../Partials/Dialog/DialogItem';
+import { withRouter } from 'react-router-dom';
+import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
 
 const fabStyles = theme => ({
     root: {
@@ -43,9 +45,9 @@ class Messages extends React.Component {
     componentDidMount() {
         this.context.toggleHeader(true)
 
-        if(!this.props.dialogs.getted) {
-            this.props.dialogsActions.dialogsGet(this.props.user.apiToken)
-        }
+        // if(!this.props.dialogs.getted) {
+        //     this.props.dialogsActions.dialogsGet(this.props.user.apiToken)
+        // }
     }
 
     onScroll() {
@@ -75,7 +77,7 @@ class Messages extends React.Component {
     render() {
         return (
             <> 
-                <div className="col-md-3 sidebar">
+                <div className="col-xl-3 col-lg-6 col-md-6 sidebar">
                     <h2 className="sidebar-title">Chats</h2>
 
                     <Scrollbars
@@ -92,11 +94,17 @@ class Messages extends React.Component {
                             <Skeleton variant="text" style={{marginLeft: 12, flex: '1 1'}} />
                         </div>)}
                         {this.props.dialogs.dialogs.map((dialog, index) => {
-                            return (
-                                <DialogItem key={index} user={dialog.user} />
+                            return dialog.lastMessage && (
+                                <DialogItem key={index} dialogId={dialog._id} typing={dialog.typing} noRead={dialog.noRead} lastMessage={dialog.lastMessage} user={dialog.user} />
                             )
                         })}
                     </Scrollbars>
+
+                    {!this.props.dialogs.dialogs.find(x => x.lastMessage) && <div className="data-empty">
+                        <ChatBubbleIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                        <p>You dont have chats, lets create new</p>
+                    </div>}
 
                     <Tooltip title="Create dialog" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
                         <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>
@@ -123,4 +131,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Messages)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Messages))

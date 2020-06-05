@@ -41,10 +41,6 @@ class Main extends React.Component {
 
     componentDidMount() {
         this.context.toggleHeader(true)
-
-        if(!this.props.dialogs.getted) {
-            this.props.dialogsActions.dialogsGet(this.props.user.apiToken)
-        }
     }
 
     onScroll() {
@@ -89,10 +85,4 @@ const mapStateToProps = state => {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        dialogsActions: bindActionCreators(dialogsActions, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Main)
+export default connect(mapStateToProps)(Main)

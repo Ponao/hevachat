@@ -19,6 +19,8 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import AddIcon from '@material-ui/icons/Add';
 import { withStyles, Tooltip } from '@material-ui/core'
 import showLoading from '../Partials/Loading'
+import WarningIcon from '@material-ui/icons/Warning';
+import AppsIcon from '@material-ui/icons/Apps';
 
 const fabStyles = theme => ({
     root: {
@@ -80,7 +82,7 @@ class Rooms extends React.Component {
             <>
                 <ModalCreateRoom isOpen={this.state.isOpenCreateRoom} close={() => {this.setState({isOpenCreateRoom: false})}} />
 
-                <div className="col-md-3 sidebar" style={{overflow: 'hidden'}}>
+                <div className="col-xl-3 col-lg-6 col-md-6 sidebar" style={{overflow: 'hidden'}}>
                     <h2 className="sidebar-title">Rooms</h2>
 
                     <Scrollbars
@@ -101,7 +103,23 @@ class Rooms extends React.Component {
                                 <RoomItem key={index} room={room} />
                             )
                         })}
+
+                        
                     </Scrollbars>
+
+                    {!this.props.rooms.isFetching && !this.props.rooms.isError && !this.props.rooms.rooms.length && <div className="data-empty">
+                        <AppsIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                        <p>Create your first room in this language</p>
+                    </div>}
+
+                    {!this.props.rooms.isFetching && this.props.rooms.isError && <div className="data-empty">
+                        <WarningIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                        <p>Что то пошло не так...</p>
+
+                        <button onClick={() => {this.props.roomsActions.roomsGet(this.props.user.apiToken, this.props.user.roomLang)}} className="button-gray" type="submit" style={{width: 'max-content'}}>Retry</button>
+                    </div>}
 
                     <Tooltip title="Create room" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
                         <CustomFab color="primary" size="small" aria-label="add" onClick={() => {this.setState({isOpenCreateRoom: true})}}>

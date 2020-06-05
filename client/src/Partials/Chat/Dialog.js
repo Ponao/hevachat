@@ -8,7 +8,8 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import SendIcon from '@material-ui/icons/Send';
 import Fab from '@material-ui/core/Fab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { withStyles, LinearProgress } from '@material-ui/core'
+import { withStyles, LinearProgress, CircularProgress } from '@material-ui/core'
+
 import { connect } from 'react-redux';
 
 let waitActiveUser = false
@@ -80,9 +81,12 @@ class Dialog extends React.Component {
         window.addEventListener('blur', this.blurPage.bind(this));
         window.addEventListener('mousemove', this.focusPage.bind(this));
 
-        setTimeout(() => {
-            this.scrollToBottom();
-        }, 200)
+        if(this.messagesBlock) {
+            this.messagesBlock.view.scroll({
+                top: 10000,
+                left: 0,
+            })
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -129,8 +133,15 @@ class Dialog extends React.Component {
             }
         }
 
-        if(this.props.rooms.activeRoom.canLoad && this.messagesBlock.getScrollTop() < 100)
+        if(this.props.type === 'room' && this.props.rooms.activeRoom.canLoad && this.messagesBlock.getScrollTop() < 100) {
             this.props.loadMessages()
+        }
+        
+        if(this.props.type === 'dialog' && this.props.dialog.canLoad && this.messagesBlock.getScrollTop() < 100) {
+            this.props.loadMessages()
+        }
+            
+
     }
 
     viewTypers() {
@@ -156,7 +167,7 @@ class Dialog extends React.Component {
                     className="dialog scroll"
                     autoHide
                 >
-                    {this.props.rooms.activeRoom.isLoading && <div className="dialog-loading">
+                    {((this.props.type === 'room' && this.props.rooms.activeRoom.isLoading) || (this.props.type === 'dialog' && this.props.dialog.canLoad)) && <div className="dialog-loading">
                         <LinearProgress style={{backgroundColor: '#EFF4F8'}} />
                     </div>}
                     <div className="offset-top"></div>
@@ -182,6 +193,11 @@ class Dialog extends React.Component {
                         {!!this.props.rooms.activeRoom.typers.length && <p className="typing">{this.viewTypers()} typing</p>}
                         {!this.props.rooms.activeRoom.typers.length && <p style={{height: 18}}></p>}
                     </div>}
+
+                    {this.props.type === 'dialog' && <div className="dialog-typers">
+                        {this.props.typing && <p className="typing">{this.props.userName} typing</p>}
+                        {!this.props.typing && <p style={{height: 18}}></p>}
+                    </div>}
                 </Scrollbars>
 
                 <CustomFab className={`scroll-to-bottom ${this.state.showFabToBottom ? 'active' : ''}`} color="primary" size="small" aria-label="add" onClick={() => {this.scrollToBottom()}}>
@@ -189,7 +205,16 @@ class Dialog extends React.Component {
                     <ExpandMoreIcon style={{color: '#99AABB'}} />
                 </CustomFab>
 
-                {!this.props.messages.length && <div className="dialog-empty">
+                {this.props.type === 'dialog' && this.props.loading && <CircularProgress style={{
+                    color: '#008FF7',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    margin: 'auto',
+                    top: 'calc(50% - 20px)'
+                }} />}
+
+                {(!this.props.messages.length && !this.props.loading) && <div className="data-empty">
                     <SendIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
                     <p>Write your first message to {this.props.to}</p>

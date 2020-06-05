@@ -3,7 +3,6 @@ import SocketController from './SocketController';
 import store from '../Redux/store';
 import { ROOMS_SET_REMOTE_STREAM, MEDIA_TOGGLE_MICROPHONE, MEDIA_TOGGLE_MUSIC } from '../Redux/constants';
 import hark from 'hark'
-import kurentoUtils from 'kurento-utils'
 
 let WebRtcPeerConnection = false
 let activeRoomId = false
@@ -97,17 +96,26 @@ export default {
             });
         })
     },
-    leaveRoom() {
-        WebRtcPeerConnection.close()
-        WebRtcPeerConnection = false
+    leaveRoom({roomId, lang}) {
+        if(WebRtcPeerConnection) {
+            WebRtcPeerConnection.close()
+            WebRtcPeerConnection = false
+        }
 
-        activeRoomId = false
+        if(activeRoomId) {
+            SocketController.leaveRoom({roomId, lang})
+            activeRoomId = false
+        }
 
-        localStream.getAudioTracks()[0].stop()
-        localStream = false
+        if(localStream) {
+            localStream.getAudioTracks()[0].stop()
+            localStream = false
+        }
 
-        remoteStream.getAudioTracks()[0].stop()
-        remoteStream = false
+        if(remoteStream) {
+            remoteStream.getAudioTracks()[0].stop()
+            remoteStream = false
+        }
 
         if(speechEvents) {
             speechEvents.stop()

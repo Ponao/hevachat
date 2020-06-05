@@ -12,6 +12,7 @@ import {
 import { connect } from 'react-redux'
 import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
+import {urlApi} from '../../config'
 
 class Register extends React.Component {
     state = {
@@ -28,7 +29,7 @@ class Register extends React.Component {
         if(this.state.email && this.state.password) {
             this.setState({isFetching: true})
 
-            fetch(`http://localhost:8000/auth/register`, {
+            fetch(`${urlApi}/auth/register`, {
                 method: "post",
                 headers: {
                     'Accept': 'application/json',
@@ -47,7 +48,7 @@ class Register extends React.Component {
                     const { cookies } = this.props
                     cookies.set('apiToken', data.token, { path: '/' })
 
-                    this.props.userActions.loginUser(data.user, data.token)
+                    this.props.userActions.loginUser(data.user, data.dialogs, data.token)
                 }
 
                 this.setState({isFetching: false})

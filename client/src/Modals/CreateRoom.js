@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
+import {urlApi} from '../config'
 
 import SocketController from '../Controllers/SocketController';
 
@@ -62,7 +63,7 @@ class CreateRoom extends React.Component {
     onSubmit(e) {
         e.preventDefault()
 
-        fetch(`http://localhost:8000/api/room/create`, {
+        fetch(`${urlApi}/api/room/create`, {
             method: "post",
             headers: {
                 Accept: "application/json",

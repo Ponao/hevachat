@@ -8,7 +8,7 @@ import * as userActions from '../Redux/actions/user'
 import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom'
-
+import {urlApi} from '../config'
 import SocketController from '../Controllers/SocketController'
 
 class Languages extends React.Component {
@@ -31,7 +31,7 @@ class Languages extends React.Component {
 
         SocketController.joinLang(lang)
 
-        fetch(`http://localhost:8000/api/user/update-room-lang`, {
+        fetch(`${urlApi}/api/user/update-room-lang`, {
             method: "post",
             headers: {
                 'Accept': 'application/json',
@@ -47,7 +47,7 @@ class Languages extends React.Component {
     render() {
         return (
             <> 
-                <div className="col-md-3 sidebar">
+                <div className="col-xl-3 col-lg-6 col-md-6 sidebar">
                     <h2 className="sidebar-title">Language</h2>
 
                     <span style={{color: this.props.user.roomLang === 'eng' ? 'red' : '#000'}} onClick={() => {

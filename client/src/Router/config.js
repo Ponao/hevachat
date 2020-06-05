@@ -11,6 +11,7 @@ import Messages from '../Sidebar/Messages';
 import Notifications from '../Sidebar/Notifications';
 import Main from '../Pages/User/Main';
 import Dialog from '../Pages/User/Dialog';
+import { randomInteger } from '../Controllers/FunctionsController';
 
 const routes = [
     {
@@ -46,7 +47,7 @@ const routes = [
         exact: true,
         type: 'user',
         title: '',
-        component: () => <Dialog />
+        component: () => <Dialog key={randomInteger(0, 1000)} />
     },
     {
         path: '/rooms/:id',

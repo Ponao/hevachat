@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // Redux
 import { connect } from 'react-redux'
 import * as roomsActions from '../../Redux/actions/rooms'
+import * as dialogsActions from '../../Redux/actions/dialogs'
 import { bindActionCreators } from 'redux'
 
 import Attachment from './Attachment';
@@ -16,6 +17,7 @@ import InputMessage from './InputMessage'
 import ToolbarMessage from './ToolbarMessage'
 import SocketController from '../../Controllers/SocketController'
 import { randomInteger } from '../../Controllers/FunctionsController';
+import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 
 let waitFastRead = false
 let waitDraft = false
@@ -37,14 +39,72 @@ class Chat extends React.Component {
         sliderImages: [],
         isEdit: false,
         editMessage: {},
-        canTyping: true
+        canTyping: true,
+        drag: false
     }
 
+    dropRef = React.createRef()
+    dragCounter = 0
+
     componentDidMount() {
+        let div = this.dropRef.current
+        div.addEventListener('dragenter', this.handleDragIn)
+        div.addEventListener('dragleave', this.handleDragOut)
+        div.addEventListener('dragover', this.handleDrag)
+        div.addEventListener('drop', this.handleDrop)
+
         let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
         
         if(drafts['draft-'+this.props.dialogId])
             this.inputMessage.current.setText(drafts['draft-'+this.props.dialogId])
+    }
+
+    componentWillUnmount() {
+        let div = this.dropRef.current
+        div.removeEventListener('dragenter', this.handleDragIn)
+        div.removeEventListener('dragleave', this.handleDragOut)
+        div.removeEventListener('dragover', this.handleDrag)
+        div.removeEventListener('drop', this.handleDrop)
+    }
+
+    handleDrag = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    handleDragIn = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.dragCounter++
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            this.setState({drag: true})
+        }
+    }
+
+    handleDragOut = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.dragCounter--
+        if (this.dragCounter === 0) {
+            this.setState({drag: false})
+        }
+    }
+
+    handleDrop = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.setState({drag: false})
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          this.handleDropFiles(e.dataTransfer.files)
+          e.dataTransfer.clearData()
+          this.dragCounter = 0    
+        }
+      }
+
+    handleDropFiles = (files) => {
+        for (var i = 0; i < files.length; i++) {
+            this.addFile(files, false, true)
+        }
     }
 
     sendMessage(text) {
@@ -65,9 +125,15 @@ class Chat extends React.Component {
                     }, this.props.user.apiToken)
                     break;
                 case 'dialog': 
-                    this.props.roomsActions.sendMessage({
-                        
-                    })
+                    this.props.dialogsActions.sendMessage({
+                        text: text,
+                        userId: this.props.userId,
+                        images: this.state.images,
+                        files: this.state.files,
+                        sounds: this.state.sounds,
+                        dialogId: this.props.dialogId,
+                        recentMessages: this.state.attachedRecentMessages
+                    }, this.props.user.apiToken)
                     break;
                 default:
                     break;
@@ -94,9 +160,16 @@ class Chat extends React.Component {
                     }, this.props.user.apiToken)
                     break;
                 case 'dialog': 
-                    this.props.roomsActions.editMessage({
-                        
-                    })
+                    this.props.dialogsActions.editMessage({
+                        _id: this.state.editMessage._id,
+                        text: text,
+                        userId: this.props.userId,
+                        images: this.state.images,
+                        files: this.state.files,
+                        sounds: this.state.sounds,
+                        dialogId: this.props.dialogId,
+                        recentMessages: this.state.attachedRecentMessages
+                    }, this.props.user.apiToken)
                     break;
                 default:
                     break;
@@ -115,9 +188,11 @@ class Chat extends React.Component {
                 }, this.props.user.apiToken)
                 break;
             case 'dialog': 
-                this.props.roomsActions.sendMessage({
-                    
-                })
+                this.props.dialogsActions.deleteMessage({
+                    otherId: this.props.userId,
+                    dialogId: this.props.dialogId,
+                    deleteMessages: this.state.recentMessages
+                }, this.props.user.apiToken)
                 break;
             default:
                 break;
@@ -134,9 +209,9 @@ class Chat extends React.Component {
                 this.props.roomsActions.retrySendMessage(message, this.props.user.apiToken)
                 break;
             case 'dialog': 
-                this.props.roomsActions.editMessage({
-                    
-                })
+                message.userId = this.props.userId
+                message.dialogId = this.props.dialogId
+                this.props.dialogsActions.retrySendMessage(message, this.props.user.apiToken)
                 break;
             default:
                 break;
@@ -149,9 +224,7 @@ class Chat extends React.Component {
                 this.props.roomsActions.deleteLocalMessage(_id)
                 break;
             case 'dialog': 
-                this.props.roomsActions.sendMessage({
-                    
-                })
+                this.props.dialogsActions.deleteLocalMessage(_id, this.props.dialogId)
                 break;
             default:
                 break;
@@ -242,13 +315,21 @@ class Chat extends React.Component {
         switch (this.props.type) {
             case 'room': 
                 waitFastRead = setTimeout(() => {
-                    this.props.roomsActions.readMessages({dialogId: this.props.dialogId, roomId: this.props.roomId, userId: this.props.user._id}, this.props.user.apiToken)
+                    this.props.roomsActions.readMessages({
+                        dialogId: this.props.dialogId, 
+                        roomId: this.props.roomId, 
+                        userId: this.props.user._id
+                    }, this.props.user.apiToken)
                 }, 500)
                 break;
             case 'dialog': 
-                this.props.roomsActions.readMessages({
-                    
-                })
+                waitFastRead = setTimeout(() => {
+                    this.props.dialogsActions.readMessages({
+                        dialogId: this.props.dialogId, 
+                        otherId: this.props.userId, 
+                        userId: this.props.user._id
+                    }, this.props.user.apiToken)
+                }, 500)
                 break;
             default:
                 break;
@@ -261,57 +342,111 @@ class Chat extends React.Component {
                 this.props.roomsActions.loadMessages({dialogId: this.props.dialogId}, this.props.user.apiToken)
                 break;
             case 'dialog': 
-                this.props.roomsActions.readMessages({
-                    
-                })
+                this.props.dialogsActions.loadMessages({dialogId: this.props.dialogId}, this.props.user.apiToken)
                 break;
             default:
                 break;
         }
     }
 
-    addFile(e) {
+    addFile(e, paste = false, drag = false) {
         let sounds = [...this.state.sounds]
         let files = [...this.state.files]
         let images = [...this.state.images]
 
         let counter = sounds.length + files.length + images.length
         
-        for (let i = 0; i < e.target.files.length; i++) {
+        if(!paste && !drag) {
+            for (let i = 0; i < e.target.files.length; i++) {
+                if(counter > 9) {
+                    toast.error("Max upload 10 attachment!", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                    break
+                }
+
+                let file = {
+                    path: (window.URL || window.webkitURL).createObjectURL(new Blob([e.target.files[i]], {type: e.target.files[i].type})), 
+                    file: e.target.files[i], 
+                    name: e.target.files[i].name, 
+                    type: e.target.files[i].name.split('.').pop(),
+                    size: e.target.files[i].size / 1000
+                }
+                
+                if(file.type === 'png' || file.type === 'jpg' || file.type === 'jpeg' || file.type === 'gif') {
+                    file.id = images.length
+                    images.push(file)
+                }
+
+                if(file.type === 'txt' || file.type === 'pdf' || file.type === 'docx' || file.type === 'zip' || file.type === 'doc') {
+                    file.id = files.length
+                    files.push(file)
+                }
+
+                if(file.type === 'mp3') {
+                    file.id = sounds.length
+                    sounds.push(file)
+                }
+
+                counter++
+            }
+
+            e.target.value = null;
+        }
+
+        if(paste) {
             if(counter > 9) {
                 toast.error("Max upload 10 attachment!", {
                     position: toast.POSITION.TOP_CENTER
                 });
-                break
-            }
+            } else {
+                let file = {
+                    id: images.length,
+                    path: (window.URL || window.webkitURL).createObjectURL(new Blob([e], {type: e.type})), 
+                    file: e, 
+                    name: e.name, 
+                    type: e.name.split('.').pop()
+                }
 
-            let file = {
-                path: (window.URL || window.webkitURL).createObjectURL(new Blob([e.target.files[i]], {type: e.target.files[i].type})), 
-                file: e.target.files[i], 
-                name: e.target.files[i].name, 
-                type: e.target.files[i].name.split('.').pop(),
-                size: e.target.files[i].size / 1000
-            }
-            
-            if(file.type === 'png' || file.type === 'jpg' || file.type === 'jpeg' || file.type === 'gif') {
-                file.id = images.length
                 images.push(file)
             }
-
-            if(file.type === 'txt' || file.type === 'pdf' || file.type === 'docx' || file.type === 'zip' || file.type === 'doc') {
-                file.id = files.length
-                files.push(file)
-            }
-
-            if(file.type === 'mp3') {
-                file.id = sounds.length
-                sounds.push(file)
-            }
-
-            counter++
         }
 
-        e.target.value = null;
+        if(drag) {
+            for (let i = 0; i < e.length; i++) {
+                if(counter > 9) {
+                    toast.error("Max upload 10 attachment!", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                    break
+                }
+
+                let file = {
+                    path: (window.URL || window.webkitURL).createObjectURL(new Blob([e[i]], {type: e[i].type})), 
+                    file: e[i], 
+                    name: e[i].name, 
+                    type: e[i].name.split('.').pop(),
+                    size: e[i].size / 1000
+                }
+                
+                if(file.type === 'png' || file.type === 'jpg' || file.type === 'jpeg' || file.type === 'gif') {
+                    file.id = images.length
+                    images.push(file)
+                }
+
+                if(file.type === 'txt' || file.type === 'pdf' || file.type === 'docx' || file.type === 'zip' || file.type === 'doc') {
+                    file.id = files.length
+                    files.push(file)
+                }
+
+                if(file.type === 'mp3') {
+                    file.id = sounds.length
+                    sounds.push(file)
+                }
+
+                counter++
+            }
+        }
 
         this.setState({sounds, files, images})
     }
@@ -328,11 +463,20 @@ class Chat extends React.Component {
         if(waitDraft)
             clearTimeout(waitDraft)
 
-        if(newText > prevText) {
+        if(newText > prevText && !this.state.isEdit) {
             if(this.state.canTyping) {
                 this.setState({canTyping: false})
 
-                SocketController.typingRoom(this.props.rooms.activeRoom._id)
+                switch (this.props.type) {
+                    case 'room': 
+                        SocketController.typingRoom(this.props.rooms.activeRoom._id)
+                        break;
+                    case 'dialog': 
+                        SocketController.typingDialog(this.props.userId, this.props.user._id)
+                        break;
+                    default:
+                        break;
+                }
                 
                 setTimeout(() => {
                     this.setState({canTyping: true})
@@ -344,6 +488,8 @@ class Chat extends React.Component {
             waitDraft = setTimeout(() => {
                 let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
                 drafts['draft-'+this.props.dialogId] = newText
+                if(!drafts['draft-'+this.props.dialogId] || !/\S/.test(drafts['draft-'+this.props.dialogId]))
+                    delete drafts['draft-'+this.props.dialogId]
                 localStorage.setItem('drafts', JSON.stringify(drafts));
             }, 500);
         }
@@ -352,7 +498,17 @@ class Chat extends React.Component {
     render() {
         return (
         <>
-            <div className="dialog-container">
+            <div className="dialog-container" ref={this.dropRef}>
+                {this.state.drag &&
+                    <div className="drag-and-drop-container">
+                        <div className="data-empty">
+                            <InsertDriveFileOutlinedIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                            <p>Drag & drop files here to attach</p>
+                        </div>
+                    </div>
+                }
+
                 {this.state.isOpenSlider && <Slider images={this.state.sliderImages} close={() => {this.setState({isOpenSlider: false, sliderImages: []})}} />}
 
                 <Dialog 
@@ -361,6 +517,10 @@ class Chat extends React.Component {
                     deleteLocalMessage={(_id) => {this.deleteLocalMessage(_id)}}
                     messages={this.props.messages}
                     to={this.props.to}
+                    dialog={this.props.dialog}
+                    userName={this.props.userName}
+                    typing={this.props.typing}
+                    loading={this.props.loading}
                     type={this.props.type}
                     unRead={this.props.messages.filter(x => !x.isRead && x.user._id !== this.props.user._id)}
                     recentMessages={this.state.recentMessages}
@@ -432,7 +592,7 @@ class Chat extends React.Component {
                     attachedRecentMessages={this.state.attachedRecentMessages} 
                     sendMessage={(text) => {this.sendMessage(text)}}
                     typing={(newText, prevText) => {this.typing(newText, prevText)}}
-                    addFile={(e) => {this.addFile(e)}} 
+                    addFile={(e, paste) => {this.addFile(e, paste)}} 
                     setLastEditMessage={() => {this.setLastEditMessage()}}
                 />
 
@@ -460,6 +620,7 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         roomsActions: bindActionCreators(roomsActions, dispatch),
+        dialogsActions: bindActionCreators(dialogsActions, dispatch)
     }
 }
 

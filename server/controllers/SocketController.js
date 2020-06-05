@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
-const {roomOnIceCandidate, roomOfferSdp, stop} = require('./WebRtcController')
+const {roomOnIceCandidate, roomOfferSdp, stop, stopBySocketId, getUserExistById} = require('./WebRtcController')
 
 let idCounter = 0;
 let io = false
@@ -40,13 +40,14 @@ function initSocket(initIo) {
                 return;
             }
 
-            socket.join(`${String(user._id)}`)
-
             // Set online status for user
             user = await User.findById(userVerify.data.userId)
             if(user) {
+                socket.join(`user.${user._id}`)
+
                 user.onlineAt = Date.now()
                 user.online = true
+                
                 await user.save()
             }
         })
@@ -67,9 +68,11 @@ function initSocket(initIo) {
 
                     await room.save()
 
-                    stop(activeRoomId, user._id)
+                    // stop(activeRoomId, user._id)
                 }
-            }
+            } 
+
+            stopBySocketId(socket.id)
         })
 
         // Join and leave from Room and Language
@@ -108,7 +111,7 @@ function initSocket(initIo) {
             socket.leave(`room.${roomId}`)
             socket.to(`room.${roomId}`).emit('leaveInRoom', user._id)
 
-            stop(roomId, user._id)
+            stopBySocketId(socket.id)
 
             let room = await Room.findById(roomId).populate('users')
 
@@ -162,16 +165,23 @@ function initSocket(initIo) {
             socket.to(`${userId}`).emit('deleteMessageRoom', messageId)
         })
 
+        socket.on('typingDialog', ({otherId, userId}) => {
+            if(userId == user._id)
+                socket.to(`user.${otherId}`).emit('typingDialog', userId)
+        })
+
         // Room conference
         socket.on('roomIceCandidate', ({roomId, candidate}) => {
             roomOnIceCandidate(roomId, user._id, candidate)
         })
 
         socket.on('roomOfferSdp', ({roomId, offerSdp}) => {
-            roomOfferSdp(roomId, user._id, offerSdp, socket, (error, answerSdp) => {
-                if(error) return console.log(error)
-                socket.emit('roomAnswerSdp', answerSdp)
-            })
+            if(!getUserExistById(user._id)) {
+                roomOfferSdp(roomId, user._id, offerSdp, socket, (error, answerSdp) => {
+                    if(error) return console.log(error)
+                    socket.emit('roomAnswerSdp', answerSdp)
+                })
+            }
         })
 
         socket.on('roomSpeaking', (roomId) => {
@@ -184,6 +194,8 @@ function initSocket(initIo) {
     })
 }
 
+
+// Chat room
 function sendMessageRoom({roomId, message, socketId}) {
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('sendMessageRoom', message)
 }
@@ -201,10 +213,39 @@ function editMessageRoom({roomId, message, socketId}) {
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('editMessageRoom', message)
 }
 
+// Chat dialog
+function sendMessageDialog({userId, socketId, message}) {
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', message)
+}
+
+function readMessageDialog({dialogId, userId, otherId, socketId}) {
+    io.to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+}
+
+function editMessageDialog({userId, otherId, message, socketId, dialogId}) {
+    io.to(`user.${otherId}`).emit('editMessageDialog', {message, dialogId})
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('editMessageDialog', {message, dialogId})
+}
+
+function deleteMessageDialog({userId, otherId, socketId, messageIds, dialogId, lastMessage}) {
+    io.to(`user.${otherId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage})
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage})
+}
+
+function findBySocketId(socketId) {
+    return io.sockets.connected[socketId]
+}
+
 module.exports = {
     initSocket, 
     sendMessageRoom, 
     deleteMessageRoom,
     readMessageRoom,
-    editMessageRoom
+    editMessageRoom,
+    sendMessageDialog,
+    readMessageDialog,
+    editMessageDialog,
+    deleteMessageDialog,
+    findBySocketId
 }

@@ -2,7 +2,7 @@
 import React from 'react'
 import Avatar from '../User/Avatar'
 import { getHM, timeAt } from '../../Controllers/TimeController'
-import {CSSTransitionGroup} from 'react-transition-group'
+import { CSSTransitionGroup } from 'react-transition-group';
 import MessageComponent from './Message'
 
 // Material
@@ -80,17 +80,14 @@ class Message extends React.PureComponent {
                     }
                 }}
                 style={{
-                    background: (this.props.message.isLoading || this.props.message.isError) ? '#fff' : (this.props.message.user._id !== this.props.user._id && !this.props.message.isRead) ? '#EFF4F8' : '', 
+                    background: this.props.isRecent ? 'none' : (this.props.message.isLoading || this.props.message.isError) ? '#fff' : (this.props.message.user._id !== this.props.user._id && !this.props.message.isRead) ? '#EFF4F8' : '', 
                     cursor: (this.props.message.isLoading || this.props.message.isError) ? 'default' : '',
                     padding: this.props.isRecent ? '8px 14px 8px 6px' : ''
                 }}
             >
                 {
                     (isFirst || isHistoryDate) && !this.props.isRecent && 
-                    <Avatar style={{
-                        width: 32, 
-                        height: 32,
-                    }} name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
+                    <Avatar style={{width: 32, height: 32, fontSize: 14, lineHeight: '14px', fontWeight: 600, backgroundColor: `rgb(${this.props.message.user.color})`}} name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
                 }
 
                 {
@@ -206,16 +203,24 @@ class Message extends React.PureComponent {
                     </div>}
                 </div>
                 
-                {!this.props.isRecent && <div className="message-status">
+                {!this.props.isRecent && !this.props.canSelect && <div className="message-status">
                     <CSSTransitionGroup 
                         transitionName="message-status-transition"
                         transitionEnterTimeout={100}
-                        transitionLeaveTimeout={0}>
-                        {this.props.message.user._id === this.props.user._id && this.props.message.isLoading && <QueryBuilderIcon style={{color: '#B8C3CF'}} />}
+                        transitionLeaveTimeout={100}>
                         {!this.props.message.isLoading && !this.props.message.isError && this.props.message.isEdit && <EditOutlinedIcon style={{color: '#B8C3CF'}} />}
-                        {this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
-                        {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
-                        {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError && <>
+                    </CSSTransitionGroup>
+                </div>}
+                {!this.props.isRecent && !this.props.canSelect && <div className="message-status">
+                    <CSSTransitionGroup 
+                        transitionName="message-status-transition"
+                        transitionEnterTimeout={100}
+                        transitionLeaveTimeout={100}>
+                            {this.props.message.user._id === this.props.user._id && this.props.message.isLoading && <QueryBuilderIcon style={{color: '#B8C3CF'}} />}
+                            
+                            {this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
+                            {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
+                            {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError &&<>
                             <ActionMenu actions={[
                                 {text: 'Retry', action: () => {
                                     this.props.retrySendMessage(this.props.message)

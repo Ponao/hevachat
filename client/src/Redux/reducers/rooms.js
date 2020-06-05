@@ -22,13 +22,16 @@ import {
     ROOMS_SET_REMOTE_STREAM,
     ROOMS_SET_SPEAKING_STATUS,
     ROOMS_USER_LEAVE_IN_ROOM,
-    ROOMS_USER_JOIN_IN_ROOM
+    ROOMS_USER_JOIN_IN_ROOM,
+    ROOMS_SET_GET,
+    ROOMS_GET_ERROR
 } from '../constants'
 
 const INITIAL_STATE = {
     isFetching: true,
     getted: false,
     activeRoom: false,
+    isError: false,
     rooms: []
 }
 
@@ -36,6 +39,12 @@ const rooms = (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case ROOMS_GET: {
             return { ...state, rooms: action.payload, isFetching: false, getted: true }
+        }
+        case ROOMS_SET_GET: {
+            return { ...state, isFetching: true, getted: false, isError: false }
+        }
+        case ROOMS_GET_ERROR: {
+            return { ...state, isFetching: false, getted: true, isError: true }
         }
         case ROOMS_ADD:
             return { ...state, rooms: [ action.payload, ...state.rooms ]  }

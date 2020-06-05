@@ -12,15 +12,22 @@ import {
     ROOMS_DELETE_MESSAGE,
     ROOMS_READ_MESSAGES,
     ROOMS_LOAD_MESSAGES,
-    ROOMS_SET_LOADING
+    ROOMS_SET_LOADING,
+    ROOMS_GET_ERROR,
+    ROOMS_SET_GET
 } from '../constants'
 import SocketController from '../../Controllers/SocketController';
 import store from '../store';
 import WebRtcController from '../../Controllers/WebRtcController'
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
+import {urlApi} from '../../config'
 
 export const roomsGet = (apiToken, lang) => (dispatch) => {
-    fetch(`http://localhost:8000/api/room/get-all`, {
+    dispatch({
+        type: ROOMS_SET_GET,
+    })
+
+    fetch(`${urlApi}/api/room/get-all`, {
         method: "post",
         headers: {
             Accept: "application/json",
@@ -39,7 +46,12 @@ export const roomsGet = (apiToken, lang) => (dispatch) => {
         })
 
         SocketController.joinLang(lang)
-    });
+    })
+    .catch((err) => {
+        dispatch({
+            type: ROOMS_GET_ERROR,
+        })
+    })
 }
 
 export const roomsAdd = room => (dispatch) => {
@@ -50,7 +62,7 @@ export const roomsAdd = room => (dispatch) => {
 }
 
 export const joinRoom = ({id, apiToken}) => (dispatch) => {
-    fetch(`http://localhost:8000/api/room/get`, {
+    fetch(`${urlApi}/api/room/get`, {
             method: "post",
             headers: {
                 'Accept': 'application/json',
@@ -58,7 +70,8 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
                 Authorization: `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
-                id
+                id,
+                socketId: SocketController.getSocketId()
             })
         })
         .then(response => response.json())
@@ -99,8 +112,7 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
 }
 
 export const leaveRoom = (roomId, lang) => (dispatch) => {
-    SocketController.leaveRoom({roomId, lang})
-    WebRtcController.leaveRoom()
+    WebRtcController.leaveRoom({roomId, lang})
     dispatch({
         type: ROOMS_LEAVE_ROOM
     })
@@ -166,7 +178,7 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
     formData.append('socketId', SocketController.getSocketId())
     // formData.append('apiToken', apiToken)
 
-    fetch(`http://localhost:8000/api/room/send-message`, {
+    fetch(`${urlApi}/api/room/send-message`, {
             method: "post",
             headers: {
                 // 'Accept': 'application/json',
@@ -177,6 +189,12 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
         })
         .then(response => response.json())
         .then(messageRes => {
+            if(messageRes.error) {
+                return dispatch({
+                    type: ROOMS_ERROR_MESSAGE,
+                    payload: _id
+                })
+            }
             dispatch({
                 type: ROOMS_SUCCESS_MESSAGE,
                 payload: {_id, _newId: messageRes._id}
@@ -268,7 +286,7 @@ export const editMessage = (message, apiToken) => (dispatch) => {
     formData.append('oldSounds', oldSounds)
     formData.append('oldFiles', oldFiles)
 
-    fetch(`http://localhost:8000/api/room/edit-message`, {
+    fetch(`${urlApi}/api/room/edit-message`, {
             method: "post",
             headers: {
                 Authorization: `Bearer ${apiToken}`,
@@ -277,6 +295,12 @@ export const editMessage = (message, apiToken) => (dispatch) => {
         })
         .then(response => response.json())
         .then(messageRes => {
+            if(messageRes.error) {
+                return dispatch({
+                    type: ROOMS_ERROR_MESSAGE,
+                    payload: message._id
+                })
+            }
             dispatch({
                 type: ROOMS_SUCCESS_MESSAGE,
                 payload: {_id: message._id, _newId: message._id}
@@ -301,7 +325,7 @@ export const deleteMessage = ({roomId, deleteMessages}, apiToken) => (dispatch) 
         payload: messageIds
     })
 
-    fetch(`http://localhost:8000/api/room/delete-message`, {
+    fetch(`${urlApi}/api/room/delete-message`, {
             method: "post",
             headers: {
                 'Accept': 'application/json',
@@ -375,7 +399,7 @@ export const retrySendMessage = (message, apiToken) => (dispatch) => {
     formData.append('dialogId', message.dialogId)
     formData.append('socketId', SocketController.getSocketId())
 
-    fetch(`http://localhost:8000/api/room/send-message`, {
+    fetch(`${urlApi}/api/room/send-message`, {
             method: "post",
             headers: {
                 // 'Accept': 'application/json',
@@ -412,7 +436,7 @@ export const readMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch)
     }, 750)
 
     if(!!readMessages.length) {
-        fetch(`http://localhost:8000/api/room/read-messages`, {
+        fetch(`${urlApi}/api/room/read-messages`, {
                 method: "post",
                 headers: {
                     'Accept': 'application/json',
@@ -438,7 +462,12 @@ export const loadMessages = ({dialogId, userId, roomId}, apiToken) => (dispatch)
         type: ROOMS_SET_LOADING
     })
 
-    fetch(`http://localhost:8000/api/room/load-messages`, {
+    dispatch({
+        type: ROOMS_LOAD_MESSAGES,
+        payload: {messages: [], canLoad: false}
+    })
+
+    fetch(`${urlApi}/api/room/load-messages`, {
             method: "post",
             headers: {
                 'Accept': 'application/json',

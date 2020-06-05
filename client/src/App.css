@@ -123,7 +123,7 @@
     transition: height .2s;
 }
 
-.dialog-empty {
+.data-empty {
     position: absolute;
     top: 50%;
     left: 0;
@@ -134,7 +134,7 @@
     transform: translateY(-50%);
 }
 
-.dialog-empty p {
+.data-empty p {
     margin-top: 10px;
     color: #999999;
     text-align: center;
@@ -152,7 +152,8 @@
 .message .select-indicator {
     width: 18px;
     position: absolute;
-    top: 6px;
+    top: 50%;
+    transform: translateY(-50%);
     right: 14px;
     height: 18px;
     border: 2px solid #CCD1D6;
@@ -175,11 +176,15 @@
 .message-status {
     align-items: flex-end;
     display: flex;
+    position: relative;
+    height: 100%;
+    width: 16px;
 }
 
 .message-status svg {
     font-size: 16px;
-    margin-bottom: 3px;
+    position: absolute;
+    bottom: 3px;
 }
 
 .message-status .error {
@@ -232,7 +237,7 @@
 }
 
 .message .message-images {
-    max-width: 100%;
+    max-width: 450px;
     display: flex;
     flex-wrap: wrap;
     margin: -5px;
@@ -280,11 +285,13 @@
     max-width: 100%;
     display: flex;
     margin-left: -4px;
+    flex-wrap: wrap;
 }
 
 .message-file {
     display: flex;
-    display: 0 1;
+    width: 100%;
+    margin: 5px 0;
 }
 
 .message-file .file-icon {
@@ -433,6 +440,7 @@
     width: 100%;
     min-height: 60px;
     max-height: 180px;
+    overflow: auto;
     z-index: 3;
     height: max-content;
     display: flex;
@@ -441,11 +449,18 @@
     flex-wrap: wrap;
 }
 
+.dialog-attachment > div {
+    position: unset!important;
+    margin-bottom: 0!important;
+    height: 100%!important;
+    overflow-x: unset!important;
+}
+
 .dialog-typers {
     display: flex;
     width: 100%;
     padding: 12px 0;
-    z-index: 3;
+    z-index: 2;
     height: max-content;
     background-color: #fff;
 }
@@ -458,7 +473,7 @@
     padding: 0;
 }
 
-.dialog-typers .typing:after {
+.typing:after {
     overflow: hidden;
     display: inline-block;
     vertical-align: bottom;
@@ -595,16 +610,31 @@
     pointer-events: none;
 }
 
+.drag-and-drop-container {
+    border: 2px dashed #C2CFD8;
+    background-color: #fff;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 10;
+    border-radius: 15px;
+    margin: 14px;
+}
+
 .unread-messages-count {
     position: absolute;
     width: max-content;
-    min-width: 20px;
-    padding: 0 5px;
-    height: 20px;
+    min-width: 18px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 0 4px;
+    height: 18px;
     color: #fff;
     background-color: #008FF7;
     top: -10px;
-    line-height: 20px;
+    line-height: 18px;
     border-radius: 50px;
     text-align: center;
 }
@@ -672,7 +702,7 @@
     transition: transform 100ms ease-in;
 }
 
-.message-status-transition-enter svg {
+.message-status-transition-enter {
     transform: scale(0);
 }
 
@@ -687,7 +717,7 @@
 
 .message-status-transition-leave.message-status-transition-leave-active {
     transform: scale(0);
-    transition: transform 1ms ease-in;
+    transition: transform 100ms ease-in;
 }
 
 .btn-reply, .btn-forward, .btn-edit-message, .btn-delete-message, .btn-cancel-select {
@@ -722,18 +752,18 @@
 
 .scroll .track-vertical {
     width: 7px;
-    background-color: #ededed;
+    background-color: none;
     position: absolute;
     right: 0;
     height: 100%;
     transition: all .2s;
     padding: 0 2px;
     z-index: 4;
+    opacity: 0;
 }
 
 .scroll .track-vertical:hover {
     width: 12px;
-    background-color: #ededed;
     padding: 0 2.5px;
 }
 
@@ -745,6 +775,7 @@
     transition: width .2s;
     width: 3px;
     background-color: #999;
+    border-radius: 5px;
 }
 
 .action-menu-container {
@@ -880,6 +911,19 @@
     justify-content: unset!important;
     color: #008FF7!important;
     border-radius: 0!important;
+    transition: all 0ms!important;
+}
+
+.active .dialog-item {
+    background-color: #EFF4F8;
+}
+
+.dialog-item:hover {
+    background-color: #EFF4F8!important;
+}
+
+.active .dialog-item .user-name {
+    color: #556677;
 }
 
 .dialog-item .user-avatar {
@@ -889,7 +933,7 @@
 .dialog-item .user-name {
     display: flex;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     color: #008FF7;
     margin: 0 0 0 12px;
     line-height: 22px;
@@ -912,9 +956,26 @@
     margin-right: 2px;
 }
 
+.dialog-item .dialog-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    text-align: center;
+    align-items: flex-end;
+}
+
+.dialog-item .dialog-info .time-at {
+    color: #999999;
+    font-size: 12px;
+}
+
+.dialog-item .dialog-info .unread-messages-count {
+    position: unset;
+}
+
 .dialog-header {
     align-items: center;
-    padding-left: 16px;
+    padding-left: 14px;
     display: flex;
     border-bottom: 1px solid #EFF4F8;
 }
@@ -928,7 +989,7 @@
     font-weight: 600;
     font-size: 16px;
     color: #008FF7;
-    margin: 0 0 0 12px;
+    margin: 0 0 0 14px;
     line-height: 22px;
 }
 
@@ -936,6 +997,6 @@
     display: flex;
     font-size: 14px;
     color: #667788;
-    margin: 0 0 0 12px;
+    margin: 0 0 0 14px;
     line-height: 16px;
 }

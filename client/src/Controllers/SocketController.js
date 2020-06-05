@@ -13,16 +13,23 @@ import {
     ROOMS_REMOVE_TYPER,
     ROOMS_SET_SPEAKING_STATUS,
     ROOMS_USER_JOIN_IN_ROOM,
-    ROOMS_USER_LEAVE_IN_ROOM
+    ROOMS_USER_LEAVE_IN_ROOM,
+    DIALOGS_ADD_MESSAGE,
+    DIALOGS_READ_MESSAGES,
+    DIALOGS_SET_TYPER,
+    DIALOGS_EDIT_MESSAGE,
+    DIALOGS_DELETE_MESSAGE,
+    DIALOGS_ADD
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
+import {urlApi} from '../config'
 
 let socket = null
 let activeLang = false
 
 export default { 
     init: (apiToken) => {
-        socket = io('http://localhost:8000', {transports: ['websocket', 'polling', 'flashsocket']})
+        socket = io(urlApi, {transports: ['websocket', 'polling', 'flashsocket']})
         socket.on('connect', () => {
             socket.emit('auth', apiToken)
         })
@@ -128,6 +135,84 @@ export default {
                 payload: {userId, speaking: false}
             })
         })
+
+        socket.on('sendMessageDialog', message => {
+            if(store.getState().dialogs.dialogs.find(x => x._id === message.dialogId)) {
+                let noReadCount = false
+
+                if(
+                    message.user._id !== store.getState().user._id &&
+                    !store.getState().dialogs.dialogs.find(x => x._id === message.dialogId).noRead
+                ) {
+                    noReadCount = true
+                }
+
+                store.dispatch({
+                    type: DIALOGS_ADD_MESSAGE,
+                    payload: {message, dialogId: message.dialogId, noRead: message.user._id !== store.getState().user._id, noReadCount}
+                })
+            } else {
+                let dialog = {
+                    lastMessage: message,
+                    _id: message.dialogId,
+                    users: [store.getState().user, message.user],
+                    user: message.user,
+                    getted: false,
+                    typing: false,
+                    noRead: 1,
+                    messages: []
+                }
+                store.dispatch({
+                    type: DIALOGS_ADD,
+                    payload: dialog
+                })
+            }
+        })
+
+        socket.on('readMessagesDialog', ({dialogId, userId}) => {
+            store.dispatch({
+                type: DIALOGS_READ_MESSAGES,
+                payload: {dialogId, userId, noRead: userId !== store.getState().user._id, noReadCount: userId !== store.getState().user._id}
+            })
+        })
+
+        socket.on('editMessageDialog', ({message, dialogId}) => {
+            let last = store.getState().dialogs.dialogs.find(x => x._id === dialogId).lastMessage
+
+            let editLast
+            if(last)
+                editLast = message._id === last._id
+            else 
+                editLast = false
+
+            store.dispatch({
+                type: DIALOGS_EDIT_MESSAGE,
+                payload: {message, dialogId, editLast}
+            })
+        })
+
+        socket.on('deleteMessageDialog', ({messageIds, dialogId, lastMessage}) => {
+            store.dispatch({
+                type: DIALOGS_DELETE_MESSAGE,
+                payload: {dialogId, messageIds, lastMessage}
+            })
+        })
+
+        socket.on('typingDialog', userId => {
+            if(store.getState().dialogs.dialogs.find(x => x.user._id === userId)) {
+                store.dispatch({
+                    type: DIALOGS_SET_TYPER,
+                    payload: {userId, typing: true}
+                })
+    
+                setTimeout(() => {
+                    store.dispatch({
+                        type: DIALOGS_SET_TYPER,
+                        payload: {userId, typing: false}
+                    })
+                }, 2500)
+            }
+        })
     },
     getSocketId: () => {
         return socket.id
@@ -168,6 +253,9 @@ export default {
     },
     sendRoomStopSpeaking: ({roomId}) => {
         socket.emit('roomStopSpeaking', roomId)
+    },
+    typingDialog: (otherId, userId) => {
+        socket.emit('typingDialog', {otherId, userId})
     }
 }
 

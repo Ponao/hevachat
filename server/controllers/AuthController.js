@@ -8,6 +8,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const Dialog = require('../models/Dialog');
 
 module.exports = {
   // Register method
@@ -45,7 +46,46 @@ module.exports = {
 
       let token = generateToken(newUser._id);
 
-      return res.json({ token, user: newUser });
+      const dialogs = await Dialog.find({'users': {'$all': [newUser._id]}}).populate([
+        {
+            path: 'users',
+            select: ['_id', 'name', 'online', 'color']
+        },
+        {
+            path: 'messages'
+        },
+        {
+            path: 'lastMessage',
+            populate: {
+                path: 'user'
+            }
+        },
+    ]).sort({updatedAt: 'DESC'});
+
+    let noReadCount = 0
+
+    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [newUser._id]}}).populate([
+      {
+          path: 'users',
+          select: ['_id']
+      },
+      {
+        path: 'lastMessage',
+        populate: {
+            path: 'user'
+        }
+    },
+  ]);
+
+    if(noReadDialogs) {
+      noReadDialogs.map(x => {
+        if(x.lastMessage.user._id != newUser._id && x.isRead) {
+          noReadCount++
+        } 
+      })
+    }
+
+      return res.json({ token, user: newUser, dialogs, noReadCount });
     } catch (e) {
       console.log(e);
       return next(new Error(e));
@@ -72,8 +112,47 @@ module.exports = {
         if (verifiedPassword) {
           // Success: generate and respond with the JWT
           let token = generateToken(user.id);
+
+          const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
+            {
+                path: 'users',
+                select: ['_id', 'name', 'online', 'color']
+            },
+            {
+                path: 'messages'
+            },
+            {
+                path: 'lastMessage',
+                populate: {
+                    path: 'user'
+                }
+            },
+        ]).sort({updatedAt: 'DESC'});
+
+        let noReadCount = 0
+
+    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}}).populate([
+      {
+          path: 'users',
+          select: ['_id']
+      },
+      {
+        path: 'lastMessage',
+        populate: {
+            path: 'user'
+        }
+    },
+  ]);
+
+    if(noReadDialogs) {
+      noReadDialogs.map(x => {
+        if(x.lastMessage.user._id != user._id && x.isRead) {
+          noReadCount++
+        } 
+      })
+    }
           
-          return res.json({ token, user });
+          return res.json({ token, user, dialogs, noReadCount });
         }
       }
     } catch (e) {
