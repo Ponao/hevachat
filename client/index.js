@@ -16,11 +16,11 @@ const sslCerts = {
     cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
 }
 
-http.createServer(app).listen(80);
+http.createServer(app).listen(443);
 
 // Redirect from http port 80 to https
-const http = require('http');
-http.createServer(function (req, res) {
-    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-    res.end();
-}).listen(80);
+// const http = require('http');
+// http.createServer(function (req, res) {
+//     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+//     res.end();
+// }).listen(80);
