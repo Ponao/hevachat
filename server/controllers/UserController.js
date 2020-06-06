@@ -48,7 +48,7 @@ module.exports = {
 
             if(noReadDialogs) {
             noReadDialogs.map(x => {
-                if(x.lastMessage.user._id != user._id && x.isRead) {
+                if(String(x.lastMessage.user._id) != String(user._id)) {
                     noReadCount++
                 } 
             })

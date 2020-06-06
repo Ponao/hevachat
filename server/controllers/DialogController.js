@@ -58,7 +58,7 @@ module.exports = {
                 return res.status(401).json({ dialog: {error: true}, errors: [err] });
             }
 
-            let query = userId == user._id ? {'$all': [user._id]} : {'$all': [user._id, userId]}
+            let query = userId == user._id ? {'$eq': [user._id]} : {'$all': [user._id, userId]}
 
             let dialog = await Dialog.findOne({'users': query}).populate([
                 {

@@ -29,13 +29,14 @@ const options = {
     ],
 };
 
-// const getMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+const getMedia = navigator.mediaDevices.getUserMedia 
+// || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 function getUserMedia(callback) {    
-    // getMedia({
-    //     audio: true,
-    //     video: false
-    // }).then(callback);
+    getMedia({
+        audio: true,
+        video: false
+    }).then(callback);
 
     function onerror(e) {
         console.log(JSON.stringify(e, null, '\t'));

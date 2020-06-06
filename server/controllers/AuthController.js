@@ -79,7 +79,7 @@ module.exports = {
 
     if(noReadDialogs) {
       noReadDialogs.map(x => {
-        if(x.lastMessage.user._id != newUser._id && x.isRead) {
+        if(x.lastMessage.user._id != newUser._id && !!x.noRead) {
           noReadCount++
         } 
       })
@@ -146,7 +146,7 @@ module.exports = {
 
     if(noReadDialogs) {
       noReadDialogs.map(x => {
-        if(x.lastMessage.user._id != user._id && x.isRead) {
+        if(x.lastMessage.user._id != user._id && !!x.noRead) {
           noReadCount++
         } 
       })
