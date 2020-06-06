@@ -176,12 +176,12 @@ function initSocket(initIo) {
         })
 
         socket.on('roomOfferSdp', ({roomId, offerSdp}) => {
-            if(!getUserExistById(user._id)) {
+            // if(!getUserExistById(user._id)) {
                 roomOfferSdp(roomId, user._id, offerSdp, socket, (error, answerSdp) => {
                     if(error) return console.log(error)
                     socket.emit('roomAnswerSdp', answerSdp)
                 })
-            }
+            // }
         })
 
         socket.on('roomSpeaking', (roomId) => {
@@ -214,23 +214,28 @@ function editMessageRoom({roomId, message, socketId}) {
 }
 
 // Chat dialog
-function sendMessageDialog({userId, socketId, message}) {
-    io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', message)
+function sendMessageDialog({userId, socketId, otherId, message}) {
+    if(userId != otherId) {
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId}))
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', ({message, otherId}))
+    } else {
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId}))
+    }
 }
 
 function readMessageDialog({dialogId, userId, otherId, socketId}) {
-    io.to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+    io.sockets.connected[socketId].to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
     io.sockets.connected[socketId].to(`user.${userId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
 }
 
 function editMessageDialog({userId, otherId, message, socketId, dialogId}) {
-    io.to(`user.${otherId}`).emit('editMessageDialog', {message, dialogId})
+    io.sockets.connected[socketId].to(`user.${otherId}`).emit('editMessageDialog', {message, dialogId})
     io.sockets.connected[socketId].to(`user.${userId}`).emit('editMessageDialog', {message, dialogId})
 }
 
-function deleteMessageDialog({userId, otherId, socketId, messageIds, dialogId, lastMessage}) {
-    io.to(`user.${otherId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage})
-    io.sockets.connected[socketId].to(`user.${userId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage})
+function deleteMessageDialog({userId, otherId, socketId, messageIds, dialogId, lastMessage, noRead, noReadCount}) {
+    io.sockets.connected[socketId].to(`user.${otherId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage, noRead, noReadCount})
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('deleteMessageDialog', {messageIds, dialogId, lastMessage, noRead})
 }
 
 function findBySocketId(socketId) {

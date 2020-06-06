@@ -65,6 +65,23 @@ module.exports = {
         }
     },
 
+    get: async(req, res, next) => {
+        const { userId } = req.body;
+
+        try {
+            const user = await User.findById(userId)
+            
+            if (user) {
+                return res.json(user);
+            }
+            const err = new Error(`User ${userId} not found.`);
+            err.notFound = true;
+            return next(err);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
     updateRoomLang: async (req, res, next) => {
         // Get this account as JSON
         const { user } = res.locals;

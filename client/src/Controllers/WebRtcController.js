@@ -29,8 +29,7 @@ const options = {
     ],
 };
 
-const getMedia = navigator.mediaDevices.getUserMedia 
-// || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+const getMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 function getUserMedia(callback) {    
     getMedia({

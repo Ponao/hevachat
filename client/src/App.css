@@ -15,10 +15,26 @@
     line-height: 22px;
     transition: all 0.2s;
     display: block;
+    margin-top: 20px;
 }
 
 .input-field:focus {
     border-bottom: 1px solid #008FF7;
+}
+
+.nav-auth {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.input-error-label {
+    color: #FF3358;
+    font-size: 12px;
+    text-align: center;
+    width: 100%;
+    display: block;
 }
 
 .button-gray, .button-blue {

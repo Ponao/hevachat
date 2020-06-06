@@ -240,8 +240,7 @@ module.exports = {
 
             await dialog.save()
 
-            sendMessageDialog({userId, socketId, message})
-            sendMessageDialog({userId: user._id, socketId, message})
+            sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
 
             return res.json(message);
         } catch (e) {
@@ -448,9 +447,11 @@ module.exports = {
         const { socketId, otherId, messageIds, dialogId } = req.body;
 
         try {
+            let cancelNoReadCount = await Message.find({_id: {'$in': messageIds}, 'user': { _id: user._id }, isRead: false}).countDocuments()
+
             let result = await Message.updateMany({_id: {'$in': messageIds}, 'user': { _id: user._id } }, {"$set":{"isDelete": true}})
 
-            let lastMessage = await Message.findOne({'user': { _id: user._id }, 'isDelete': false}).sort({ field: 'asc', _id: -1 }).populate([
+            let lastMessage = await Message.findOne({'user': {_id: user._id}, 'isDelete': false}).sort({ field: 'asc', _id: -1 }).populate([
                 {
                     path: 'user',
                     select: ['_id', 'email', 'name', 'online', 'color']
@@ -473,20 +474,55 @@ module.exports = {
                 }
             ]).limit(1)
 
+            let noRead = false
             if(lastMessage) {
                 let dialog = await Dialog.findById(dialogId)
 
                 dialog.updatedAt = lastMessage.createdAt
+                
+                if(cancelNoReadCount) {
+                    dialog.noRead = dialog.noRead - cancelNoReadCount
+                }
+
+                if(dialog.noRead < 0) {
+                    dialog.noRead = 0
+                }
+
                 dialog.lastMessage = lastMessage
 
                 await dialog.save()
+
+                noRead = dialog.noRead
             } else {
                 lastMessage = false
+            }
+
+            let noReadCount = 0
+
+            const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [otherId]}}).populate([
+            {
+                path: 'users',
+                select: ['_id']
+            },
+            {
+                path: 'lastMessage',
+                populate: {
+                    path: 'user'
+                }
+            },
+        ]);
+
+            if(noReadDialogs) {
+            noReadDialogs.map(x => {
+                if(String(x.lastMessage.user._id) != String(otherId)) {
+                    noReadCount++
+                } 
+            })
             }
             
 
             if(result.nModified === messageIds.length) {
-                deleteMessageDialog({userId: user._id, otherId, socketId, messageIds, dialogId, lastMessage})
+                deleteMessageDialog({userId: user._id, otherId, socketId, messageIds, dialogId, lastMessage, noRead, noReadCount})
             }
             return next()
         } catch (e) {

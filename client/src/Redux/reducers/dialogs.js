@@ -106,7 +106,8 @@ const dialogs = (state = INITIAL_STATE, action) => {
                     { ...dialog, messages: [ ...dialog.messages.filter(message => {        
                         return !action.payload.messageIds.find(x => x === message._id)
                     })],
-                    lastMessage: action.payload.lastMessage
+                    lastMessage: action.payload.lastMessage, 
+                    noRead: action.payload.noRead || action.payload.noRead === 0 ? action.payload.noRead : dialog.noRead
                 } :
                 dialog
             ).sort((a, b) => {
@@ -117,7 +118,7 @@ const dialogs = (state = INITIAL_STATE, action) => {
                 b = new Date(b.lastMessage.createdAt);
                 
                 return a>b ? -1 : a<b ? 1 : 0;
-            }) }
+            }), noReadCount: action.payload.noReadCount || action.payload.noReadCount === 0 ? action.payload.noReadCount : state.noReadCount }
         case DIALOGS_SET_LOADING:
             return { ...state, dialogs: state.dialogs.map(dialog => 
                 action.payload.dialogId === dialog._id ? 

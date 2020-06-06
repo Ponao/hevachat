@@ -320,7 +320,7 @@ class Chat extends React.Component {
                         roomId: this.props.roomId, 
                         userId: this.props.user._id
                     }, this.props.user.apiToken)
-                }, 500)
+                }, 1000)
                 break;
             case 'dialog': 
                 waitFastRead = setTimeout(() => {
@@ -329,7 +329,7 @@ class Chat extends React.Component {
                         otherId: this.props.userId, 
                         userId: this.props.user._id
                     }, this.props.user.apiToken)
-                }, 500)
+                }, 1000)
                 break;
             default:
                 break;

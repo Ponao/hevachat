@@ -33,12 +33,14 @@ module.exports = {
         // Conflict: the resource already exists (HTTP 409)
         const err = {};
         err.param = `all`;
-        err.msg = `That email or phone is already taken.`;
+        err.msg = `email_already`;
         return res.status(409).json({ error: true, errors: [err] });
       }
 
       const newUser = new User();
-      
+
+      newUser.firstName = user.firstName
+      newUser.lastMessage = user.lastMessage
       newUser.email = user.email
       newUser.password = await bcrypt.hash(user.password, 12)
 
@@ -79,7 +81,7 @@ module.exports = {
 
     if(noReadDialogs) {
       noReadDialogs.map(x => {
-        if(x.lastMessage.user._id != newUser._id && !!x.noRead) {
+        if(String(x.lastMessage.user._id) != String(newUser._id)) {
           noReadCount++
         } 
       })
@@ -146,7 +148,7 @@ module.exports = {
 
     if(noReadDialogs) {
       noReadDialogs.map(x => {
-        if(x.lastMessage.user._id != user._id && !!x.noRead) {
+        if(String(x.lastMessage.user._id) != String(user._id)) {
           noReadCount++
         } 
       })
@@ -161,7 +163,7 @@ module.exports = {
     // Unauthorized (HTTP 401)
     const err = {};
     err.param = `all`;
-    err.msg = `Username and password don't match.`;
+    err.msg = `email_or_password_wrong`;
     return res.status(401).json({ error: true, errors: [err] });
   },
   forgot: async (req, res, next) => {

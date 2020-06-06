@@ -5,7 +5,7 @@ import '../../Css/Auth/Login.css'
 
 // Router
 import {
-    BrowserRouter as Router,
+    Link
 } from "react-router-dom"
 
 // Redux
@@ -69,9 +69,22 @@ class Login extends React.Component {
 
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
+                    {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'email').msg} 
+                    </span>}
+
                     <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Пароль" />
+                    {this.state.errors.find(value => value.param === 'password') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'password').msg} 
+                    </span>}
+
+                    {this.state.errors.find(value => value.param === 'all') && <span style={{marginTop: 30}} className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'all').msg} 
+                    </span>}
 
                     <button type="submit" className="button-gray">Войти</button>
+
+                    <p className="nav-auth">New to the site? <Link to="/register">Sign up</Link></p>
                 </form>
             </div>
         )

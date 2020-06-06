@@ -136,7 +136,7 @@ export default {
             })
         })
 
-        socket.on('sendMessageDialog', message => {
+        socket.on('sendMessageDialog', ({message, otherId}) => {
             if(store.getState().dialogs.dialogs.find(x => x._id === message.dialogId)) {
                 let noReadCount = false
 
@@ -152,20 +152,34 @@ export default {
                     payload: {message, dialogId: message.dialogId, noRead: message.user._id !== store.getState().user._id, noReadCount}
                 })
             } else {
-                let dialog = {
-                    lastMessage: message,
-                    _id: message.dialogId,
-                    users: [store.getState().user, message.user],
-                    user: message.user,
-                    getted: false,
-                    typing: false,
-                    noRead: 1,
-                    messages: []
-                }
-                store.dispatch({
-                    type: DIALOGS_ADD,
-                    payload: dialog
+                fetch(`${urlApi}/api/user/get`, {
+                    method: "post",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${apiToken}`,
+                    },
+                    body: JSON.stringify({
+                        userId: otherId
+                    })
                 })
+                .then((response) => response.json())
+                .then((user) => {
+                    let dialog = {
+                        lastMessage: message,
+                        _id: message.dialogId,
+                        users: [store.getState().user, user],
+                        user: user,
+                        getted: false,
+                        typing: false,
+                        noRead: 1,
+                        messages: []
+                    }
+                    store.dispatch({
+                        type: DIALOGS_ADD,
+                        payload: dialog
+                    })
+                });
             }
         })
 
@@ -191,10 +205,11 @@ export default {
             })
         })
 
-        socket.on('deleteMessageDialog', ({messageIds, dialogId, lastMessage}) => {
+        socket.on('deleteMessageDialog', ({messageIds, dialogId, lastMessage, noRead, noReadCount}) => {
+            console.log(noReadCount)
             store.dispatch({
                 type: DIALOGS_DELETE_MESSAGE,
-                payload: {dialogId, messageIds, lastMessage}
+                payload: {dialogId, messageIds, lastMessage, noRead, noReadCount}
             })
         })
 

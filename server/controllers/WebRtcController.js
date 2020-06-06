@@ -107,7 +107,7 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
             }
 
             for (let [key, value] of Object.entries(Rooms[roomId].users)) {
-                if(String(value.id) !== String(userId)) {
+                if(String(value._id) !== String(userId)) {
                     value.webRtcEndpoint.connect(webRtcEndpoint, function(error) {
                         if (error) {
                             stop(roomId, userId);

@@ -5,7 +5,7 @@ import '../../Css/Auth/Login.css'
 
 // Router
 import {
-    BrowserRouter as Router,
+    Link,
 } from "react-router-dom"
 
 // Redux
@@ -16,6 +16,8 @@ import {urlApi} from '../../config'
 
 class Register extends React.Component {
     state = {
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         error: false,
@@ -36,6 +38,8 @@ class Register extends React.Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    firstName: this.state.firstName,
+                    lastName: this.state.lastName,
                     email: this.state.email,
                     password: this.state.password
                 })
@@ -65,10 +69,33 @@ class Register extends React.Component {
                 </h1>
 
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
-                    <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" placeholder="E-mail" />
-                    <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" placeholder="Пароль" />
+                    <input value={this.state.firstName} onChange={(e) => {this.setState({firstName: e.target.value})}} className="input-field" type="text" name="firstName" placeholder="First name" />
+                    {this.state.errors.find(value => value.param === 'firstName') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'firstName').msg} 
+                    </span>}
+
+                    <input value={this.state.lastName} onChange={(e) => {this.setState({lastName: e.target.value})}} className="input-field" type="text" name="lastName" placeholder="Last name" />
+                    {this.state.errors.find(value => value.param === 'lastName') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'lastName').msg} 
+                    </span>}
+
+                    <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
+                    {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'email').msg} 
+                    </span>}
+
+                    <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Пароль" />
+                    {this.state.errors.find(value => value.param === 'password') && <span className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'password').msg} 
+                    </span>}
+
+                    {this.state.errors.find(value => value.param === 'all') && <span style={{marginTop: 30}} className="input-error-label">
+                        {this.state.errors.find(value => value.param === 'all').msg} 
+                    </span>}
 
                     <button type="submit" className="button-gray">Зарегистрироваться</button>
+
+                    <p className="nav-auth">Already have account? <Link to="/login">Log in</Link></p>
                 </form>
             </div>
         )
