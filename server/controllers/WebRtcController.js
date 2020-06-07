@@ -51,31 +51,35 @@ function getKurentoClient(callback) {
 function roomOnIceCandidate(roomId, userId, _candidate) {
     let candidate = kurento.getComplexType('IceCandidate')(_candidate);
 
-    if(Rooms[roomId] && Rooms[roomId].users[userId] && Rooms[roomId].users[userId].webRtcEndpoint) {
-        Rooms[roomId].users[userId].webRtcEndpoint.addIceCandidate(candidate);
-    } else {
-        if(!candidatesQueues[userId]) {
-            candidatesQueues[userId] = [];
+    try {
+        if(Rooms[roomId] && Rooms[roomId].users[userId] && Rooms[roomId].users[userId].webRtcEndpoint) {
+            Rooms[roomId].users[userId].webRtcEndpoint.addIceCandidate(candidate);
+        } else {
+            if(!candidatesQueues[userId]) {
+                candidatesQueues[userId] = [];
+            }
+            candidatesQueues[userId].push(candidate);
         }
-        candidatesQueues[userId].push(candidate);
-    }
+    } catch {}
 }
 
 function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
     clearCandidatesQueue(userId);
 
-    
-
     if(Rooms[roomId].MediaPipeline) {
-        connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+        try {
+            connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+        } catch {}
     } else {
-        getKurentoClient((error, kurentoClient) => {
-            kurentoClient.create('MediaPipeline', (error, pipeline) => {
-                Rooms[roomId].MediaPipeline = pipeline
+        try {
+            getKurentoClient((error, kurentoClient) => {
+                kurentoClient.create('MediaPipeline', (error, pipeline) => {
+                    Rooms[roomId].MediaPipeline = pipeline
 
-                connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+                    connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+                })
             })
-        })
+        } catch {}
     }
 }
 

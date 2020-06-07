@@ -103,8 +103,6 @@ class Rooms extends React.Component {
                                 <RoomItem key={index} room={room} />
                             )
                         })}
-
-                        
                     </Scrollbars>
 
                     {!this.props.rooms.isFetching && !this.props.rooms.isError && !this.props.rooms.rooms.length && <div className="data-empty">

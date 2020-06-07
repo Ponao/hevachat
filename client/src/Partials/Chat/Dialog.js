@@ -12,6 +12,12 @@ import { withStyles, LinearProgress, CircularProgress } from '@material-ui/core'
 
 import { connect } from 'react-redux';
 
+// Internet Explorer 6-11
+const isIE = /*@cc_on!@*/false || !!document.documentMode;
+
+// Edge 20+
+const isEdge = !isIE && !!window.StyleMedia;
+
 let waitActiveUser = false
 
 const fabStyles = theme => ({
@@ -39,11 +45,15 @@ class Dialog extends React.Component {
 
     scrollToBottom() {
         if(this.messagesBlock) {
-            this.messagesBlock.view.scroll({
-                top: this.messagesBlock.getScrollHeight(),
-                left: 0,
-                behavior: 'smooth'
-            })
+            if(isEdge || isIE)
+                this.messagesBlock.view.scrollTop = 100000
+            else {
+                this.messagesBlock.view.scroll({
+                    top: 100000,
+                    left: 0,
+                    behavior: 'smooth'
+                })
+            }
         }
     }
 
@@ -82,10 +92,7 @@ class Dialog extends React.Component {
         window.addEventListener('mousemove', this.focusPage.bind(this));
 
         if(this.messagesBlock) {
-            this.messagesBlock.view.scroll({
-                top: 10000,
-                left: 0,
-            })
+            this.messagesBlock.view.scrollTop = 100000
         }
     }
 

@@ -4,6 +4,7 @@ import Avatar from '../User/Avatar'
 import { getHM, timeAt } from '../../Controllers/TimeController'
 import { CSSTransitionGroup } from 'react-transition-group';
 import MessageComponent from './Message'
+import ogs from 'ts-open-graph-scraper'
 
 // Material
 import CheckIcon from '@material-ui/icons/Check';
@@ -24,11 +25,21 @@ import { connect } from 'react-redux'
 import ActionMenu from '../ActionMenu'
 import { randomInteger } from '../../Controllers/FunctionsController'
 
-const componentDecorator = (href, text, key) => (
-    <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
-      {text}
-    </a>
-);
+let ogsLink = false
+
+const componentDecorator = (href, text, key) => {
+    // ogsLink = ogs({url: href}, (error, results, response) => {
+    //     console.log('error:', error); // This is returns true or false. True if there was a error. The error it self is inside the results object.
+    //     console.log('results:', results); // This contains all of the Open Graph results
+    //     console.log('response:', response); // This contains the HTML of page
+    // })
+
+    return (
+        <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
+        {text}
+        </a>
+    )
+};
 
 class Message extends React.PureComponent {
     state = {
@@ -95,7 +106,12 @@ class Message extends React.PureComponent {
                     <div style={{width: 46}} />
                 }
 
+                
                 {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
+                <CSSTransitionGroup 
+                    transitionName="message-status-transition"
+                    transitionEnterTimeout={100}
+                    transitionLeaveTimeout={100}>
                     {this.props.selected && <CheckIcon style={{
                         color: '#fff', 
                         fontSize: 16,
@@ -106,7 +122,9 @@ class Message extends React.PureComponent {
                         bottom: 0,
                         margin: 'auto'
                     }} />}
+                    </CSSTransitionGroup>
                 </span>}
+                
                 
                 <div className="content col">
                     {
@@ -155,12 +173,12 @@ class Message extends React.PureComponent {
                                         this.props.openSlider(images)
                                     }}>
                                         <span>{`+${images.length-3}`}</span>
-                                        <img key={index} src={image.path} alt={image.name} />
+                                        <img draggable="false" key={index} src={image.path} alt={image.name} />
                                     </div>
                                 </div>
 
                             return  <div key={index} className="image" style={{width}}>
-                                <img onClick={(e) => {
+                                <img draggable="false" onClick={(e) => {
                                     e.stopPropagation()
                                     this.props.openSlider(images)
                                 }} src={image.path} alt={image.name} />
@@ -203,24 +221,24 @@ class Message extends React.PureComponent {
                     </div>}
                 </div>
                 
-                {!this.props.isRecent && !this.props.canSelect && <div className="message-status">
+                {!this.props.isRecent && <div className="message-status">
                     <CSSTransitionGroup 
                         transitionName="message-status-transition"
                         transitionEnterTimeout={100}
                         transitionLeaveTimeout={100}>
-                        {!this.props.message.isLoading && !this.props.message.isError && this.props.message.isEdit && <EditOutlinedIcon style={{color: '#B8C3CF'}} />}
+                        {!this.props.canSelect && !this.props.message.isLoading && !this.props.message.isError && this.props.message.isEdit && <EditOutlinedIcon style={{color: '#B8C3CF'}} />}
                     </CSSTransitionGroup>
                 </div>}
-                {!this.props.isRecent && !this.props.canSelect && <div className="message-status">
+                {!this.props.isRecent && <div className="message-status">
                     <CSSTransitionGroup 
                         transitionName="message-status-transition"
                         transitionEnterTimeout={100}
                         transitionLeaveTimeout={100}>
-                            {this.props.message.user._id === this.props.user._id && this.props.message.isLoading && <QueryBuilderIcon style={{color: '#B8C3CF'}} />}
+                            {!this.props.canSelect && this.props.message.user._id === this.props.user._id && this.props.message.isLoading && <QueryBuilderIcon style={{color: '#B8C3CF'}} />}
                             
-                            {this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
-                            {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
-                            {this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError &&<>
+                            {!this.props.canSelect && this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
+                            {!this.props.canSelect && this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
+                            {!this.props.canSelect && this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError &&<>
                             <ActionMenu actions={[
                                 {text: 'Retry', action: () => {
                                     this.props.retrySendMessage(this.props.message)

@@ -3,7 +3,7 @@ import React from 'react'
 
 import Avatar from '../User/Avatar'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-
+import { CSSTransitionGroup } from 'react-transition-group';
 import '../../Css/Partials/RoomItem.css'
 import { NavLink, withRouter } from 'react-router-dom';
 
@@ -81,6 +81,10 @@ class DialogItem extends React.Component {
                     </div>
                     <div className="dialog-info">
                         <span className="time-at">{LastMessageDate(this.props.lastMessage.createdAt)}</span>
+                        <CSSTransitionGroup 
+                    transitionName="message-status-transition"
+                    transitionEnterTimeout={100}
+                    transitionLeaveTimeout={100}>
                         {(this.props.lastMessage.user._id === this.props.myUser._id && !this.props.lastMessage.isError && this.props.lastMessage.isLoading) && <QueryBuilderIcon style={{marginTop: 2, fontSize: 16, color: '#B8C3CF'}} />}
                         {(this.props.lastMessage.user._id === this.props.myUser._id && !this.props.lastMessage.isError && !this.props.lastMessage.isLoading && !this.props.lastMessage.isRead) && <DoneIcon style={{marginTop: 2, fontSize: 16, color: '#B8C3CF'}} />}
                         {(this.props.lastMessage.user._id === this.props.myUser._id && !this.props.lastMessage.isError && !this.props.lastMessage.isLoading && this.props.lastMessage.isRead) && <DoneAllIcon style={{marginTop: 2, fontSize: 16, color: '#008FF7'}} />}
@@ -100,6 +104,7 @@ class DialogItem extends React.Component {
                             ]} from={'message-error-actions-'+this.state.randomId} />
                             <ErrorOutlineIcon className='error' id={'message-error-actions-'+this.state.randomId} style={{marginTop: 2, fontSize: 16, color: '#FF3333'}} />
                         </>}
+                        </CSSTransitionGroup>
                     </div>
                 </Button>
             </NavLink>

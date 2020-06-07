@@ -9,6 +9,8 @@ import { connect } from 'react-redux'
 import * as dialogsActions from '../../Redux/actions/dialogs'
 import { bindActionCreators } from 'redux'
 import RoomItem from '../../Partials/Room/RoomItem'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import IconButton from '@material-ui/core/IconButton';
 
 // Material
 import Fab from '@material-ui/core/Fab';
@@ -44,6 +46,9 @@ class Dialog extends React.Component {
 
     componentDidMount() {
         this.context.toggleHeader(true)
+        
+        if(window.innerWidth < 769)
+            this.context.toggleHeader(false)
 
         if(!this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id)) {
             this.props.dialogsActions.dialogGet(this.props.match.params.id, this.props.user.apiToken)
@@ -62,6 +67,11 @@ class Dialog extends React.Component {
         return (
             <> 
                 {dialog && !dialog.isNotFound && <><div className="col-xl-9 col-lg-6 col-md-6 dialog-header" style={{order: 2}}>
+                        <IconButton className="back-btn" onClick={() => {
+                            this.props.history.push('/')
+                        }}>
+                            <ArrowBackIcon fontSize="small" style={{color: '#008FF7'}} />
+                        </IconButton>
                      <><Avatar style={{
                         width: 32, 
                         height: 32, 
