@@ -36,7 +36,7 @@ function getUserMedia(callback) {
     getMedia({
         audio: true,
         video: false
-    }).then(callback);
+    }, callback);
 
     function onerror(e) {
         console.log(JSON.stringify(e, null, '\t'));
