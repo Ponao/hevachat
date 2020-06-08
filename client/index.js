@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const http = require("http")
+const https = require("https")
 const fs = require("fs")
 
 const app = express();
@@ -11,16 +11,16 @@ app.get('/*', function(req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// const sslCerts = {
-//     key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
-//     cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
-// }
+const sslCerts = {
+    key: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/fullchain.pem")
+}
 
-http.createServer(app).listen(80);
+https.createServer(app).listen(443);
 
 // Redirect from http port 80 to https
-// const http = require('http');
-// http.createServer(function (req, res) {
-//     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-//     res.end();
-// }).listen(80);
+const http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+}).listen(80);
