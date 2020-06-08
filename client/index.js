@@ -16,7 +16,7 @@ const sslCerts = {
     cert: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/fullchain.pem")
 }
 
-https.createServer(app).listen(443);
+https.createServer(sslCerts, app).listen(443);
 
 // Redirect from http port 80 to https
 const http = require('http');
