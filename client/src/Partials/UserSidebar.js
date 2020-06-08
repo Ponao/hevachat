@@ -32,7 +32,8 @@ class UserSidebar extends React.Component {
                                 style={{
                                     top: 11,
                                     right: '40%',
-                                    transform: 'translateX(50%)'
+                                    transform: 'translateX(50%)',
+                                    backgroundColor: '#FF3333'
                                 }}
                             >{this.props.dialogs.noReadCount}</span>}
                         </li>

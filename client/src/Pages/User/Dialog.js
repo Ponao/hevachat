@@ -7,6 +7,7 @@ import {PageSettings} from '../PageSettings'
 // Redux
 import { connect } from 'react-redux'
 import * as dialogsActions from '../../Redux/actions/dialogs'
+import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
 import RoomItem from '../../Partials/Room/RoomItem'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -57,6 +58,7 @@ class Dialog extends React.Component {
                 this.props.dialogsActions.dialogLoad(this.props.match.params.id, this.props.user.apiToken)
         }
     }
+
     componentWillUnmount() {
         this.context.toggleHeader(false)
     }
@@ -72,14 +74,14 @@ class Dialog extends React.Component {
                         }}>
                             <ArrowBackIcon fontSize="small" style={{color: '#008FF7'}} />
                         </IconButton>
-                     <><Avatar style={{
+                     <><div style={{display: 'contents'}} onClick={() => {this.props.usersActions.setActiveUserId(dialog.user._id)}}><Avatar style={{
                         width: 32, 
                         height: 32, 
                         fontSize: 14, 
                         fontWeight: 600, 
                         backgroundColor: `rgb(${dialog.user.color})`
-                    }} name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} />
-                    <div className="user-info">
+                    }} name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} /></div>
+                    <div className="user-info" onClick={() => {this.props.usersActions.setActiveUserId(dialog.user._id)}}>
                         <p className="user-name">{`${dialog.user.name.first} ${dialog.user.name.last}`}</p>
                         <p className="last-message">Last message</p>
                     </div></>
@@ -123,6 +125,7 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         dialogsActions: bindActionCreators(dialogsActions, dispatch),
+        usersActions: bindActionCreators(usersActions, dispatch)
     }
 }
 

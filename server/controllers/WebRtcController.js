@@ -2,7 +2,7 @@ var kurento = require('kurento-client');
 
 var kurentoClient = null;
 
-let wsKurentoUri = 'ws://192.168.10.10:8888/kurento'
+let wsKurentoUri = 'ws://85.143.202.123:8888/kurento'
 
 let candidatesQueues = {}
 let Rooms = {}
@@ -73,7 +73,13 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
     } else {
         try {
             getKurentoClient((error, kurentoClient) => {
+                if(error) {
+                    return console.log(error)
+                }
                 kurentoClient.create('MediaPipeline', (error, pipeline) => {
+                    if(error) {
+                        return console.log(error)
+                    }
                     Rooms[roomId].MediaPipeline = pipeline
 
                     connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
@@ -85,11 +91,14 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
 
 function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) {
     Rooms[roomId].MediaPipeline.create('WebRtcEndpoint', function(error, webRtcEndpoint) {
+        if(error) {
+            return console.log(error)
+        }
         Rooms[roomId].users[userId].webRtcEndpoint = webRtcEndpoint
 
         webRtcEndpoint.on('OnIceCandidate', function(event) {
             let candidate = kurento.getComplexType('IceCandidate')(event.candidate);
-            // socket.to(`room.${roomId}`).emit('roomOnIceCandidate', candidate);
+            socket.emit('roomOnIceCandidate', candidate);
         });
 
         if (candidatesQueues[userId]) {

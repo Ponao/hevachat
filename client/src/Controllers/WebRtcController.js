@@ -21,6 +21,7 @@ const mediaConstraints = {
 
 const options = {
     iceServers: [
+        {urls: 'stun:173.194.66.127:19302'}, 
         {
           urls: 'turn:89.223.100.223:3478',
           credential: 'TkYUraQew3RjwTA2JPjAaWL1Q7FIamc',
@@ -29,7 +30,8 @@ const options = {
     ],
 };
 
-const getMedia = navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+const getMedia = navigator.mediaDevices.getUserMedia 
+// || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
 function getUserMedia(callback) {    
     getMedia({
@@ -123,8 +125,8 @@ export default {
         }
     },
     roomOnIceCandidate: (e) => {
-        let candidate = new RTCIceCandidate(e)
-        WebRtcPeerConnection.addIceCandidate(candidate)
+        if(WebRtcPeerConnection)
+            WebRtcPeerConnection.addIceCandidate(e)
     },
     onRoomAnswerSdp: (sdpAnswer) => {
         let answer = new RTCSessionDescription({

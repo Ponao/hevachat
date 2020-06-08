@@ -8,6 +8,8 @@ import UserSidebar from './Partials/UserSidebar'
 
 // Router
 import AppRouter from './Router'
+import { connect } from 'react-redux'
+import ModalUser from './Modals/User'
 
 class App extends React.Component {
     constructor(props) {
@@ -31,6 +33,7 @@ class App extends React.Component {
                     <div className="row">
                         {this.state.userHeader && <UserSidebar />}
                         <AppRouter />
+                        {!!this.props.users.activeUserId && <ModalUser userId={this.props.users.activeUserId} />}
                     </div>
                 </div>
             </PageSettings.Provider>
@@ -38,4 +41,10 @@ class App extends React.Component {
     }
 }
 
-export default App
+const mapStateToProps = state => {
+    return {
+        users: state.users
+    }
+}
+
+export default connect(mapStateToProps)(App)

@@ -12,5 +12,8 @@ const UserController = require('../controllers/UserController')
 router.get('/me', verifyToken, UserController.user);
 router.post('/update-room-lang', verifyToken, UserController.updateRoomLang);
 router.post('/get', verifyToken, UserController.get);
+router.post('/request', verifyToken, UserController.requestFriend)
+router.post('/accept-request', verifyToken, UserController.acceptRequest)
+router.post('/remove-request', verifyToken, UserController.declineRequest)
 
 module.exports = router;

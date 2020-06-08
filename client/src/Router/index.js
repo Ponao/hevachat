@@ -10,6 +10,7 @@ import routes from './config'
 // Redux
 import { connect } from "react-redux";
 import * as userActions from "../Redux/actions/user";
+import * as usersActions from "../Redux/actions/users";
 import { bindActionCreators } from "redux";
 
 import NoMatch from '../Pages/NoMatch'
@@ -40,9 +41,9 @@ class AppRouter extends React.Component {
         },
       })
         .then((response) => response.json())
-        .then(({user, dialogs, noReadCount}) => {
+        .then(({user, dialogs, noReadCount, friends}) => {
           SocketController.init(apiToken)
-          // SocketController.joinLang(user.roomLang)
+          this.props.usersActions.setUsers(friends);
           this.props.userActions.loginUser(user, dialogs, noReadCount, apiToken);
           this.setState({isRender: true})
         })
@@ -139,6 +140,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
   return {
     userActions: bindActionCreators(userActions, dispatch),
+    usersActions: bindActionCreators(usersActions, dispatch),
   };
 }
 

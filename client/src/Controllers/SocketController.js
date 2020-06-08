@@ -164,7 +164,7 @@ export default {
                     })
                 })
                 .then((response) => response.json())
-                .then((user) => {
+                .then(({user, friendStatus}) => {
                     let dialog = {
                         lastMessage: message,
                         _id: message.dialogId,

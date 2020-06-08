@@ -24,6 +24,8 @@ import Linkify from 'react-linkify'
 import { connect } from 'react-redux'
 import ActionMenu from '../ActionMenu'
 import { randomInteger } from '../../Controllers/FunctionsController'
+import * as usersActions from '../../Redux/actions/users'
+import { bindActionCreators } from 'redux'
 
 let ogsLink = false
 
@@ -129,7 +131,7 @@ class Message extends React.PureComponent {
                 <div className="content col">
                     {
                         (isFirst || isHistoryDate) &&
-                        <h3 className="user-name" style={{color: this.props.message.user._id === this.props.user._id ? '#FF3333' : ''}}>{`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span></h3>
+                        <h3 onClick={(e) => {e.stopPropagation();this.props.usersActions.setActiveUserId(this.props.message.user._id)}} className="user-name" style={{color: this.props.message.user._id === this.props.user._id ? '#FF3333' : ''}}>{`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span></h3>
                     }
 
                     {this.props.message.text && <p className="message-text">
@@ -263,5 +265,10 @@ const mapStateToProps = state => {
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        usersActions: bindActionCreators(usersActions, dispatch)
+    }
+}
 
-export default connect(mapStateToProps)(Message)
+export default connect(mapStateToProps, mapDispatchToProps)(Message)

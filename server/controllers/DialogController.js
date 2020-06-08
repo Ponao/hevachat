@@ -451,7 +451,7 @@ module.exports = {
 
             let result = await Message.updateMany({_id: {'$in': messageIds}, 'user': { _id: user._id } }, {"$set":{"isDelete": true}})
 
-            let lastMessage = await Message.findOne({'user': {_id: user._id}, 'isDelete': false}).sort({ field: 'asc', _id: -1 }).populate([
+            let lastMessage = await Message.findOne({dialogId: dialogId, 'isDelete': false}).sort({ field: 'asc', _id: -1 }).populate([
                 {
                     path: 'user',
                     select: ['_id', 'email', 'name', 'online', 'color']

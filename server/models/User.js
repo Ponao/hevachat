@@ -21,6 +21,7 @@ const UserSchema = new Schema({
   online: { type: Boolean, default: true },
   onlineAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now, select: false },
+  friends: [{ type: Schema.Types.ObjectId, ref: 'Friend'}],
   color: { type: String },
   buff: Buffer
 });

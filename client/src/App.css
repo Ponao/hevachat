@@ -653,6 +653,7 @@
     line-height: 18px;
     border-radius: 50px;
     text-align: center;
+    display: block;
 }
 
 .btn-add-files, .btn-send-message, .back-btn {
@@ -1025,4 +1026,22 @@
     color: #667788;
     margin: 0 0 0 14px;
     line-height: 16px;
+}
+
+.user-profile-name {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.user-profile-city {
+    color: #667788;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 5px;
+    width: 100%;
 }
