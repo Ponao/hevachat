@@ -77,13 +77,18 @@ function startServer() {
     const fs = require("fs")
 
     var sslCerts = {
-      key: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/privkey.pem"),
-      cert: fs.readFileSync("/etc/letsencrypt/live/pogrooz.ru/fullchain.pem")
+      key: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/privkey.pem"),
+      cert: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/fullchain.pem")
     }
 
     const https = require("https").createServer(sslCerts, app)
 
     const io = require('socket.io')(https)
+
+    const redisAdapter = require('socket.io-redis');
+
+    io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+
     initSocket(io)
 
     https.listen(8080);
