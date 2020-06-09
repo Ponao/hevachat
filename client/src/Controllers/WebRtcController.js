@@ -91,8 +91,8 @@ export default {
         
         getUserMedia((stream) => {
             localStream = stream
-            let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-            let dest = audioCtx.createMediaStreamDestination ();
+            // let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+            // let dest = audioCtx.createMediaStreamDestination ();
 
             localStream.getAudioTracks()[0].enabled = false
 
