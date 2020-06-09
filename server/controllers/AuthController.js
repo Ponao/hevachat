@@ -39,8 +39,10 @@ module.exports = {
 
       const newUser = new User();
 
-      newUser.firstName = user.firstName
-      newUser.lastMessage = user.lastMessage
+      newUser.name = {
+        first: user.firstName,
+        last: user.lastMessage
+      }
       newUser.email = user.email
       newUser.password = await bcrypt.hash(user.password, 12)
 
@@ -51,7 +53,7 @@ module.exports = {
       const dialogs = await Dialog.find({'users': {'$all': [newUser._id]}}).populate([
         {
             path: 'users',
-            select: ['_id', 'name', 'online', 'color']
+            select: ['_id', 'name', 'online', 'color', 'onlineAt']
         },
         {
             path: 'messages'
@@ -118,7 +120,7 @@ module.exports = {
           const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
             {
                 path: 'users',
-                select: ['_id', 'name', 'online', 'color']
+                select: ['_id', 'name', 'online', 'color', 'onlineAt']
             },
             {
                 path: 'messages'

@@ -82,6 +82,19 @@
     align-items: center;
     justify-content: center;
     display: flex;
+    position: relative;
+}
+
+.online-status {
+    position: absolute;
+    display: block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    background: #35E551;
+    right: 0;
+    bottom: 0;
+    border-radius: 50px;
 }
 
 .sidebar {
@@ -234,6 +247,7 @@
     font-size: 14px;
     font-weight: 600;
     margin: 0;
+    width: max-content;
 }
 
 .message .time-at {
@@ -842,6 +856,8 @@
 
 .dialog-loading {
     width: 100%;
+    text-align: center;
+    padding: 5px 0;
 }
 
 .dialog-loading .MuiLinearProgress-bar {
@@ -935,6 +951,35 @@
     background-color: #EFF4F8;
 }
 
+.user-item {
+    padding: 10px 12px!important;
+    display: flex!important;
+    cursor: pointer;
+    width: 100%!important;
+    text-transform: unset!important;
+    justify-content: unset!important;
+    color: #008FF7!important;
+    border-radius: 0!important;
+    transition: all 0ms!important;
+}
+
+.user-item .user-name {
+    display: flex;
+    font-weight: 600;
+    font-size: 14px;
+    color: #008FF7;
+    margin: 0 0 0 12px;
+    line-height: 22px;
+}
+
+.user-item .last-message {
+    display: flex;
+    font-size: 14px;
+    color: #667788;
+    margin: 0 0 0 12px;
+    line-height: 16px;
+}
+
 .dialog-item:hover {
     background-color: #EFF4F8!important;
 }
@@ -980,7 +1025,7 @@
     text-align: center;
     align-items: flex-end;
     position: relative;
-    height: 45px;
+    height: 40px;
     width: max-content;
 }
 
@@ -1029,8 +1074,8 @@
 }
 
 .user-profile-name {
-    color: #333;
-    font-size: 24px;
+    color: #556677;
+    font-size: 20px;
     font-weight: 600;
     text-align: center;
     margin-top: 10px;
@@ -1044,4 +1089,45 @@
     text-align: center;
     margin-top: 5px;
     width: 100%;
+}
+
+.user-btn {
+    width: 25%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.user-btn p {
+    font-size: 12px;
+    color: #999;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dialog-header .user-avatar {
+    cursor: pointer;
+}
+
+.dialog-header .user-info {
+    cursor: pointer;
+}
+
+.contacts-tabs {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.contacts-tabs span {
+    margin: 0 10px;
+    color: #999;
+    transition: color 0.1s;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.contacts-tabs span.active {
+    color: #008FF7;
 }

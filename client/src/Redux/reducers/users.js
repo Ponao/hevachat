@@ -3,7 +3,10 @@ import {
     USERS_ADD,
     USERS_SET_ACTIVE_USER_ID,
     USERS_SET_FRIEND_STATUS,
-    USERS_SET
+    USERS_SET,
+    USERS_FRIENDS_GET,
+    USERS_REQUESTED_GET,
+    USERS_PENDING_GET
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -12,7 +15,25 @@ const INITIAL_STATE = {
     activeUserId: false,
     isError: false,
     canLoad: false,
-    users: []
+    users: [],
+    friends: {
+        users: [],
+        getted: false,
+        canLoad: false,
+        isFetching: true,
+    },
+    requested: {
+        users: [],
+        getted: false,
+        canLoad: false,
+        isFetching: true,
+    },
+    pending: {
+        users: [],
+        getted: false,
+        canLoad: false,
+        isFetching: true,
+    },
 }
 
 const rooms = (state = INITIAL_STATE, action) => {
@@ -31,6 +52,12 @@ const rooms = (state = INITIAL_STATE, action) => {
                 } :
                 user
             ) }
+        case USERS_FRIENDS_GET:
+            return { ...state, friends: { ...state.friends, users: action.payload, isFetching: false, getted: true } }
+        case USERS_REQUESTED_GET:
+            return { ...state, requested: { ...state.requested, users: action.payload, isFetching: false, getted: true } }
+        case USERS_PENDING_GET:
+            return { ...state, pending: { ...state.pending, users: action.payload, isFetching: false, getted: true } }
         default: 
             return state
     }

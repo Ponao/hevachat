@@ -20,7 +20,7 @@ class UserSidebar extends React.Component {
     }
 
     render() {
-        return (
+        return this.props.show && (
             <>
                 <div className="col-xl-3 col-lg-6 col-md-6 user-header">
                     <ul>

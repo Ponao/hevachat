@@ -8,7 +8,7 @@ const INITIAL_STATE = {
     musicOn: true
 }
 
-const user = (state = INITIAL_STATE, action) => {
+const media = (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case MEDIA_TOGGLE_MICROPHONE: {
             return { ...state, micOn: action.payload }
@@ -21,4 +21,4 @@ const user = (state = INITIAL_STATE, action) => {
     }
 }
 
-export default user
+export default media

@@ -15,5 +15,12 @@ router.post('/get', verifyToken, UserController.get);
 router.post('/request', verifyToken, UserController.requestFriend)
 router.post('/accept-request', verifyToken, UserController.acceptRequest)
 router.post('/remove-request', verifyToken, UserController.declineRequest)
+router.post('/get-online', verifyToken, UserController.getOnline)
+router.get('/get-friends', verifyToken, UserController.getFriends)
+router.get('/get-requested', verifyToken, UserController.getRequested)
+router.get('/get-pending', verifyToken, UserController.getPending)
+// router.get('/load-friends', verifyToken, UserController.loadFriends)
+// router.get('/load-requested', verifyToken, UserController.loadRequested)
+// router.get('/load-pending', verifyToken, UserController.loadPending)
 
 module.exports = router;

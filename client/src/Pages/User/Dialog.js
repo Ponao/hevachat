@@ -22,6 +22,7 @@ import showLoading from '../../Partials/Loading'
 import Avatar from '../../Partials/User/Avatar';
 import Chat from '../../Partials/Chat/Chat';
 import SearchIcon from '@material-ui/icons/Search';
+import { OnlineDate } from '../../Controllers/TimeController';
 
 const fabStyles = theme => ({
     root: {
@@ -54,6 +55,7 @@ class Dialog extends React.Component {
         if(!this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id)) {
             this.props.dialogsActions.dialogGet(this.props.match.params.id, this.props.user.apiToken)
         } else {
+            this.props.dialogsActions.updateOnline(this.props.match.params.id, this.props.user.apiToken)
             if(!this.props.dialogs.dialogs.find(dialog => dialog.user._id === this.props.match.params.id).getted)
                 this.props.dialogsActions.dialogLoad(this.props.match.params.id, this.props.user.apiToken)
         }
@@ -74,16 +76,25 @@ class Dialog extends React.Component {
                         }}>
                             <ArrowBackIcon fontSize="small" style={{color: '#008FF7'}} />
                         </IconButton>
-                     <><div style={{display: 'contents'}} onClick={() => {this.props.usersActions.setActiveUserId(dialog.user._id)}}><Avatar style={{
+                     <><div style={{display: 'contents'}} onClick={() => {
+                         this.props.history.push({
+                            search: `?user=${dialog.user._id}`
+                         })
+                     }}><Avatar style={{
                         width: 32, 
                         height: 32, 
                         fontSize: 14, 
                         fontWeight: 600, 
                         backgroundColor: `rgb(${dialog.user.color})`
                     }} name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} /></div>
-                    <div className="user-info" onClick={() => {this.props.usersActions.setActiveUserId(dialog.user._id)}}>
+                    <div className="user-info" onClick={() => {
+                        this.props.history.push({
+                            search: `?user=${dialog.user._id}`
+                         })
+                    }}>
                         <p className="user-name">{`${dialog.user.name.first} ${dialog.user.name.last}`}</p>
-                        <p className="last-message">Last message</p>
+                        {!dialog.user.online && <p className="last-message">{OnlineDate(dialog.user.onlineAt)}</p>}
+                        {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>online</p>}
                     </div></>
                 </div>
                 <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>

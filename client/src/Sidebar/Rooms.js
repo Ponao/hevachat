@@ -21,6 +21,7 @@ import { withStyles, Tooltip } from '@material-ui/core'
 import showLoading from '../Partials/Loading'
 import WarningIcon from '@material-ui/icons/Warning';
 import AppsIcon from '@material-ui/icons/Apps';
+import { withRouter } from 'react-router-dom';
 
 const fabStyles = theme => ({
     root: {
@@ -80,8 +81,6 @@ class Rooms extends React.Component {
     render() {
         return (
             <>
-                <ModalCreateRoom isOpen={this.state.isOpenCreateRoom} close={() => {this.setState({isOpenCreateRoom: false})}} />
-
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar" style={{overflow: 'hidden'}}>
                     <h2 className="sidebar-title">Rooms</h2>
 
@@ -120,7 +119,11 @@ class Rooms extends React.Component {
                     </div>}
 
                     <Tooltip title="Create room" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
-                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {this.setState({isOpenCreateRoom: true})}}>
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: "?act=newRoom"
+                            })
+                        }}>
                             <AddIcon />
                         </CustomFab>
                     </Tooltip>
@@ -143,4 +146,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Rooms)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Rooms))

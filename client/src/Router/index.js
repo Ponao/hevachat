@@ -16,6 +16,7 @@ import { bindActionCreators } from "redux";
 import NoMatch from '../Pages/NoMatch'
 import { setTitle } from "../Controllers/FunctionsController";
 import {urlApi} from '../config'
+import MainModal from "../Modals/MainModal";
 class AppRouter extends React.Component {
   state = {
     isRender: false
@@ -41,9 +42,8 @@ class AppRouter extends React.Component {
         },
       })
         .then((response) => response.json())
-        .then(({user, dialogs, noReadCount, friends}) => {
+        .then(({user, dialogs, noReadCount}) => {
           SocketController.init(apiToken)
-          this.props.usersActions.setUsers(friends);
           this.props.userActions.loginUser(user, dialogs, noReadCount, apiToken);
           this.setState({isRender: true})
         })
@@ -98,7 +98,10 @@ class AppRouter extends React.Component {
         {...rest}
         render={() =>
           this.props.user.isAuth ? (
-            children
+            (<>
+              {children}
+              <MainModal />
+            </>)
           ) : (
             <Redirect
               to={{

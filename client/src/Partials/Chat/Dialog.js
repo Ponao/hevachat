@@ -114,7 +114,7 @@ class Dialog extends React.Component {
         }
 
         if(JSON.stringify(prevProps.messages[0]) !== JSON.stringify(this.props.messages[0])) {
-            this.messagesBlock.scrollTop(this.messagesBlock.getScrollHeight() - this.state.scrollTop - 4)
+            this.messagesBlock.scrollTop(this.messagesBlock.getScrollHeight() - this.state.scrollTop)
         }
     }
 
@@ -174,8 +174,10 @@ class Dialog extends React.Component {
                     className="dialog scroll"
                     autoHide
                 >
-                    {((this.props.type === 'room' && this.props.rooms.activeRoom.isLoading) || (this.props.type === 'dialog' && this.props.dialog.canLoad)) && <div className="dialog-loading">
-                        <LinearProgress style={{backgroundColor: '#EFF4F8'}} />
+                    {((this.props.type === 'room' && this.props.rooms.activeRoom.isLoading) || (this.props.type === 'dialog' && this.props.dialog.isLoading)) && <div className="dialog-loading">
+                        <CircularProgress style={{
+                            color: '#008FF7',
+                        }} />
                     </div>}
                     <div className="offset-top"></div>
                     {this.props.messages.map((message, index, messages) => {

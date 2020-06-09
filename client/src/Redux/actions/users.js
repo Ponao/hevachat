@@ -3,7 +3,10 @@ import {
     USERS_GET,
     USERS_SET_ACTIVE_USER_ID,
     USERS_SET_FRIEND_STATUS,
-    USERS_SET
+    USERS_SET,
+    USERS_FRIENDS_GET,
+    USERS_REQUESTED_GET,
+    USERS_PENDING_GET
 } from '../constants'
 import store from '../store'
 import {urlApi} from '../../config'
@@ -26,6 +29,78 @@ export const userGet = (userId, apiToken) => (dispatch) => {
         dispatch({
             type: USERS_ADD,
             payload: user
+        })
+    });
+}
+
+export const friendsGet = (apiToken) => (dispatch) => {
+    fetch(`${urlApi}/api/user/get-friends`, {
+        method: "get",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiToken}`,
+        }
+    })
+    .then((response) => response.json())
+    .then((friends) => {
+        let users = []
+        
+        friends.map(user => {
+            users.push(user.recipient)
+        })
+
+        dispatch({
+            type: USERS_FRIENDS_GET,
+            payload: users
+        })
+    });
+}
+
+export const requestedGet = (apiToken) => (dispatch) => {
+    fetch(`${urlApi}/api/user/get-requested`, {
+        method: "get",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiToken}`,
+        }
+    })
+    .then((response) => response.json())
+    .then((friends) => {
+        let users = []
+        
+        friends.map(user => {
+            users.push(user.recipient)
+        })
+
+        dispatch({
+            type: USERS_REQUESTED_GET,
+            payload: users
+        })
+    });
+}
+
+export const pendingGet = (apiToken) => (dispatch) => {
+    fetch(`${urlApi}/api/user/get-pending`, {
+        method: "get",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiToken}`,
+        }
+    })
+    .then((response) => response.json())
+    .then((friends) => {
+        let users = []
+        
+        friends.map(user => {
+            users.push(user.recipient)
+        })
+
+        dispatch({
+            type: USERS_PENDING_GET,
+            payload: users
         })
     });
 }

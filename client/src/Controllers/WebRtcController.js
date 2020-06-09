@@ -10,6 +10,12 @@ let localStream = false
 let remoteStream = false
 let speechEvents = false
 
+// Internet Explorer 6-11
+const isIE = /*@cc_on!@*/false || !!document.documentMode;
+
+// Edge 20+
+const isEdge = !isIE && !!window.StyleMedia;
+
 const RTCPeerConnection = RTCPeerConnection || window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.RTCSessionDescription;
 const RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
@@ -33,10 +39,16 @@ const options = {
 const getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 // navigator.mediaDevices.getUserMedia 
 function getUserMedia(callback) {    
-    getMedia({
-        audio: true,
-        video: false
-    }, callback);
+    if(isIE || isEdge) {
+        navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(stream => {
+            callback(stream)
+        })
+    } else {
+        getMedia({
+            audio: true,
+            video: false
+        }, callback);
+    }
 
     function onerror(e) {
         console.log(JSON.stringify(e, null, '\t'));

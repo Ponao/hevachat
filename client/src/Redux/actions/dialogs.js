@@ -9,7 +9,8 @@ import {
     DIALOGS_EDIT_MESSAGE,
     DIALOGS_DELETE_MESSAGE,
     DIALOGS_SET_LOADING,
-    DIALOGS_LOAD_MESSAGES
+    DIALOGS_LOAD_MESSAGES,
+    DIALOGS_UPDATE_ONLINE
 } from '../constants'
 import store from '../store';
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
@@ -116,6 +117,27 @@ export const dialogLoad = (userId, apiToken) => (dispatch) => {
         dispatch({
             type: DIALOGS_LOAD,
             payload: {dialogId: dialog._id, messages: dialog.messages, canLoad: messages.length === 50}
+        })
+    });
+}
+
+export const updateOnline = (userId, apiToken) => (dispatch) => {
+    fetch(`${urlApi}/api/user/get-online`, {
+        method: "post",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiToken}`,
+        },
+        body: JSON.stringify({
+            userId
+        })
+    })
+    .then((response) => response.json())
+    .then(({online, onlineAt}) => {
+        dispatch({
+            type: DIALOGS_UPDATE_ONLINE,
+            payload: {userId, online, onlineAt}
         })
     });
 }
@@ -491,11 +513,6 @@ export const loadMessages = ({dialogId}, apiToken) => (dispatch) => {
     dispatch({
         type: DIALOGS_SET_LOADING,
         payload: dialogId
-    })
-
-    dispatch({
-        type: DIALOGS_LOAD_MESSAGES,
-        payload: {dialogId,  messages: [], canLoad: false}
     })
 
     fetch(`${urlApi}/api/dialog/load-messages`, {

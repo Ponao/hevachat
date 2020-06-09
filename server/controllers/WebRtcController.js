@@ -19,6 +19,18 @@ function getUserExistById(id) {
     return false
 }
 
+function getUserExistBySocketId(id) {
+    for (let [key, room] of Object.entries(Rooms)) {
+        for (let [key, user] of Object.entries(room.users)) {
+            if(String(user.socketId) === String(id)) {
+                return user
+            }
+        }
+    }
+
+    return false
+}
+
 function addUserRoom(roomId, userId, socketId) {
     if(!Rooms[roomId])
         Rooms[roomId] = {_id: roomId, users: {}, MediaPipeline: null}
@@ -192,5 +204,6 @@ module.exports = {
     stop,
     getUserExistById,
     stopBySocketId,
-    addUserRoom
+    addUserRoom,
+    getUserExistBySocketId
 }

@@ -74,6 +74,13 @@ export default {
                 type: ROOMS_ADD_MESSAGE,
                 payload: message
             })
+
+            if(store.getState().rooms.activeRoom.typers.find(x => x._id === message.user._id)) {
+                store.dispatch({
+                    type: ROOMS_REMOVE_TYPER,
+                    payload: message.user._id
+                })
+            }
         })
 
         socket.on('deleteMessageRoom', (messageIds) => {
@@ -137,6 +144,13 @@ export default {
         })
 
         socket.on('sendMessageDialog', ({message, otherId}) => {
+            if(store.getState().dialogs.dialogs.find(x => x.user._id === message.user._id) && store.getState().dialogs.dialogs.find(x => x.user._id === message.user._id).typing) {
+                store.dispatch({
+                    type: DIALOGS_SET_TYPER,
+                    payload: {userId: message.user._id, typing: false}
+                })
+            }
+
             if(store.getState().dialogs.dialogs.find(x => x._id === message.dialogId)) {
                 let noReadCount = false
 

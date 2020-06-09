@@ -20,7 +20,7 @@ module.exports = {
             const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
                 {
                     path: 'users',
-                    select: ['_id', 'name', 'online', 'color']
+                    select: ['_id', 'name', 'online', 'color', 'onlineAt']
                 },
                 {
                     path: 'messages'
@@ -55,18 +55,9 @@ module.exports = {
                     } 
                 })
             }
-
-            const friends = await User.findById(user._id).populate({
-                path: 'friends',
-                populate: [
-                    {path: 'recipient', options: {select: ['-friends']}}, 
-                    {path: 'requester', options: {select: ['-friends']}}
-                ],
-                options: {limit: 15}
-            })
             
             if (user) {
-                return res.json({user, dialogs, noReadCount, friends: friends.friends});
+                return res.json({user, dialogs, noReadCount});
             }
             const err = new Error(`User ${userId} not found.`);
             err.notFound = true;
@@ -76,10 +67,23 @@ module.exports = {
         }
     },
 
+    getOnline: async(req, res, next) => {
+        const { userId } = req.body;
+        
+        try {
+            let user = await User.findById(userId).select(['online', 'onlineAt'])
+            
+            return res.json(user);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
     get: async(req, res, next) => {
         const { user } = res.locals;
         const { userId } = req.body;
 
+        try {
         const friend = await User.aggregate([
             { "$match": { "_id": user._id } },
             { "$lookup": {
@@ -101,7 +105,7 @@ module.exports = {
             }}
           ])
 
-        try {
+        
             const userGet = await User.findById(userId)
 
             if (userGet) {
@@ -110,6 +114,66 @@ module.exports = {
             const err = new Error(`User ${userId} not found.`);
             err.notFound = true;
             return next(err);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    getFriends: async(req, res, next) => {
+        const { user } = res.locals;
+        
+        try {
+            const friends = await User.findById(user._id).populate({
+                path: 'friends',
+                populate: [
+                    {path: 'recipient', options: {select: ['-friends']}}, 
+                    {path: 'requester', options: {select: ['-friends']}}
+                ],
+                options: {where: {status: 3}, limit: 15}
+            })
+
+            if(friends)
+                return res.json(friends.friends);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    getRequested: async(req, res, next) => {
+        const { user } = res.locals;
+        
+        try {
+            const friends = await User.findById(user._id).populate({
+                path: 'friends',
+                populate: [
+                    {path: 'recipient', options: {select: ['-friends']}}, 
+                    {path: 'requester', options: {select: ['-friends']}}
+                ],
+                options: {where: {status: 2}, limit: 15}
+            })
+
+            if(friends)
+                return res.json(friends.friends);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    getPending: async(req, res, next) => {
+        const { user } = res.locals;
+        
+        try {
+            const friends = await User.findById(user._id).populate({
+                path: 'friends',
+                populate: [
+                    {path: 'recipient', options: {select: ['-friends']}}, 
+                    {path: 'requester', options: {select: ['-friends']}}
+                ],
+                options: {where: {status: 1}, limit: 15}
+            })
+
+            if(friends)
+                return res.json(friends.friends);
         } catch (e) {
             return next(new Error(e));
         }

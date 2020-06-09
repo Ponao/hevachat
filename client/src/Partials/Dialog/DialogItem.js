@@ -34,7 +34,8 @@ class DialogItem extends React.Component {
                     e.preventDefault()
             }} className="dialog-link" to={`/chats/${this.props.user._id}`}>
                 <Button className={`dialog-item`}>
-                    <Avatar style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} />
+                    <Avatar online={this.props.user.online} style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} />
+
                     <div>
                         <p className="user-name">{`${this.props.user.name.first} ${this.props.user.name.last}`}</p>
                         {!this.props.typing && <p className="last-message">
@@ -77,7 +78,7 @@ class DialogItem extends React.Component {
                                 <><span style={{color: '#008FF7'}}>Файлы [{this.props.lastMessage.files.length}]</span></>
                             }
                         </p>}
-                        {this.props.typing && <p className="last-message typing">{this.props.user.name.first} typing</p>}
+                        {this.props.typing && <p className="last-message typing">typing</p>}
                     </div>
                     <div className="dialog-info">
                         <span className="time-at">{LastMessageDate(this.props.lastMessage.createdAt)}</span>

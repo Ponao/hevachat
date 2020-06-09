@@ -26,6 +26,7 @@ import ActionMenu from '../ActionMenu'
 import { randomInteger } from '../../Controllers/FunctionsController'
 import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
+import { withRouter } from 'react-router-dom';
 
 let ogsLink = false
 
@@ -100,7 +101,16 @@ class Message extends React.PureComponent {
             >
                 {
                     (isFirst || isHistoryDate) && !this.props.isRecent && 
-                    <Avatar style={{width: 32, height: 32, fontSize: 14, lineHeight: '14px', fontWeight: 600, backgroundColor: `rgb(${this.props.message.user.color})`}} name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
+                    <span onClick={(e) => {
+                        e.stopPropagation();
+                        this.props.history.push({
+                            search: `?user=${this.props.message.user._id}`
+                        })
+                    }}>
+                        <Avatar 
+                            style={{width: 32, height: 32, fontSize: 14, lineHeight: '14px', fontWeight: 600, backgroundColor: `rgb(${this.props.message.user.color})`}} 
+                            name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
+                    </span>
                 }
 
                 {
@@ -131,7 +141,14 @@ class Message extends React.PureComponent {
                 <div className="content col">
                     {
                         (isFirst || isHistoryDate) &&
-                        <h3 onClick={(e) => {e.stopPropagation();this.props.usersActions.setActiveUserId(this.props.message.user._id)}} className="user-name" style={{color: this.props.message.user._id === this.props.user._id ? '#FF3333' : ''}}>{`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span></h3>
+                        <h3 onClick={(e) => {
+                            e.stopPropagation();
+                            this.props.history.push({
+                                search: `?user=${this.props.message.user._id}`
+                            })
+                        }} className="user-name" style={{color: this.props.message.user._id === this.props.user._id ? '#FF3333' : ''}}>
+                            {`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span>
+                        </h3>
                     }
 
                     {this.props.message.text && <p className="message-text">
@@ -271,4 +288,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Message)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Message))

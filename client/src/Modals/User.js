@@ -38,13 +38,14 @@ const customStylesModal = {
         boxShadow             : '0px 5px 30px rgba(0, 0, 0, 0.16)',
         display               : 'flex',
         justifyContent        : 'center',
-        flexWrap              : 'wrap'
+        flexWrap              : 'wrap',
+        width                 : '300px'
     }
 };
 
 class User extends React.Component {
     componentDidMount() {
-        if(!this.props.users.users.find(user => user._id === this.props.userId)) {
+        if(!this.props.users.users.find(user => user._id === this.props.userId) && this.props.user._id !== this.props.userId) {
             this.props.usersActions.userGet(this.props.userId, this.props.user.apiToken)
         }
     }
@@ -53,20 +54,16 @@ class User extends React.Component {
         let user = this.props.users.users.find(user => user._id === this.props.userId)
         return <Modal
             isOpen={true}
-            onRequestClose={() => {this.props.usersActions.setActiveUserId(false)}}
+            onRequestClose={() => {this.props.close()}}
             style={customStylesModal}
             contentLabel="User"
         >
             {user && 
-            <>
-                {user._id !== this.props.user._id && 
-                    <OtherUser userId={this.props.userId} user={user} />
-                }
+                <OtherUser userId={this.props.userId} user={user} />
+            }
 
-                {user._id === this.props.user._id && 
-                    <MyUser />
-                }
-            </>
+            {this.props.user._id === this.props.userId && 
+                <MyUser />
             }
         </Modal>
     }

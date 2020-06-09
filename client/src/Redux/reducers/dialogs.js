@@ -10,7 +10,8 @@ import {
     DIALOGS_EDIT_MESSAGE,
     DIALOGS_DELETE_MESSAGE,
     DIALOGS_SET_LOADING,
-    DIALOGS_LOAD_MESSAGES
+    DIALOGS_LOAD_MESSAGES,
+    DIALOGS_UPDATE_ONLINE
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -75,6 +76,12 @@ const dialogs = (state = INITIAL_STATE, action) => {
                 } :
                 dialog
             ) }
+        case DIALOGS_UPDATE_ONLINE:
+            return { ...state, dialogs: state.dialogs.map(dialog => 
+                action.payload.userId === dialog.user._id ? 
+                { ...dialog, user: { ...dialog.user, online: action.payload.online, onlineAt: action.payload.onlineAt } } :
+                dialog
+            ) }
         case DIALOGS_READ_MESSAGES:
             return { ...state, dialogs: state.dialogs.map(dialog => 
                 action.payload.dialogId === dialog._id ? 
@@ -121,7 +128,7 @@ const dialogs = (state = INITIAL_STATE, action) => {
             }), noReadCount: action.payload.noReadCount || action.payload.noReadCount === 0 ? action.payload.noReadCount : state.noReadCount }
         case DIALOGS_SET_LOADING:
             return { ...state, dialogs: state.dialogs.map(dialog => 
-                action.payload.dialogId === dialog._id ? 
+                action.payload === dialog._id ? 
                     { ...dialog, canLoad: false, isLoading: true } :
                 dialog
             )

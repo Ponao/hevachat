@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
-const {roomOnIceCandidate, roomOfferSdp, stop, stopBySocketId, getUserExistById} = require('./WebRtcController')
+const {roomOnIceCandidate, roomOfferSdp, stop, stopBySocketId, getUserExistById, getUserExistBySocketId} = require('./WebRtcController')
 
 let idCounter = 0;
 let io = false
@@ -54,7 +54,7 @@ function initSocket(initIo) {
 
         socket.on('disconnect', async () => {
             if(user) {
-                user.onlineAt = Date.now()
+                user.onlineAt = new Date()
                 user.online = false
                 await user.save()
 
@@ -176,12 +176,12 @@ function initSocket(initIo) {
         })
 
         socket.on('roomOfferSdp', ({roomId, offerSdp}) => {
-            // if(!getUserExistById(user._id)) {
+            if(getUserExistBySocketId(socket.id)) {
                 roomOfferSdp(roomId, user._id, offerSdp, socket, (error, answerSdp) => {
                     if(error) return console.log(error)
                     socket.emit('roomAnswerSdp', answerSdp)
                 })
-            // }
+            }
         })
 
         socket.on('roomSpeaking', (roomId) => {
