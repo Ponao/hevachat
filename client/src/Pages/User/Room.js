@@ -62,7 +62,7 @@ class MediaStream extends React.PureComponent {
     }
 
     render() {
-        return <audio ref={ref => {this.audio = ref}} style={{display: 'none'}} autoPlay></audio>
+        return <audio ref={ref => {this.audio = ref}} style={{display: 'none'}} autoPlay controls></audio>
     }
 }
 
