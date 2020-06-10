@@ -50,7 +50,7 @@ module.exports = {
 
       let token = generateToken(newUser._id);
 
-      const dialogs = await Dialog.find({'users': {'$all': [newUser._id]}}).populate([
+      const dialogs = await Dialog.find({'users': {'$all': [newUser._id]}, 'lastMessage': {$exists: true}}).populate([
         {
             path: 'users',
             select: ['_id', 'name', 'online', 'color', 'onlineAt']
@@ -68,7 +68,7 @@ module.exports = {
 
     let noReadCount = 0
 
-    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [newUser._id]}}).populate([
+    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [newUser._id]}, 'lastMessage': {$exists: true}}).populate([
       {
           path: 'users',
           select: ['_id']
@@ -117,7 +117,7 @@ module.exports = {
           // Success: generate and respond with the JWT
           let token = generateToken(user.id);
 
-          const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
+          const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
             {
                 path: 'users',
                 select: ['_id', 'name', 'online', 'color', 'onlineAt']
@@ -135,7 +135,7 @@ module.exports = {
 
         let noReadCount = 0
 
-    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}}).populate([
+    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
       {
           path: 'users',
           select: ['_id']

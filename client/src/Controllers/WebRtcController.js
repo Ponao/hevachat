@@ -16,7 +16,7 @@ const isIE = /*@cc_on!@*/false || !!document.documentMode;
 // Edge 20+
 const isEdge = !isIE && !!window.StyleMedia;
 
-const RTCPeerConnection = RTCPeerConnection || window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+const RTCPC = RTCPeerConnection || window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.RTCSessionDescription;
 const RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
@@ -36,6 +36,12 @@ const options = {
     ],
 };
 
+function createEmptyStream(callback) {
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    let dest = audioCtx.createMediaStreamDestination()
+    return callback(dest.stream)
+}
+
 const getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 // navigator.mediaDevices.getUserMedia 
 function getUserMedia(callback) {    
@@ -43,11 +49,18 @@ function getUserMedia(callback) {
         navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(stream => {
             callback(stream)
         })
+        .catch((err) => {
+            createEmptyStream(callback)
+        })
     } else {
         getMedia({
             audio: true,
             video: false
-        }, callback);
+        }, 
+        callback, 
+        () => {
+            createEmptyStream(callback)
+        });
     }
 
     function onerror(e) {
@@ -96,7 +109,7 @@ export default {
 
             localStream.getAudioTracks()[0].enabled = false
 
-            WebRtcPeerConnection = new RTCPeerConnection(options)
+            WebRtcPeerConnection = new RTCPC(options)
             
             WebRtcPeerConnection.addStream(stream)
 
@@ -134,6 +147,11 @@ export default {
             speechEvents.stop()
             speechEvents = false
         }
+
+        store.dispatch({
+            type: MEDIA_TOGGLE_MICROPHONE,
+            payload: false
+        })
     },
     roomOnIceCandidate: (e) => {
         if(WebRtcPeerConnection)

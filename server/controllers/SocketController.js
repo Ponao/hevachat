@@ -216,10 +216,10 @@ function editMessageRoom({roomId, message, socketId}) {
 // Chat dialog
 function sendMessageDialog({userId, socketId, otherId, message}) {
     if(userId != otherId) {
-        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId}))
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId}))
         io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', ({message, otherId}))
     } else {
-        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId}))
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId}))
     }
 }
 
@@ -242,6 +242,19 @@ function findBySocketId(socketId) {
     return io.sockets.connected[socketId]
 }
 
+// User friends
+function sendRequestFriend({userId, otherId, friendStatus}) {
+    io.to(`user.${otherId}`).emit('sendRequestFriend', {userId, friendStatus})
+}
+
+function sendAcceptFriend({userId, otherId, friendStatus}) {
+    io.to(`user.${otherId}`).emit('sendAcceptFriend', {userId, friendStatus})
+}
+
+function sendRemoveFriend({userId, otherId, friendStatus}) {
+    io.to(`user.${otherId}`).emit('sendRemoveFriend', {userId, friendStatus})
+}
+
 module.exports = {
     initSocket, 
     sendMessageRoom, 
@@ -252,5 +265,8 @@ module.exports = {
     readMessageDialog,
     editMessageDialog,
     deleteMessageDialog,
-    findBySocketId
+    findBySocketId,
+    sendRequestFriend,
+    sendAcceptFriend,
+    sendRemoveFriend
 }

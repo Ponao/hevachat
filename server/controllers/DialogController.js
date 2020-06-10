@@ -495,11 +495,13 @@ module.exports = {
                 noRead = dialog.noRead
             } else {
                 lastMessage = false
+
+                await Dialog.update({_id: dialogId}, {$unset: {lastMessage: 1}})
             }
 
             let noReadCount = 0
 
-            const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [otherId]}}).populate([
+            const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [otherId]}, 'lastMessage': {$exists: true}}).populate([
             {
                 path: 'users',
                 select: ['_id']

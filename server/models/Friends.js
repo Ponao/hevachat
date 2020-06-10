@@ -21,6 +21,7 @@ const FriendSchema = new Schema({
             3,    //'friends'
         ]
     },
+    updatedAt: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
     buff: Buffer
 });

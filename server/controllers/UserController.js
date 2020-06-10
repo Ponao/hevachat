@@ -9,6 +9,7 @@ const Message = require('../models/Message');
 const Dialog = require('../models/Dialog');
 const Friend = require('../models/Friends')
 const mongoose = require("../database");
+const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend} = require('./SocketController')
 
 module.exports = {
     // Get user data
@@ -17,7 +18,7 @@ module.exports = {
         const { user } = res.locals;
 
         try {
-            const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
+            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
                 {
                     path: 'users',
                     select: ['_id', 'name', 'online', 'color', 'onlineAt']
@@ -35,7 +36,7 @@ module.exports = {
 
             let noReadCount = 0
 
-            const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}}).populate([
+            const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
                 {
                     path: 'users',
                     select: ['_id']
@@ -129,7 +130,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 3}, limit: 15}
+                options: {where: {status: 3}, limit: 15, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)
@@ -149,7 +150,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 2}, limit: 15}
+                options: {where: {status: 2}, limit: 15, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)
@@ -169,7 +170,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 1}, limit: 15}
+                options: {where: {status: 1}, limit: 15, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)
@@ -202,6 +203,8 @@ module.exports = {
             { $push: { friends: docB._id }}
         )
 
+        sendRequestFriend({userId: user._id, otherId: userId, friendStatus: 2})
+
         return res.json(1)
     },
 
@@ -211,12 +214,14 @@ module.exports = {
 
         await Friend.findOneAndUpdate(
             { requester: {_id: user._id}, recipient: {_id: userId} },
-            { $set: { status: 3 }}
+            { $set: { status: 3, updatedAt: new Date() }}
         )
         await Friend.findOneAndUpdate(
             { recipient: {_id: user._id}, requester: {_id: userId} },
-            { $set: { status: 3 }}
+            { $set: { status: 3, updatedAt: new Date() }}
         )
+
+        sendAcceptFriend({userId: user._id, otherId: userId, friendStatus: 3})
 
         return res.json(3)
     },
@@ -251,14 +256,15 @@ module.exports = {
         if(friend[0].friendsStatus === 3) {
             const docA = await Friend.findOneAndUpdate(
                 { requester: {_id: user._id}, recipient: {_id: userId} },
-                { $set: { status: 2 }}
+                { $set: { status: 2, updatedAt: new Date() }}
             )
             const docB = await Friend.findOneAndUpdate(
                 { recipient: {_id: user._id}, requester: {_id: userId} },
-                { $set: { status: 1 }}
+                { $set: { status: 1, updatedAt: new Date() }}
             )
             status = 2
             
+            sendRemoveFriend({userId: user._id, otherId: userId, friendStatus: 1})
         } else {
             const docA = await Friend.findOneAndRemove(
                 { requester: {_id: user._id}, recipient: {_id: userId} }
@@ -275,7 +281,9 @@ module.exports = {
                 { _id: userId },
                 { $pull: { friends: docB._id }}
             )
-        }        
+
+            sendRemoveFriend({userId: user._id, otherId: userId, friendStatus: 0})
+        }
 
         return res.json(status)
     },

@@ -6,7 +6,13 @@ import {
     USERS_SET,
     USERS_FRIENDS_GET,
     USERS_REQUESTED_GET,
-    USERS_PENDING_GET
+    USERS_PENDING_GET,
+    USERS_FRIENDS_REMOVE,
+    USERS_REQUESTED_REMOVE,
+    USERS_PENDING_REMOVE,
+    USERS_FRIENDS_ADD,
+    USERS_REQUESTED_ADD,
+    USERS_PENDING_ADD
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -53,11 +59,29 @@ const rooms = (state = INITIAL_STATE, action) => {
                 user
             ) }
         case USERS_FRIENDS_GET:
-            return { ...state, friends: { ...state.friends, users: action.payload, isFetching: false, getted: true } }
+            return { ...state, friends: { ...state.friends, users: action.payload.users, canLoad: action.payload.canLoad, isFetching: false, getted: true } }
         case USERS_REQUESTED_GET:
-            return { ...state, requested: { ...state.requested, users: action.payload, isFetching: false, getted: true } }
+            return { ...state, requested: { ...state.requested, users: action.payload.users, canLoad: action.payload.canLoad, isFetching: false, getted: true } }
         case USERS_PENDING_GET:
-            return { ...state, pending: { ...state.pending, users: action.payload, isFetching: false, getted: true } }
+            return { ...state, pending: { ...state.pending, users: action.payload.users, canLoad: action.payload.canLoad, isFetching: false, getted: true } }
+        case USERS_FRIENDS_REMOVE:
+            return { ...state, friends: { ...state.friends, users: [ ...state.friends.users.filter(user => {        
+                return action.payload.userId !== user._id
+            })] } }
+        case USERS_REQUESTED_REMOVE:
+            return { ...state, requested: { ...state.requested, users: [ ...state.requested.users.filter(user => {        
+                return action.payload.userId !== user._id
+            })] } }
+        case USERS_PENDING_REMOVE:
+            return { ...state, pending: { ...state.pending, users: [ ...state.pending.users.filter(user => {        
+                return action.payload.userId !== user._id
+            })] } }
+        case USERS_FRIENDS_ADD:
+            return { ...state, friends: { ...state.friends, users: [ action.payload.user, ...state.friends.users] } }
+        case USERS_REQUESTED_ADD:
+            return { ...state, requested: { ...state.requested, users: [ action.payload.user, ...state.requested.users] } }
+        case USERS_PENDING_ADD:
+            return { ...state, pending: { ...state.pending, users: [ action.payload.user, ...state.pending.users] } }
         default: 
             return state
     }

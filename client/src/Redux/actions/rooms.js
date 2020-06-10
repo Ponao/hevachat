@@ -101,7 +101,16 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
             })
             
             SocketController.joinRoom({roomId: room._id, lang: room.lang})
-            WebRtcController.connectRoom(room._id)
+
+            try {
+                WebRtcController.connectRoom(room._id)
+            } catch (err) {
+                SocketController.leaveRoom({roomId: room._id, lang: room.lang})
+                dispatch({
+                    type: ROOMS_JOIN_ERROR,
+                    payload: {param: 'all', msg: 'something_goes_wrong'}
+                })
+            }
         })
         .catch((err) => {
             dispatch({

@@ -19,7 +19,15 @@ import {
     DIALOGS_SET_TYPER,
     DIALOGS_EDIT_MESSAGE,
     DIALOGS_DELETE_MESSAGE,
-    DIALOGS_ADD
+    DIALOGS_ADD,
+    USERS_SET_FRIEND_STATUS,
+    USERS_FRIENDS_ADD,
+    USERS_PENDING_ADD,
+    USERS_REQUESTED_ADD,
+    USERS_FRIENDS_REMOVE,
+    USERS_PENDING_REMOVE,
+    USERS_REQUESTED_REMOVE,
+    USERS_ADD
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -166,6 +174,7 @@ export default {
                     payload: {message, dialogId: message.dialogId, noRead: message.user._id !== store.getState().user._id, noReadCount}
                 })
             } else {
+                console.log(123)
                 fetch(`${urlApi}/api/user/get`, {
                     method: "post",
                     headers: {
@@ -240,6 +249,163 @@ export default {
                         payload: {userId, typing: false}
                     })
                 }, 2500)
+            }
+        })
+
+        socket.on('sendRequestFriend', ({userId, friendStatus}) => {
+            store.dispatch({
+                type: USERS_SET_FRIEND_STATUS,
+                payload: {userId, friendStatus}
+            })
+
+            if(store.getState().users.pending.getted) {
+                store.dispatch({
+                    type: USERS_PENDING_REMOVE,
+                    payload: {userId}
+                })
+            }
+    
+            if(store.getState().users.requested.getted) {
+                if(store.getState().users.users.find(x => x._id === userId)) {
+                    store.dispatch({
+                        type: USERS_REQUESTED_ADD,
+                        payload: {user: store.getState().users.users.find(x => x._id === userId)}
+                    })
+                } else {
+                    fetch(`${urlApi}/api/user/get`, {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiToken}`,
+                        },
+                        body: JSON.stringify({
+                            userId: userId
+                        })
+                    })
+                    .then((response) => response.json())
+                    .then(({user, friendStatus}) => {
+                        user.friendStatus = friendStatus
+                        store.dispatch({
+                            type: USERS_ADD,
+                            payload: user
+                        })
+                        store.dispatch({
+                            type: USERS_REQUESTED_ADD,
+                            payload: {user}
+                        })
+                    });
+                }
+            }
+        })
+
+        socket.on('sendAcceptFriend', ({userId, friendStatus}) => {
+            store.dispatch({
+                type: USERS_SET_FRIEND_STATUS,
+                payload: {userId, friendStatus}
+            })
+    
+            if(store.getState().users.pending.getted) {
+                store.dispatch({
+                    type: USERS_PENDING_REMOVE,
+                    payload: {userId}
+                })
+            }
+    
+            if(store.getState().users.friends.getted) {
+                if(store.getState().users.users.find(x => x._id === userId)) {
+                    store.dispatch({
+                        type: USERS_FRIENDS_ADD,
+                        payload: {user: store.getState().users.users.find(x => x._id === userId)}
+                    })
+                } else {
+                    fetch(`${urlApi}/api/user/get`, {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiToken}`,
+                        },
+                        body: JSON.stringify({
+                            userId: userId
+                        })
+                    })
+                    .then((response) => response.json())
+                    .then(({user, friendStatus}) => {
+                        user.friendStatus = friendStatus
+                        store.dispatch({
+                            type: USERS_ADD,
+                            payload: user
+                        })
+                        store.dispatch({
+                            type: USERS_FRIENDS_ADD,
+                            payload: {user}
+                        })
+                    });
+                }
+            }
+        })
+
+        socket.on('sendRemoveFriend', ({userId, friendStatus}) => {
+            store.dispatch({
+                type: USERS_SET_FRIEND_STATUS,
+                payload: {userId, friendStatus}
+            })
+    
+            if(store.getState().users.friends.getted) {
+                if(friendStatus === 1) {
+                    store.dispatch({
+                        type: USERS_FRIENDS_REMOVE,
+                        payload: {userId}
+                    })
+    
+                    if(store.getState().users.requested.getted) {
+                        if(store.getState().users.users.find(x => x._id === userId)) {
+                            store.dispatch({
+                                type: USERS_PENDING_ADD,
+                                payload: {user: store.getState().users.users.find(x => x._id === userId)}
+                            })
+                        } else {
+                            fetch(`${urlApi}/api/user/get`, {
+                                method: "post",
+                                headers: {
+                                    Accept: "application/json",
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${apiToken}`,
+                                },
+                                body: JSON.stringify({
+                                    userId: userId
+                                })
+                            })
+                            .then((response) => response.json())
+                            .then(({user, friendStatus}) => {
+                                user.friendStatus = friendStatus
+                                store.dispatch({
+                                    type: USERS_ADD,
+                                    payload: user
+                                })
+                                store.dispatch({
+                                    type: USERS_PENDING_ADD,
+                                    payload: {user}
+                                })
+                            });
+                        }
+                    }
+                }
+            }
+    
+            if(store.getState().users.pending.getted && friendStatus === 0) {
+                store.dispatch({
+                    type: USERS_PENDING_REMOVE,
+                    payload: {userId}
+                })
+            }
+    
+            if(store.getState().users.requested.getted && friendStatus === 0) {
+                store.dispatch({
+                    type: USERS_REQUESTED_REMOVE,
+                    payload: {userId}
+                })
             }
         })
     },
