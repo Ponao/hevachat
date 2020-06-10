@@ -920,8 +920,11 @@
 }
 
 .dialog > div {
-    display: flex;
+    display: block;
     flex-direction: column;
+    margin-top: auto;
+    max-height: 100%;
+    height: max-content;
 }
 
 .dialog .offset-top {

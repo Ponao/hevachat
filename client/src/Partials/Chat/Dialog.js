@@ -179,7 +179,6 @@ class Dialog extends React.Component {
                             color: '#008FF7',
                         }} />
                     </div>}
-                    <div className="offset-top"></div>
                     {this.props.messages.map((message, index, messages) => {
                         return <Message 
                             countRecent={0}
