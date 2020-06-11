@@ -63,7 +63,11 @@ class Contacts extends React.Component {
                 <span className={this.state.activeTab === 'outbox' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'outbox'})}}>Outbox</span>
             </div>
 
-            {this.state.activeTab === 'friends' && <Friends />}
+            {this.state.activeTab === 'friends' && <Friends onClick={(id) => {
+                this.props.history.push({
+                    search: `?user=${id}`
+                 })
+            }} type={'normal'} />}
             {this.state.activeTab === 'inbox' && <Inbox />}
             {this.state.activeTab === 'outbox' && <Outbox />}
         </Modal>

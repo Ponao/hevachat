@@ -1,6 +1,5 @@
 // App
 import React from 'react'
-import { Scrollbars } from 'react-custom-scrollbars';
 import { withRouter } from 'react-router-dom'
 import {PageSettings} from '../PageSettings'
 
@@ -9,36 +8,17 @@ import { connect } from 'react-redux'
 import * as dialogsActions from '../../Redux/actions/dialogs'
 import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
-import RoomItem from '../../Partials/Room/RoomItem'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 
 // Material
-import Fab from '@material-ui/core/Fab';
-import Skeleton from '@material-ui/lab/Skeleton';
-import AddIcon from '@material-ui/icons/Add';
-import { withStyles } from '@material-ui/core'
-import showLoading from '../../Partials/Loading'
 import Avatar from '../../Partials/User/Avatar';
 import Chat from '../../Partials/Chat/Chat';
 import SearchIcon from '@material-ui/icons/Search';
 import { OnlineDate } from '../../Controllers/TimeController';
 
-const fabStyles = theme => ({
-    root: {
-        backgroundColor: '#008FF7',
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        '&:hover': {
-            backgroundColor: '#008FF7',
-        }
-    }
-})
 
-const CustomFab = withStyles(fabStyles)(Fab);
-
-class Dialog extends React.Component {
+class Dialog extends React.PureComponent {
     static contextType = PageSettings;
 
     state = {

@@ -54,7 +54,7 @@ function initSocket(initIo) {
 
         socket.on('disconnect', async () => {
             if(user) {
-                user.onlineAt = new Date()
+                user.onlineAt = Date.now()
                 user.online = false
                 await user.save()
 
@@ -255,6 +255,11 @@ function sendRemoveFriend({userId, otherId, friendStatus}) {
     io.to(`user.${otherId}`).emit('sendRemoveFriend', {userId, friendStatus})
 }
 
+// Notifications
+function sendInvite({userId, notification}) {
+    io.to(`user.${userId}`).emit('sendNotification', notification)
+}
+
 module.exports = {
     initSocket, 
     sendMessageRoom, 
@@ -268,5 +273,6 @@ module.exports = {
     findBySocketId,
     sendRequestFriend,
     sendAcceptFriend,
-    sendRemoveFriend
+    sendRemoveFriend,
+    sendInvite
 }

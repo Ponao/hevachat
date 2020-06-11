@@ -27,7 +27,8 @@ import {
     USERS_FRIENDS_REMOVE,
     USERS_PENDING_REMOVE,
     USERS_REQUESTED_REMOVE,
-    USERS_ADD
+    USERS_ADD,
+    NOTIFICATIONS_ADD
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -174,7 +175,6 @@ export default {
                     payload: {message, dialogId: message.dialogId, noRead: message.user._id !== store.getState().user._id, noReadCount}
                 })
             } else {
-                console.log(123)
                 fetch(`${urlApi}/api/user/get`, {
                     method: "post",
                     headers: {
@@ -204,6 +204,14 @@ export default {
                     })
                 });
             }
+        })
+
+        socket.on('sendNotification', notification => {
+            if(store.getState().notifications.getted)
+                store.dispatch({
+                    type: NOTIFICATIONS_ADD,
+                    payload: notification
+                })
         })
 
         socket.on('readMessagesDialog', ({dialogId, userId}) => {

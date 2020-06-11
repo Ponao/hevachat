@@ -13,7 +13,7 @@
     font-weight: normal;
     font-size: 16px;
     line-height: 22px;
-    transition: all 0.2s;
+    transition: all 0.1s;
     display: block;
     margin-top: 20px;
 }
@@ -104,6 +104,7 @@
 }
 
 .sidebar-title {
+    line-height: 24px;
     color: #333333;
     font-size: 24px;
     font-weight: 900;
@@ -972,6 +973,10 @@
     color: #008FF7;
     margin: 0 0 0 12px;
     line-height: 22px;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .user-item .last-message {
@@ -980,6 +985,9 @@
     color: #667788;
     margin: 0 0 0 12px;
     line-height: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .dialog-item:hover {

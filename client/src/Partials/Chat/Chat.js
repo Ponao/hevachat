@@ -460,9 +460,6 @@ class Chat extends React.Component {
     }
 
     typing(newText, prevText) {
-        if(waitDraft)
-            clearTimeout(waitDraft)
-
         if(newText > prevText && !this.state.isEdit) {
             if(this.state.canTyping) {
                 this.setState({canTyping: false})
@@ -485,13 +482,11 @@ class Chat extends React.Component {
         }
 
         if(!this.state.isEdit) {
-            waitDraft = setTimeout(() => {
-                let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
-                drafts['draft-'+this.props.dialogId] = newText
-                if(!drafts['draft-'+this.props.dialogId] || !/\S/.test(drafts['draft-'+this.props.dialogId]))
-                    delete drafts['draft-'+this.props.dialogId]
-                localStorage.setItem('drafts', JSON.stringify(drafts));
-            }, 500);
+            let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
+            drafts['draft-'+this.props.dialogId] = newText
+            if(!drafts['draft-'+this.props.dialogId] || !/\S/.test(drafts['draft-'+this.props.dialogId]))
+                delete drafts['draft-'+this.props.dialogId]
+            localStorage.setItem('drafts', JSON.stringify(drafts));
         }
     }
 

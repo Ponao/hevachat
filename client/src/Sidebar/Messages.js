@@ -107,7 +107,11 @@ class Messages extends React.Component {
                     </div>}
 
                     <Tooltip title="Create dialog" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
-                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: "?act=newChat"
+                            })
+                        }}>
                             <AddIcon />
                         </CustomFab>
                     </Tooltip>

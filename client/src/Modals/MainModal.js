@@ -8,6 +8,7 @@ import CreateRoom from './CreateRoom';
 import qs from 'qs'
 import User from './User';
 import Contacts from './Contacts';
+import CreateDialog from './CreateDialog';
 
 class MainModal extends React.Component {
     state = {
@@ -29,6 +30,12 @@ class MainModal extends React.Component {
     render() {
         return <>
             <CreateRoom isOpen={this.state.act === 'newRoom'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />
+
+            <CreateDialog isOpen={this.state.act === 'newChat'} close={() => {
                 this.props.history.push({
                     search: ""
                 })

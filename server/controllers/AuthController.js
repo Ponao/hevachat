@@ -41,10 +41,14 @@ module.exports = {
 
       newUser.name = {
         first: user.firstName,
-        last: user.lastMessage
+        last: user.lastName
       }
       newUser.email = user.email
       newUser.password = await bcrypt.hash(user.password, 12)
+
+      let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
+
+      newUser.color = colors[randomInteger(0,7)]
 
       await newUser.save()
 
@@ -249,9 +253,13 @@ function generateToken(userId) {
   // Include some data and an expiration timestamp in the JWT
   return jwt.sign(
     {
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // This key expires in 1 hour
       data: { userId },
     },
     process.env.JWT_SECRET
   );
+}
+
+function randomInteger(min, max) {
+  let rand = min + Math.random() * (max + 1 - min);
+  return Math.floor(rand);
 }

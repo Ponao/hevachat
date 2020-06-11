@@ -5,11 +5,13 @@ import rooms from './rooms'
 import media from './media'
 import dialogs from './dialogs'
 import users from './users'
+import notifications from './notifications'
 
 export default combineReducers({
     user,
     rooms,
     media,
     dialogs,
-    users
+    users,
+    notifications
 })

@@ -7,8 +7,10 @@
 const Room = require('../models/Room');
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
+const Notification = require('../models/Notification');
+const { validationResult } = require("express-validator");
 
-const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId} = require('./SocketController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendInvite} = require('./SocketController')
 const {getUserExistById, addUserRoom} = require('./WebRtcController')
 
 module.exports = {
@@ -144,9 +146,23 @@ module.exports = {
     create: async (req, res, next) => {
         // Get this account as JSON
         const { user } = res.locals;
-        const { lang, title, isPrivate } = req.body;
+        const { lang, title, isPrivate, selectUsers } = req.body;
+
+        const existRoom = await Room.findOne({title})
 
         try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ error: true, errors: errors.array() });
+            }
+
+            if(existRoom) {
+                const err = {};
+                err.param = `title`;
+                err.msg = `room_exist`;
+                return res.status(409).json({ error: true, errors: [err] });
+            }
+
             const dialog = new Dialog()
             await dialog.save()
             
@@ -162,6 +178,22 @@ module.exports = {
             room.color = colors[randomInteger(0,7)]        
 
             await room.save()
+
+            selectUsers.map(async id => {
+                let notification = new Notification()
+
+                notification.user = user
+                notification.userId = id
+                notification.type = 'invite'
+                notification.data = {
+                    roomId: room._id,
+                    title
+                }
+
+                sendInvite({userId: id, notification})
+
+                await notification.save()
+            })
 
             return res.json(room);
         } catch (e) {

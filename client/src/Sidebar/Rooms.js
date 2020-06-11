@@ -17,7 +17,7 @@ import { bindActionCreators } from 'redux'
 import Fab from '@material-ui/core/Fab';
 import Skeleton from '@material-ui/lab/Skeleton';
 import AddIcon from '@material-ui/icons/Add';
-import { withStyles, Tooltip } from '@material-ui/core'
+import { withStyles, Tooltip, CircularProgress } from '@material-ui/core'
 import showLoading from '../Partials/Loading'
 import WarningIcon from '@material-ui/icons/Warning';
 import AppsIcon from '@material-ui/icons/Apps';
@@ -93,10 +93,14 @@ class Rooms extends React.Component {
                         style={{height: 'calc(100% - 78px)'}}
                         autoHide
                     >
-                        {this.props.rooms.isFetching && showLoading(<div className="room-item">
-                            <Skeleton variant="circle" width={40} height={40} />
-                            <Skeleton variant="text" style={{marginLeft: 12, flex: '1 1'}} />
-                        </div>)}
+                        {this.props.rooms.isFetching && <CircularProgress style={{
+                            color: '#008FF7',
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            margin: 'auto',
+                            top: 'calc(50% - 20px)'
+                        }} />}
                         {this.props.rooms.rooms.map((room, index) => {
                             return (
                                 <RoomItem key={index} room={room} />
