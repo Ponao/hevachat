@@ -33,12 +33,13 @@ function getUserExistBySocketId(id) {
 
 function addUserRoom(roomId, userId, socketId) {
     if(!Rooms[roomId])
-        Rooms[roomId] = {_id: roomId, users: {}, MediaPipeline: null}
+        Rooms[roomId] = {_id: roomId, users: {}, composite: null, MediaPipeline: null}
     
     Rooms[roomId].users[userId] = {
         _id: userId,
         socketId,
-        webRtcEndpoint: false
+        webRtcEndpoint: false,
+        hubPort: false
     }
 }
 
@@ -94,6 +95,13 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
                     }
                     Rooms[roomId].MediaPipeline = pipeline
 
+                    Rooms[roomId].MediaPipeline.create('Composite',  function( error, composite ) {
+                        if (error) {
+                            return callback(error);
+                        }
+                        Rooms[roomId].composite = composite;
+                    });
+
                     connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
                 })
             })
@@ -131,23 +139,23 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                 return callback('Error not find user');
             }
 
-            for (let [key, value] of Object.entries(Rooms[roomId].users)) {
-                if(String(value._id) !== String(userId)) {
-                    value.webRtcEndpoint.connect(webRtcEndpoint, function(error) {
-                        if (error) {
-                            stop(roomId, userId);
-                            return callback(error);
-                        }
+            // for (let [key, value] of Object.entries(Rooms[roomId].users)) {
+            //     if(String(value._id) !== String(userId)) {
+            //         webRtcEndpoint.connect(value.webRtcEndpoint, function(error) {
+            //             if (error) {
+            //                 stop(roomId, userId);
+            //                 return callback(error);
+            //             }
 
-                        webRtcEndpoint.connect(value.webRtcEndpoint, function(error) {
-                            if (error) {
-                                stop(roomId, userId);
-                                return callback(error);
-                            }
-                        });
-                    });
-                }
-            }
+            //             value.webRtcEndpoint.connect(webRtcEndpoint, function(error) {
+            //                 if (error) {
+            //                     stop(roomId, userId);
+            //                     return callback(error);
+            //                 }
+            //             });
+            //         });
+            //     }
+            // }
 
             callback(null, sdpAnswer);
         });
@@ -157,6 +165,26 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                 stop(roomId, userId);
                 return callback(error);
             }
+        });
+
+        Rooms[roomId].composite.createHubPort( function(error, hubPort) {
+            if (error) {
+                return callback(error);
+            }
+
+            Rooms[roomId].users[userId].hubPort = hubPort
+
+            Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+                if (error) {
+                    return callback(error);
+                }
+            })
+
+            Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
+                if (error) {
+                    return callback(error);
+                }
+            })
         });
     })
 }
@@ -169,7 +197,11 @@ function clearCandidatesQueue(userId) {
 
 const stop = async (roomId, userId) => {
 	if (Rooms[roomId] && Rooms[roomId].users[userId]) {
-        Rooms[roomId].users[userId].webRtcEndpoint.release();
+        if(Rooms[roomId].users[userId].webRtcEndpoint)
+            Rooms[roomId].users[userId].webRtcEndpoint.release();
+
+        if(Rooms[roomId].users[userId].hubPort)
+            Rooms[roomId].users[userId].hubPort.release();
             
         delete Rooms[roomId].users[userId]
 	}
@@ -179,6 +211,9 @@ const stop = async (roomId, userId) => {
 	if (Rooms[roomId].users.length < 1) {
         if(Rooms[roomId].MediaPipeline)
             Rooms[roomId].MediaPipeline.release();
+        
+        if(Rooms[roomId].composite)
+            Rooms[roomId].composite.release();
         delete Rooms[roomId]
     }
 }
@@ -189,8 +224,21 @@ function stopBySocketId(socketId) {
             if(user.socketId == socketId) {
                 if(Rooms[room._id].users[user._id].webRtcEndpoint)
                     Rooms[room._id].users[user._id].webRtcEndpoint.release();
+                
+                if(Rooms[room._id].users[user._id].hubPort)
+                    Rooms[room._id].users[user._id].hubPort.release();
 
                 delete Rooms[room._id].users[user._id]
+
+                if (Rooms[room._id].users.length < 1) {
+                    if(Rooms[room._id].MediaPipeline)
+                        Rooms[room._id].MediaPipeline.release();
+
+                    if(Rooms[room._id].composite)
+                        Rooms[room._id].composite.release();
+
+                    delete Rooms[room._id]
+                }
 
                 return
             }

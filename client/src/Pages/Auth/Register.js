@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
 import {urlApi} from '../../config'
+import SocketController from '../../Controllers/SocketController'
 
 class Register extends React.Component {
     state = {
@@ -53,6 +54,8 @@ class Register extends React.Component {
                     cookies.set('apiToken', data.token, { path: '/' })
 
                     this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.token)
+
+                    SocketController.init(data.token)
                 }
 
                 this.setState({isFetching: false})
