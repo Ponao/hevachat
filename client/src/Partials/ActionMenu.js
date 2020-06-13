@@ -16,8 +16,19 @@ class ActionMenu extends React.Component {
     toggleActive() {
         let element = document.getElementById(this.props.from)
         let rect = element.getBoundingClientRect()
+
+        let top
+        let left
+        if(this.props.bottom) {
+            top = rect.y + element.clientHeight
+            left = rect.x
+        }
+        else {
+            top = rect.y
+            left = rect.x+element.clientWidth
+        }
         
-        this.setState({left: rect.x+element.clientWidth, top: rect.y})
+        this.setState({left, top})
         this.setState({active: !this.state.active})
     }
 
@@ -33,10 +44,10 @@ class ActionMenu extends React.Component {
 
     render() {
         return (
-            <div style={{left: this.state.left, top: this.state.top}} className={`action-menu-container ${this.state.active ? 'active' : ''}`}>
+            <div style={{left: this.state.left, top: this.state.top, transform: this.props.bottom ? 'none' : null}} className={`action-menu-container ${this.state.active ? 'active' : ''}`}>
                 <div className={`action-menu`}>
                     {this.props.actions.map((action, index) => {
-                        return <Button key={index} onClick={() => {action.action()}} className="action-button">{action.text}</Button>
+                        return action ? <Button key={index} onClick={() => {action.action()}} className="action-button">{action.text}</Button> : null
                     })}
                 </div>
             </div>

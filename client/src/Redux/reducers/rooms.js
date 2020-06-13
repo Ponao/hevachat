@@ -24,7 +24,10 @@ import {
     ROOMS_USER_LEAVE_IN_ROOM,
     ROOMS_USER_JOIN_IN_ROOM,
     ROOMS_SET_GET,
-    ROOMS_GET_ERROR
+    ROOMS_GET_ERROR,
+    ROOMS_EDIT_ROOM,
+    ROOMS_EDIT_IN_ROOM,
+    ROOMS_DELETE_ROOM
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -48,6 +51,12 @@ const rooms = (state = INITIAL_STATE, action) => {
         }
         case ROOMS_ADD:
             return { ...state, rooms: [ action.payload, ...state.rooms ]  }
+        case ROOMS_EDIT_ROOM:
+            return { ...state, rooms: state.rooms.map(room => 
+                action.payload._id === room._id ? { ...room, title: action.payload.title, isPrivate: action.payload.isPrivate} : room
+            ) }
+        case ROOMS_DELETE_ROOM:
+            return { ...state, rooms: [...state.rooms.filter(room => room._id !== action.payload)] }
         case ROOMS_JOIN_ROOM:
             return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false, remoteStream: false} }
         case ROOMS_JOIN_ERROR:
@@ -60,6 +69,8 @@ const rooms = (state = INITIAL_STATE, action) => {
             ] } }
         case ROOMS_USER_JOIN_IN_ROOM:
             return { ...state, activeRoom: { ...state.activeRoom, users: [ ...state.activeRoom.users, action.payload ] } }
+        case ROOMS_EDIT_IN_ROOM:
+            return { ...state, activeRoom: { ...state.activeRoom, title: action.payload.title, isPrivate: action.payload.isPrivate } }
         case ROOMS_LEAVE_ROOM:
             return { ...state, activeRoom: false }
         case ROOMS_USER_JOIN_ROOM:

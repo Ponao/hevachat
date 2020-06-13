@@ -2,12 +2,13 @@ import {
     USER_LOGIN,
     USER_LOGOUT,
     USER_UPDATE_ROOM_LANG,
-    DIALOGS_GET
+    DIALOGS_GET,
+    NOTIFICATIONS_SET_NO_READ
 } from '../constants'
 import store from '../store'
 
 
-export const loginUser = (user, dialogs, noReadCount, apiToken) => (dispatch) => {
+export const loginUser = (user, dialogs, noReadCount, noReadNotifications, apiToken) => (dispatch) => {
     user.apiToken = apiToken
     
     dispatch({
@@ -37,6 +38,11 @@ export const loginUser = (user, dialogs, noReadCount, apiToken) => (dispatch) =>
     dispatch({
         type: DIALOGS_GET,
         payload: {dialogs, noReadCount}
+    })
+
+    dispatch({
+        type: NOTIFICATIONS_SET_NO_READ,
+        payload: noReadNotifications
     })
 }
 

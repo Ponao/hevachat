@@ -37,7 +37,6 @@ class Notifications extends React.Component {
                         renderTrackVertical={props => <div className="track-vertical"/>}
                         renderThumbVertical={props => <div className="thumb-vertical"/>}
                         className="scroll"
-                        onScroll={() => {this.onScroll()}}
                         style={{height: 'calc(100% - 78px)'}}
                         autoHide
                     >

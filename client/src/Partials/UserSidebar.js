@@ -38,7 +38,18 @@ class UserSidebar extends React.Component {
                             >{this.props.dialogs.noReadCount}</span>}
                         </li>
                         <li className={`${this.state.activeTab === 'rooms' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'rooms'})}}><AppsIcon style={{color: '#CCD1D6'}} /></li>
-                        <li className={`${this.state.activeTab === 'notifications' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'notifications'})}}><NotificationsNoneIcon style={{color: '#CCD1D6'}} /></li>
+                        <li style={{position: 'relative'}} className={`${this.state.activeTab === 'notifications' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'notifications'})}}>
+                            <NotificationsNoneIcon style={{color: '#CCD1D6'}} />
+                            {!!this.props.notifications.noRead && <span 
+                                className="unread-messages-count"
+                                style={{
+                                    top: 11,
+                                    right: '44%',
+                                    transform: 'translateX(50%)',
+                                    backgroundColor: '#FF3333'
+                                }}
+                            >{this.props.notifications.noRead}</span>}
+                        </li>
                         <li className={`${this.state.activeTab === 'languages' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'languages'})}}><LanguageIcon style={{color: '#CCD1D6'}} /></li>
                     </ul>
                 </div>
@@ -55,7 +66,8 @@ class UserSidebar extends React.Component {
 const mapStateToProps = state => {
     return {
         user: state.user,
-        dialogs: state.dialogs
+        dialogs: state.dialogs,
+        notifications: state.notifications
     }
 }
 

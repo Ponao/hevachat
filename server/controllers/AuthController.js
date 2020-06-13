@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Dialog = require('../models/Dialog');
+const Notification = require('../models/Notification');
 
 module.exports = {
   // Register method
@@ -92,8 +93,11 @@ module.exports = {
         } 
       })
     }
+    let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
+            
+    const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
 
-      return res.json({ token, user: newUser, dialogs, noReadCount });
+      return res.json({ token, user: newUser, dialogs, noReadCount, noReadNotifications });
     } catch (e) {
       console.log(e);
       return next(new Error(e));
@@ -159,8 +163,11 @@ module.exports = {
         } 
       })
     }
+    let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
+            
+    const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
           
-          return res.json({ token, user, dialogs, noReadCount });
+          return res.json({ token, user, dialogs, noReadCount, noReadNotifications });
         }
       }
     } catch (e) {

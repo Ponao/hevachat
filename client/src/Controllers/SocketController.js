@@ -28,7 +28,13 @@ import {
     USERS_PENDING_REMOVE,
     USERS_REQUESTED_REMOVE,
     USERS_ADD,
-    NOTIFICATIONS_ADD
+    NOTIFICATIONS_ADD,
+    NOTIFICATIONS_READ,
+    NOTIFICATIONS_SET_NO_READ,
+    NOTIFICATIONS_REMOVE,
+    ROOMS_EDIT_ROOM,
+    ROOMS_EDIT_IN_ROOM,
+    ROOMS_DELETE_ROOM
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -47,6 +53,27 @@ export default {
             store.dispatch({
                 type: ROOMS_ADD,
                 payload: room
+            })
+        })
+
+        socket.on('editRoom', room => {
+            store.dispatch({
+                type: ROOMS_EDIT_ROOM,
+                payload: room
+            })
+        })
+
+        socket.on('editInRoom', room => {
+            store.dispatch({
+                type: ROOMS_EDIT_IN_ROOM,
+                payload: room
+            })
+        })
+
+        socket.on('deleteRoom', roomId => {
+            store.dispatch({
+                type: ROOMS_DELETE_ROOM,
+                payload: roomId
             })
         })
 
@@ -212,6 +239,35 @@ export default {
                     type: NOTIFICATIONS_ADD,
                     payload: notification
                 })
+            else 
+                store.dispatch({
+                    type: NOTIFICATIONS_SET_NO_READ,
+                    payload: store.getState().notifications.noRead+1
+                })
+        })
+
+        socket.on('readNotification', id => {
+            store.dispatch({
+                type: NOTIFICATIONS_READ,
+                payload: id
+            })
+        })
+
+        socket.on('removeNotification', ({id, read}) => {
+            let noRead = store.getState().notifications.noRead
+            
+            if(!read)
+                noRead--
+
+            store.dispatch({
+                type: NOTIFICATIONS_SET_NO_READ,
+                payload: noRead
+            })
+
+            store.dispatch({
+                type: NOTIFICATIONS_REMOVE,
+                payload: id
+            })
         })
 
         socket.on('readMessagesDialog', ({dialogId, userId}) => {

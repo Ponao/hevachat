@@ -18,6 +18,7 @@ router.post('/create', verifyToken, [
 ], RoomController.create);
 router.post('/delete', verifyToken, RoomController.delete);
 router.post('/edit', verifyToken, RoomController.edit);
+router.post('/invite', verifyToken, RoomController.invite);
 router.post('/send-message', verifyToken, RoomController.sendMessage);
 router.post('/delete-message', verifyToken, RoomController.deleteMessage);
 router.post('/read-messages', verifyToken, RoomController.readMessages);

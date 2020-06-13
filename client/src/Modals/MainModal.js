@@ -9,6 +9,10 @@ import qs from 'qs'
 import User from './User';
 import Contacts from './Contacts';
 import CreateDialog from './CreateDialog';
+import { connect } from 'react-redux';
+import Invite from './Invite';
+import EditRoom from './EditRoom';
+import DeleteRoom from './DeleteRoom';
 
 class MainModal extends React.Component {
     state = {
@@ -52,8 +56,33 @@ class MainModal extends React.Component {
                     search: ""
                 })
             }} />
+
+            <Invite isOpen={this.state.act === 'invite' && this.props.rooms.activeRoom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />
+
+            {this.state.act === 'editRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId) && <EditRoom isOpen={this.state.act === 'editRoom' && this.props.rooms.activeRoom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.act === 'deleteRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId) && <DeleteRoom isOpen={this.state.act === 'deleteRoom' && this.props.rooms.activeRoom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
         </>
     }
 }
 
-export default withRouter(MainModal)
+const mapStateToProps = state => {
+    return {
+        rooms: state.rooms,
+        user: state.user
+    }
+}
+
+export default connect(mapStateToProps)(withRouter(MainModal))

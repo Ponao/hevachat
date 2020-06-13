@@ -114,10 +114,11 @@ function initSocket(initIo) {
             stopBySocketId(socket.id)
 
             let room = await Room.findById(roomId).populate('users')
+            if(room) {
+                room.users = room.users.filter(x => String(x._id) != String(user._id))
 
-            room.users = room.users.filter(x => String(x._id) != String(user._id))
-
-            await room.save()
+                await room.save()
+            }
 
             activeRoomId = 0
         })
@@ -213,6 +214,15 @@ function editMessageRoom({roomId, message, socketId}) {
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('editMessageRoom', message)
 }
 
+function editRoom({roomId, lang, room}) {
+    io.to(`language.${lang}`).emit('editRoom', room)
+    io.to(`room.${roomId}`).emit('editInRoom', room)
+}
+
+function deleteRoom({roomId, lang}) {
+    io.to(`language.${lang}`).emit('deleteRoom', roomId)
+}
+
 // Chat dialog
 function sendMessageDialog({userId, socketId, otherId, message}) {
     if(userId != otherId) {
@@ -256,8 +266,16 @@ function sendRemoveFriend({userId, otherId, friendStatus}) {
 }
 
 // Notifications
-function sendInvite({userId, notification}) {
+function sendNotification({userId, notification}) {
     io.to(`user.${userId}`).emit('sendNotification', notification)
+}
+
+function removeNotification({userId, id, read}) {
+    io.to(`user.${userId}`).emit('removeNotification', {id, read})
+}
+
+function readNotification({socketId, userId, id}) {
+    io.sockets.connected[socketId].to(`user.${userId}`).emit('readNotification', id)
 }
 
 module.exports = {
@@ -274,5 +292,9 @@ module.exports = {
     sendRequestFriend,
     sendAcceptFriend,
     sendRemoveFriend,
-    sendInvite
+    sendNotification,
+    readNotification,
+    removeNotification,
+    editRoom,
+    deleteRoom
 }

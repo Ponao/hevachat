@@ -10,7 +10,7 @@ const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const { validationResult } = require("express-validator");
 
-const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendInvite} = require('./SocketController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom} = require('./SocketController')
 const {getUserExistById, addUserRoom} = require('./WebRtcController')
 
 module.exports = {
@@ -64,6 +64,17 @@ module.exports = {
                 return res.status(401).json({ error: true, errors: [err] });
             } else {
                 addUserRoom(room._id, user._id, socketId)
+            }
+
+            if(room.isPrivate) {
+                let existInvite = await Notification.findOne({type: 'invite', userId: user._id, room: {_id: room._id}})
+
+                if(!existInvite && room.ownerId != user._id) {
+                    const err = {};
+                    err.param = `all`;
+                    err.msg = `you_are_not_invited`;
+                    return res.status(401).json({ error: true, errors: [err] });
+                }
             }
 
             let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
@@ -185,12 +196,9 @@ module.exports = {
                 notification.user = user
                 notification.userId = id
                 notification.type = 'invite'
-                notification.data = {
-                    roomId: room._id,
-                    title
-                }
+                notification.room = room
 
-                sendInvite({userId: id, notification})
+                sendNotification({userId: id, notification})
 
                 await notification.save()
             })
@@ -201,16 +209,50 @@ module.exports = {
         }
     },
 
+    invite: async (req, res, next) => {
+        const { user } = res.locals;
+        const { id, selectUsers } = req.body;
+
+        try{
+            const room = await Room.findById(id)
+
+            selectUsers.map(async userId => {
+                let exist = await Notification.findOne({type: 'invite', userId, room: {_id: room._id}})
+                if(!exist) {
+                    let notification = new Notification()
+
+                    notification.user = user
+                    notification.userId = userId
+                    notification.type = 'invite'
+                    notification.room = room
+
+                    sendNotification({userId, notification})
+
+                    await notification.save()
+                }
+            })
+
+            return res.json();
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
     delete: async (req, res, next) => {
         // Get this account as JSON
         const { user } = res.locals;
-        const { lang } = req.body;
+        const { id } = req.body;
 
         try {
-            user.roomLang = lang;
-            await user.save()
+            const room = await Room.findById(id)
 
-            return res.json(user);
+            if(room && user._id == room.ownerId) {
+                await Room.deleteOne({_id: id})
+
+                deleteRoom({roomId: id, lang: room.lang})
+            }
+
+            return res.json();
         } catch (e) {
             return next(new Error(e));
         }
@@ -219,9 +261,39 @@ module.exports = {
     edit: async (req, res, next) => {
         // Get this account as JSON
         const { user } = res.locals;
+        const { title, isPrivate, id } = req.body;
 
         try {
-            return res.json(user);
+            const existRoom = await Room.findOne({title})
+            const room = await Room.findById(id)
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ error: true, errors: errors.array() });
+            }
+
+            if(existRoom && room.title != title) {
+                const err = {};
+                err.param = `title`;
+                err.msg = `room_exist`;
+                return res.status(409).json({ error: true, errors: [err] });
+            }
+
+            if(user._id != room.ownerId) {
+                const err = {};
+                err.param = `title`;
+                err.msg = `dont_have_permissions`;
+                return res.status(409).json({ error: true, errors: [err] });
+            }
+
+            editRoom({roomId: room._id, lang: room.lang, room: {isPrivate, title, _id: room._id}})
+
+            room.title = title
+            room.isPrivate = isPrivate
+
+            await room.save()
+            
+            return res.json({error: false});
         } catch (e) {
             return next(new Error(e));
         }

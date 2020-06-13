@@ -13,7 +13,7 @@ const NotificationSchema = new Schema({
     userId: { type: String },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     type: { type: String },
-    data: { type: Object },
+    room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
     isRead: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     buff: Buffer

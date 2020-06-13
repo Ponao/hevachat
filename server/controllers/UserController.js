@@ -8,8 +8,9 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 const Dialog = require('../models/Dialog');
 const Friend = require('../models/Friends')
+const Notification = require('../models/Notification');
 const mongoose = require("../database");
-const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend} = require('./SocketController')
+const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification} = require('./SocketController')
 
 module.exports = {
     // Get user data
@@ -56,9 +57,13 @@ module.exports = {
                     } 
                 })
             }
+
+            let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
+            
+            const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
             
             if (user) {
-                return res.json({user, dialogs, noReadCount});
+                return res.json({user, dialogs, noReadCount, noReadNotifications});
             }
             const err = new Error(`User ${userId} not found.`);
             err.notFound = true;
@@ -203,6 +208,16 @@ module.exports = {
             { $push: { friends: docB._id }}
         )
 
+        let notification = new Notification()
+
+        notification.user = user
+        notification.userId = userId
+        notification.type = 'request'
+
+        sendNotification({userId, notification})
+
+        await notification.save()
+
         sendRequestFriend({userId: user._id, otherId: userId, friendStatus: 2})
 
         return res.json(1)
@@ -220,6 +235,26 @@ module.exports = {
             { recipient: {_id: user._id}, requester: {_id: userId} },
             { $set: { status: 3, updatedAt: new Date() }}
         )
+
+        let notification = new Notification()
+
+        notification.user = user
+        notification.userId = userId
+        notification.type = 'accept'
+
+        sendNotification({userId, notification})
+
+        await notification.save()
+
+        let removeNotificationD = await Notification.findOne({user: {_id: userId}, userId: user._id, type: 'request'})
+        
+        if(removeNotificationD) {
+            let read = removeNotificationD.isRead
+            removeNotification({userId: user._id, id: removeNotificationD._id, read})
+    
+            await Notification.deleteOne({user: {_id: userId}, userId: user._id, type: 'request'})
+        }
+            
 
         sendAcceptFriend({userId: user._id, otherId: userId, friendStatus: 3})
 
@@ -284,6 +319,49 @@ module.exports = {
 
             sendRemoveFriend({userId: user._id, otherId: userId, friendStatus: 0})
         }
+
+        if(status === 0) {
+            let removeNotificationA = await Notification.findOne({user: {_id: user._id}, userId: userId, type: 'request'})
+            
+            if(removeNotificationA) {
+                let read = removeNotificationA.isRead
+                removeNotification({userId: userId, id: removeNotificationA._id, read})
+                await Notification.deleteOne({user: {_id: user._id}, userId: userId, type: 'request'})
+            }
+
+            let removeNotificationR = await Notification.findOne({user: {_id: userId}, userId: user._id, type: 'request'})
+            
+            if(removeNotificationR) {
+                let read = removeNotificationR.isRead
+                removeNotification({userId: user._id, id: removeNotificationR._id, read})
+                await Notification.deleteOne({user: {_id: userId}, userId: user._id, type: 'request'})
+            }
+        } else {
+            let removeNotificationR = await Notification.findOne({user: {_id: userId}, userId: user._id, type: 'request'})
+            
+            if(removeNotificationR) {
+                let read = removeNotificationR.isRead
+                removeNotification({userId: user._id, id: removeNotificationR._id, read})
+                await Notification.deleteOne({user: {_id: userId}, userId: user._id, type: 'request'})
+            }
+            
+            let removeNotificationA = await Notification.findOne({user: {_id: user._id}, userId: userId, type: 'accept'})
+            
+            if(removeNotificationA) {
+                let read = removeNotificationA.isRead
+                removeNotification({userId: userId, id: removeNotificationA._id, read})
+                await Notification.deleteOne({user: {_id: user._id}, userId: userId, type: 'accept'})
+            }
+
+            let removeNotificationS = await Notification.findOne({user: {_id: userId}, userId: user._id, type: 'accept'})
+            
+            if(removeNotificationS) {
+                let read = removeNotificationS.isRead
+                removeNotification({userId: user._id, id: removeNotificationS._id, read})
+                await Notification.deleteOne({user: {_id: userId}, userId: user._id, type: 'accept'})
+            }
+        }
+        
 
         return res.json(status)
     },

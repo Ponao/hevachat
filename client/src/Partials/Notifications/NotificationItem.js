@@ -10,7 +10,7 @@ import { NavLink, withRouter } from 'react-router-dom';
 // Material
 import { connect } from 'react-redux';
 
-import * as dialogsActions from '../../Redux/actions/dialogs'
+import * as notificationsActions from '../../Redux/actions/notifications'
 import { bindActionCreators } from 'redux'
 
 import { randomInteger } from '../../Controllers/FunctionsController';
@@ -25,15 +25,24 @@ class NotificationItem extends React.Component {
     render() {
         return (
             <Button className={`dialog-item`} onClick={() => {
+                if(!this.props.notification.isRead)
+                    this.props.notificationsActions.notificationRead(this.props.notification._id, this.props.user.apiToken)
+
                 if(this.props.notification.type === 'invite')
-                    this.props.history.push(`/rooms/${this.props.notification.data.roomId}`)
+                    this.props.history.push(`/rooms/${this.props.notification.room._id}`)
+                if(this.props.notification.type === 'accept' || this.props.notification.type === 'request')
+                    this.props.history.push({
+                        search: `?user=${this.props.notification.user._id}`
+                    })
             }}>
-                <Avatar online={this.props.notification.user.online} style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.notification.user.color})`}} name={this.props.notification.user.name.first.charAt(0) + this.props.notification.user.name.last.charAt(0)} />
+                <Avatar status={this.props.notification.type} style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.notification.user.color})`}} name={this.props.notification.user.name.first.charAt(0) + this.props.notification.user.name.last.charAt(0)} />
 
                 <div>
                     <p className="user-name">{`${this.props.notification.user.name.first} ${this.props.notification.user.name.last}`}</p>
                     
-                    {this.props.notification.type === 'invite' && <p className="last-message">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.data.title}</span></p>}
+                    {this.props.notification.type === 'invite' && <p className="last-message">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></p>}
+                    {this.props.notification.type === 'accept' && <p className="last-message">Accept your friend request</p>}
+                    {this.props.notification.type === 'request' && <p className="last-message">Send you friend request</p>}
                 </div>
                 <div className="dialog-info">
                     <span className="time-at">{LastMessageDate(this.props.notification.createdAt)}</span>
@@ -51,13 +60,13 @@ class NotificationItem extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        myUser: state.user,
+        user: state.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        dialogsActions: bindActionCreators(dialogsActions, dispatch)
+        notificationsActions: bindActionCreators(notificationsActions, dispatch)
     }
 }
 
