@@ -250,6 +250,8 @@ module.exports = {
                 await Room.deleteOne({_id: id})
 
                 deleteRoom({roomId: id, lang: room.lang})
+
+                await Notification.deleteMany({type: 'invite', room: {_id: room._id}})
             }
 
             return res.json();

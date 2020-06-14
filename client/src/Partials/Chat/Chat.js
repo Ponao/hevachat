@@ -30,7 +30,7 @@ class Chat extends React.Component {
 
     state = {
         recentMessages: [],
-        attachedRecentMessages: [],
+        attachedRecentMessages: this.props.dialogs.forwardMessages,
         sounds: [],
         files: [],
         images: [],
@@ -47,6 +47,10 @@ class Chat extends React.Component {
     dragCounter = 0
 
     componentDidMount() {
+        if(!!this.props.dialogs.forwardMessages.length) {
+            this.props.dialogsActions.setForward([])
+        }
+
         let div = this.dropRef.current
         div.addEventListener('dragenter', this.handleDragIn)
         div.addEventListener('dragleave', this.handleDragOut)
@@ -234,6 +238,13 @@ class Chat extends React.Component {
     addAttachmentRecentMessage() {
         this.setState({
             attachedRecentMessages: this.state.recentMessages,
+            recentMessages: []
+        })
+    }
+
+    addAttachmentForwardMessage() {
+        this.props.dialogsActions.setForward(this.state.recentMessages)
+        this.setState({
             recentMessages: []
         })
     }
@@ -594,7 +605,8 @@ class Chat extends React.Component {
                 {!!this.state.recentMessages.length && 
                     <ToolbarMessage 
                         addAttachmentRecentMessage={() => {this.addAttachmentRecentMessage()}}
-                        cancelAttachmentRecentMessage={() => {this.cancelAttachmentRecentMessage()}} 
+                        cancelAttachmentRecentMessage={() => {this.cancelAttachmentRecentMessage()}}
+                        addAttachmentForwardMessage={() => {this.addAttachmentForwardMessage()}} 
                         deleteMessage={() => {this.deleteMessage()}}
                         recentMessages={this.state.recentMessages}
                         setEditMessage={() => {this.setEditMessage()}}
@@ -608,7 +620,8 @@ class Chat extends React.Component {
 const mapStateToProps = state => {
     return {
         user: state.user,
-        rooms: state.rooms
+        rooms: state.rooms,
+        dialogs: state.dialogs
     }
 }
 

@@ -154,7 +154,7 @@ export default {
         })
     },
     roomOnIceCandidate: (e) => {
-        if(WebRtcPeerConnection)
+        if(WebRtcPeerConnection && e.candidate)
             WebRtcPeerConnection.addIceCandidate(e)
     },
     onRoomAnswerSdp: (sdpAnswer) => {

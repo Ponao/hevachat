@@ -10,7 +10,8 @@ import {
     DIALOGS_DELETE_MESSAGE,
     DIALOGS_SET_LOADING,
     DIALOGS_LOAD_MESSAGES,
-    DIALOGS_UPDATE_ONLINE
+    DIALOGS_UPDATE_ONLINE,
+    DIALOGS_SET_FORWARD
 } from '../constants'
 import store from '../store';
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
@@ -140,6 +141,13 @@ export const updateOnline = (userId, apiToken) => (dispatch) => {
             payload: {userId, online, onlineAt}
         })
     });
+}
+
+export const setForward = (messages) => (dispatch) => {
+    dispatch({
+        type: DIALOGS_SET_FORWARD,
+        payload: messages
+    })
 }
 
 export const sendMessage = (message, apiToken) => (dispatch) => {

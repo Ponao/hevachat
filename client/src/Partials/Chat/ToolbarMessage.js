@@ -22,7 +22,7 @@ class ToolbarMessage extends React.Component {
                     Reply
                 </Button>
 
-                <Button className="btn-forward">
+                <Button className="btn-forward" onClick={() => {this.props.addAttachmentForwardMessage()}}>
                     Forward
                 </Button>
 

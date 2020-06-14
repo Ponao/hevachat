@@ -124,6 +124,27 @@ module.exports = {
             return next(new Error(e));
         }
     },
+    
+    search: async (req, res, next) => {
+        const { user } = res.locals;
+        const { q } = req.body;
+
+        let search = new RegExp(q, 'ig');
+        
+        try {
+            const users = await User.find({
+                '$or': [
+                    {'name.first': search},
+                    {'name.last': search}
+                ]
+            }).limit(20)
+
+            if(users)
+                return res.json(users);
+        } catch (err) {
+            return next(new Error(err));
+        }
+    },
 
     getFriends: async(req, res, next) => {
         const { user } = res.locals;

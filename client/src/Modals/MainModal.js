@@ -13,6 +13,8 @@ import { connect } from 'react-redux';
 import Invite from './Invite';
 import EditRoom from './EditRoom';
 import DeleteRoom from './DeleteRoom';
+import Forward from './Forward';
+import { DIALOGS_SET_FORWARD } from '../Redux/constants';
 
 class MainModal extends React.Component {
     state = {
@@ -74,6 +76,13 @@ class MainModal extends React.Component {
                     search: ""
                 })
             }} />}
+
+            <Forward isOpen={!!this.props.dialogs.forwardMessages.length} close={(status) => {
+                this.props.dispatch({
+                    type: DIALOGS_SET_FORWARD,
+                    payload: []
+                })
+            }} />
         </>
     }
 }
@@ -81,7 +90,8 @@ class MainModal extends React.Component {
 const mapStateToProps = state => {
     return {
         rooms: state.rooms,
-        user: state.user
+        user: state.user,
+        dialogs: state.dialogs
     }
 }
 

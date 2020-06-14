@@ -11,12 +11,14 @@ import {
     DIALOGS_DELETE_MESSAGE,
     DIALOGS_SET_LOADING,
     DIALOGS_LOAD_MESSAGES,
-    DIALOGS_UPDATE_ONLINE
+    DIALOGS_UPDATE_ONLINE,
+    DIALOGS_SET_FORWARD
 } from '../constants'
 
 const INITIAL_STATE = {
     isFetching: true,
-    dialogs: []
+    dialogs: [],
+    forwardMessages: []
 }
 
 const dialogs = (state = INITIAL_STATE, action) => {
@@ -146,6 +148,8 @@ const dialogs = (state = INITIAL_STATE, action) => {
                 { ...dialog, typing: action.payload.typing } :
                 dialog
             ) }
+        case DIALOGS_SET_FORWARD: 
+            return { ...state, forwardMessages: action.payload }
         default: 
             return state
     }
