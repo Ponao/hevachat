@@ -29,6 +29,7 @@ const userRoutes = require('./routes/user');
 const roomRoutes = require('./routes/room');
 const dialogRoutes = require('./routes/dialog');
 const notificationRoutes = require('./routes/notification');
+const callRoutes = require('./routes/call')
 
 // Use Express as our web server
 const app = express();
@@ -49,6 +50,7 @@ app
   .use('/api/room', roomRoutes)
   .use('/api/dialog', dialogRoutes)
   .use('/api/notification', notificationRoutes)
+  .use('/api/call', callRoutes)
   // Serve static files
   .use('/media', express.static(path.join(__dirname, './uploads')))
   // Enable history API

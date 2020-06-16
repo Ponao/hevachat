@@ -1,4 +1,5 @@
-var kurento = require('kurento-client');
+const kurento = require('kurento-client');
+const {sendCallMessage} = require('./CallMessageController')
 
 var kurentoClient = null;
 
@@ -6,6 +7,7 @@ let wsKurentoUri = 'ws://85.143.202.123:8888/kurento'
 
 let candidatesQueues = {}
 let Rooms = {}
+let Calls = {}
 
 function getUserExistById(id) {
     for (let [key, room] of Object.entries(Rooms)) {
@@ -13,6 +15,16 @@ function getUserExistById(id) {
             if(String(user._id) === String(id)) {
                 return user
             }
+        }
+    }
+
+    return false
+}
+
+function checkBusy(userId) {
+    for (let [key, call] of Object.entries(Calls)) {
+        if(String(call.userFrom._id) == String(userId) || call.userTo._id == String(userId)) {
+            return call
         }
     }
 
@@ -29,6 +41,11 @@ function getUserExistBySocketId(id) {
     }
 
     return false
+}
+
+function addUserCall(userId, userIdOther, socketId) {
+    if(!Calls[userId])
+        Calls[userId] = {userFrom: {_id: userId, socketId}, userTo: {_id: userIdOther}, status: 'calling'}
 }
 
 function addUserRoom(roomId, userId, socketId) {
@@ -139,24 +156,6 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                 return callback('Error not find user');
             }
 
-            // for (let [key, value] of Object.entries(Rooms[roomId].users)) {
-            //     if(String(value._id) !== String(userId)) {
-            //         webRtcEndpoint.connect(value.webRtcEndpoint, function(error) {
-            //             if (error) {
-            //                 stop(roomId, userId);
-            //                 return callback(error);
-            //             }
-
-            //             value.webRtcEndpoint.connect(webRtcEndpoint, function(error) {
-            //                 if (error) {
-            //                     stop(roomId, userId);
-            //                     return callback(error);
-            //                 }
-            //             });
-            //         });
-            //     }
-            // }
-
             callback(null, sdpAnswer);
         });
         
@@ -218,7 +217,7 @@ const stop = async (roomId, userId) => {
     }
 }
 
-function stopBySocketId(socketId) {
+function stopRoomBySocketId(socketId) {
     for (let [key, room] of Object.entries(Rooms)) {
         for (let [key, user] of Object.entries(room.users)) {
             if(user.socketId == socketId) {
@@ -246,12 +245,41 @@ function stopBySocketId(socketId) {
     }
 }
 
+function stopCall(socketId, userId, stopUserCall, io, reject = false) {
+    for (let [key, call] of Object.entries(Calls)) {
+        if(((call.userFrom.socketId == socketId && String(call.userFrom._id) == String(userId)) || call.userTo._id == String(userId))) {
+            if(call.userFrom.socketId == socketId && String(call.userFrom._id) == String(userId)) {
+                stopUserCall({userId, otherId: call.userTo._id, socketId})
+
+                if(call.status === 'calling') {
+                    sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'missed_call')
+                }
+
+                delete Calls[call.userFrom._id]
+            }
+                
+            if(call.userTo._id == String(userId) && reject) {
+                stopUserCall({userId, otherId: call.userFrom._id, socketId})
+
+                if(call.status === 'calling') {
+                    sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'canceled_call')
+                }
+
+                delete Calls[call.userFrom._id]
+            }
+        }
+    }
+}
+
 module.exports = {
     roomOnIceCandidate,
     roomOfferSdp,
     stop,
     getUserExistById,
-    stopBySocketId,
+    stopRoomBySocketId,
     addUserRoom,
-    getUserExistBySocketId
+    getUserExistBySocketId,
+    addUserCall,
+    stopCall,
+    checkBusy
 }

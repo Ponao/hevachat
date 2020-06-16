@@ -15,6 +15,8 @@ import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import CallReceivedIcon from '@material-ui/icons/CallReceived';
 
 import Audio from './Audio';
 
@@ -117,7 +119,6 @@ class Message extends React.PureComponent {
                     (!isFirst && !isHistoryDate && !this.props.isRecent) &&
                     <div style={{width: 46}} />
                 }
-
                 
                 {(!this.props.message.isLoading && !this.props.message.isError) && this.props.canSelect && <span className={`select-indicator ${this.props.selected ? 'active' : ''}`}>
                 <CSSTransitionGroup 
@@ -153,14 +154,22 @@ class Message extends React.PureComponent {
 
                     {this.props.message.text && <p className="message-text">
                         <Linkify componentDecorator={componentDecorator}>
-                            {this.props.message.text.replace(/&nbsp;/g, '')
-                                .replace(/&amp;/g, '&')
-                                .replace(/&gt;/g, '>')
-                                .replace(/&lt;/g, '<')
-                                // .replace(/(\r\n|\n|\r)/gm, "")
-                                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
-                                .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
-                            }
+                            {this.props.message.type === 'message' && <>
+                                {this.props.message.text.replace(/&nbsp;/g, '')
+                                    .replace(/&amp;/g, '&')
+                                    .replace(/&gt;/g, '>')
+                                    .replace(/&lt;/g, '<')
+                                    // .replace(/(\r\n|\n|\r)/gm, "")
+                                    .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")
+                                    .replace(/(\r\n|\r|\n){2,}/g, '$1\n')
+                                }
+                            </>}
+
+                            {this.props.message.type === 'call' && <>
+                                {this.props.message.user._id === this.props.user._id && <CallMadeIcon style={{color: '#008FF7', fontSize: 20, marginRight: 8}} />}
+                                {this.props.message.user._id !== this.props.user._id && <CallReceivedIcon style={{color: '#008FF7', fontSize: 20, marginRight: 8}} />}
+                                {this.props.message.text}
+                            </>}
                         </Linkify>
                     </p>}
 

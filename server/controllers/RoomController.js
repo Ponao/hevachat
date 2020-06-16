@@ -191,16 +191,18 @@ module.exports = {
             await room.save()
 
             selectUsers.map(async id => {
-                let notification = new Notification()
+                if(user._id != id) {
+                    let notification = new Notification()
 
-                notification.user = user
-                notification.userId = id
-                notification.type = 'invite'
-                notification.room = room
+                    notification.user = user
+                    notification.userId = id
+                    notification.type = 'invite'
+                    notification.room = room
 
-                sendNotification({userId: id, notification})
+                    sendNotification({userId: id, notification})
 
-                await notification.save()
+                    await notification.save()
+                }
             })
 
             return res.json(room);
@@ -219,16 +221,18 @@ module.exports = {
             selectUsers.map(async userId => {
                 let exist = await Notification.findOne({type: 'invite', userId, room: {_id: room._id}})
                 if(!exist) {
-                    let notification = new Notification()
+                    if(user._id != userId) {
+                        let notification = new Notification()
+                        
+                        notification.user = user
+                        notification.userId = userId
+                        notification.type = 'invite'
+                        notification.room = room
 
-                    notification.user = user
-                    notification.userId = userId
-                    notification.type = 'invite'
-                    notification.room = room
+                        sendNotification({userId, notification})
 
-                    sendNotification({userId, notification})
-
-                    await notification.save()
+                        await notification.save()
+                    }
                 }
             })
 

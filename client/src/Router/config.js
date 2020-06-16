@@ -47,7 +47,7 @@ const routes = [
         exact: true,
         type: 'user',
         title: '',
-        component: () => <Dialog key={randomInteger(0, 1000)} />
+        component: () => <Dialog key={window.location.pathname} />
     },
     {
         path: '/rooms/:id',

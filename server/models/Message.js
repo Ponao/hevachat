@@ -24,6 +24,7 @@ const MessageSchema = new Schema({
     recentMessages: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Message' }
     ],
+    type: { type: String, default: 'message' }, // message, call, voice
     isRead: { type: Boolean, default: false },
     isEdit: { type: Boolean, default: false },
     isDelete: { type: Boolean, default: false },

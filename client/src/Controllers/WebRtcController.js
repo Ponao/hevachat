@@ -104,8 +104,6 @@ export default {
         
         getUserMedia((stream) => {
             localStream = stream
-            // let audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-            // let dest = audioCtx.createMediaStreamDestination ();
 
             localStream.getAudioTracks()[0].enabled = false
 
@@ -116,10 +114,10 @@ export default {
             WebRtcPeerConnection.onicecandidate = onRoomIceCandidate
 
             WebRtcPeerConnection.createOffer(mediaConstraints).then((offer) => {
-                WebRtcPeerConnection.setLocalDescription(offer);
+                WebRtcPeerConnection.setLocalDescription(offer)
                 
                 onRoomOffer(null, offer)
-            });
+            })
         })
     },
     leaveRoom({roomId, lang}) {

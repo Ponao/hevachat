@@ -5,7 +5,8 @@ import {
 
 const INITIAL_STATE = {
     micOn: false,
-    musicOn: true
+    musicOn: true,
+    cameraOn: false
 }
 
 const media = (state = INITIAL_STATE, action) => {
@@ -16,7 +17,7 @@ const media = (state = INITIAL_STATE, action) => {
         case MEDIA_TOGGLE_MUSIC: {
             return { ...state, musicOn: action.payload }
         }
-        default: 
+        default:    
             return state
     }
 }

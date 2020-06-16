@@ -30,7 +30,7 @@ class ToolbarMessage extends React.Component {
 
                 </div>
 
-                {(!this.props.recentMessages.find(message => message.user._id !== this.props.user._id) && this.props.recentMessages.length === 1) && <Button className="btn-edit-message" onClick={() => {
+                {(this.props.recentMessages[0].user._id === this.props.user._id && this.props.recentMessages[0].type !== 'call' && this.props.recentMessages.length === 1) && <Button className="btn-edit-message" onClick={() => {
                     this.props.setEditMessage()
                 }}>
                     <EditOutlinedIcon style={{color: '#99AABB'}} />

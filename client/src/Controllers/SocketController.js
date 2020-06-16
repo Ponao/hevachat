@@ -34,7 +34,9 @@ import {
     NOTIFICATIONS_REMOVE,
     ROOMS_EDIT_ROOM,
     ROOMS_EDIT_IN_ROOM,
-    ROOMS_DELETE_ROOM
+    ROOMS_DELETE_ROOM,
+    CALL_SET_USER,
+    CALL_SET_STATUS
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -47,6 +49,38 @@ export default {
         socket = io(urlApi, {transports: ['websocket', 'polling', 'flashsocket']})
         socket.on('connect', () => {
             socket.emit('auth', apiToken)
+
+            fetch(`${urlApi}/api/call/check`, {
+                method: "post",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiToken}`,
+                }
+            })
+            .then((response) => response.json())
+            .then(({have, call}) => {
+                if(have) {
+                    fetch(`${urlApi}/api/user/get`, {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiToken}`,
+                        },
+                        body: JSON.stringify({
+                            userId: call.userFrom._id
+                        })
+                    })
+                    .then((response) => response.json())
+                    .then(({user, friendStatus}) => {
+                        store.dispatch({
+                            type: CALL_SET_USER,
+                            payload: {user, status: 'incoming'}
+                        })
+                    });
+                }
+            });
         })
 
         socket.on('createRoom', room => {
@@ -470,6 +504,43 @@ export default {
                     type: USERS_REQUESTED_REMOVE,
                     payload: {userId}
                 })
+            }
+        })
+
+        socket.on('sendUserCall', userId => {
+            fetch(`${urlApi}/api/user/get`, {
+                method: "post",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${apiToken}`,
+                },
+                body: JSON.stringify({
+                    userId: userId
+                })
+            })
+            .then((response) => response.json())
+            .then(({user, friendStatus}) => {
+                store.dispatch({
+                    type: CALL_SET_USER,
+                    payload: {user, status: 'incoming'}
+                })
+            });
+        })
+
+        socket.on('stopUserCall', userId => {
+            if(store.getState().call.user && store.getState().call.user._id === userId) {
+                if(store.getState().call.status === 'outcoming')
+                    store.dispatch({
+                        type: CALL_SET_STATUS,
+                        payload: 'canceled'
+                    })
+                
+                if(store.getState().call.status === 'incoming')
+                    store.dispatch({
+                        type: CALL_SET_USER,
+                        payload: {user: false, status: 'none'}
+                    })
             }
         })
     },

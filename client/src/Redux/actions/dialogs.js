@@ -187,6 +187,7 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
         isRead: false,
         recentMessages: message.recentMessages,
         createdAt: Date.now(),
+        type: 'message'
     }
     
     dispatch({
@@ -399,6 +400,7 @@ export const retrySendMessage = (message, apiToken) => (dispatch) => {
         isError: false,
         recentMessages: message.recentMessages,
         createdAt: Date.now(),
+        type: 'message'
     }
 
     dispatch({

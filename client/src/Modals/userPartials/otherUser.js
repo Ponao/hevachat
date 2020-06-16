@@ -8,10 +8,12 @@ import BookOutlinedIcon from '@material-ui/icons/BookOutlined';
 import { withStyles } from '@material-ui/core'
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@material-ui/icons/ChatBubbleOutlineOutlined';
+import CallIcon from '@material-ui/icons/Call';
 
 // Redux
 import { connect } from 'react-redux'
 import * as usersActions from '../../Redux/actions/users'
+import * as callActions from '../../Redux/actions/call'
 import { bindActionCreators } from 'redux'
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
@@ -64,6 +66,17 @@ class OtherUser extends React.Component {
                         <p>Message</p>
                     </div>    
 
+                    <div className="user-btn">
+                        <NavLink style={{textDecoration: 'none'}} onClick={(e) => {
+                            this.props.callActions.call(this.props.user, this.props.myUser.apiToken)
+                        }} className="dialog-link" to={`/chats/${this.props.user._id}`}>
+                            <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>
+                                <CallIcon style={{color: '#99AABB'}} />
+                            </CustomFab>
+                        </NavLink>
+                        <p>Call</p>
+                    </div>  
+
                     {this.props.user.friendStatus === 0 && <div className="user-btn">
                         <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
                             this.props.usersActions.sendRequest(this.props.userId, this.props.myUser.apiToken)
@@ -114,6 +127,7 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         usersActions: bindActionCreators(usersActions, dispatch),
+        callActions: bindActionCreators(callActions, dispatch)
     }
 }
 

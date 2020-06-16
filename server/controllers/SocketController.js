@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
-const {roomOnIceCandidate, roomOfferSdp, stop, stopBySocketId, getUserExistById, getUserExistBySocketId} = require('./WebRtcController')
+const {roomOnIceCandidate, roomOfferSdp, stop, stopRoomBySocketId, getUserExistById, getUserExistBySocketId, stopCall} = require('./WebRtcController')
 
 let idCounter = 0;
 let io = false
@@ -67,12 +67,12 @@ function initSocket(initIo) {
                     room.users = room.users.filter(x => String(x._id) != String(user._id))
 
                     await room.save()
-
-                    // stop(activeRoomId, user._id)
                 }
+
+                stopCall(socket.id, user._id, stopUserCall, io)
             } 
 
-            stopBySocketId(socket.id)
+            stopRoomBySocketId(socket.id)
         })
 
         // Join and leave from Room and Language
@@ -111,7 +111,7 @@ function initSocket(initIo) {
             socket.leave(`room.${roomId}`)
             socket.to(`room.${roomId}`).emit('leaveInRoom', user._id)
 
-            stopBySocketId(socket.id)
+            stopRoomBySocketId(socket.id)
 
             let room = await Room.findById(roomId).populate('users')
             if(room) {
@@ -195,6 +195,9 @@ function initSocket(initIo) {
     })
 }
 
+function getIO() {
+    return io
+}
 
 // Chat room
 function sendMessageRoom({roomId, message, socketId}) {
@@ -202,7 +205,6 @@ function sendMessageRoom({roomId, message, socketId}) {
 }
 
 function deleteMessageRoom({roomId, messageIds, socketId}) {
-    console.log(roomId)
     io.sockets.connected[socketId].to(`room.${roomId}`).emit('deleteMessageRoom', messageIds)
 }
 
@@ -278,7 +280,22 @@ function readNotification({socketId, userId, id}) {
     io.sockets.connected[socketId].to(`user.${userId}`).emit('readNotification', id)
 }
 
+// Calls
+function sendUserCall({userId, otherId, socketId}) {
+    io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendUserCall', userId)
+}
+
+function stopUserCall({userId, otherId, socketId}) {
+    if(io.sockets.connected[socketId]) {
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('stopUserCall', userId)
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('stopUserCall', otherId)
+    } else {
+        io.to(`user.${otherId}`).emit('stopUserCall', userId)
+    }
+}
+
 module.exports = {
+    getIO,
     initSocket, 
     sendMessageRoom, 
     deleteMessageRoom,
@@ -296,5 +313,7 @@ module.exports = {
     readNotification,
     removeNotification,
     editRoom,
-    deleteRoom
+    deleteRoom,
+    stopUserCall,
+    sendUserCall,
 }

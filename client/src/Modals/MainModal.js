@@ -15,6 +15,7 @@ import EditRoom from './EditRoom';
 import DeleteRoom from './DeleteRoom';
 import Forward from './Forward';
 import { DIALOGS_SET_FORWARD } from '../Redux/constants';
+import Call from './Call';
 
 class MainModal extends React.Component {
     state = {
@@ -83,6 +84,8 @@ class MainModal extends React.Component {
                     payload: []
                 })
             }} />
+
+        {this.props.call.user && <Call isOpen={true} />}
         </>
     }
 }
@@ -91,7 +94,8 @@ const mapStateToProps = state => {
     return {
         rooms: state.rooms,
         user: state.user,
-        dialogs: state.dialogs
+        dialogs: state.dialogs,
+        call: state.call
     }
 }
 

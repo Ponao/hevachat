@@ -6,6 +6,7 @@ import {PageSettings} from '../PageSettings'
 // Redux
 import { connect } from 'react-redux'
 import * as dialogsActions from '../../Redux/actions/dialogs'
+import * as callActions from '../../Redux/actions/call'
 import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -16,7 +17,28 @@ import Avatar from '../../Partials/User/Avatar';
 import Chat from '../../Partials/Chat/Chat';
 import SearchIcon from '@material-ui/icons/Search';
 import { OnlineDate } from '../../Controllers/TimeController';
+import Fab from '@material-ui/core/Fab';
+import CallIcon from '@material-ui/icons/Call';
+import { withStyles } from '@material-ui/core'
 
+const fabStyles = theme => ({
+    root: {
+        backgroundColor: '#25D441',
+        color: '#fff',
+        zIndex: 2,
+        width: 36,
+        height: 36,
+        boxShadow: 'none!important',
+        marginLeft: 'auto',
+        marginRight: '14px',
+        '&:hover': {
+            backgroundColor: '#25D441',
+            boxShadow: 'none',
+        }
+    }
+})
+
+const CustomFab = withStyles(fabStyles)(Fab);
 
 class Dialog extends React.PureComponent {
     static contextType = PageSettings;
@@ -76,6 +98,12 @@ class Dialog extends React.PureComponent {
                         {!dialog.user.online && <p className="last-message">{OnlineDate(dialog.user.onlineAt)}</p>}
                         {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>online</p>}
                     </div></>
+
+                    {dialog.user._id !== this.props.user._id && <CustomFab color="primary" size="small" aria-label="call" onClick={() => {
+                        this.props.callActions.call(dialog.user, this.props.user.apiToken)
+                    }}>
+                        <CallIcon style={{color: '#fff'}} />
+                    </CustomFab>}
                 </div>
                 <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>
                     <Chat 
@@ -116,7 +144,8 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         dialogsActions: bindActionCreators(dialogsActions, dispatch),
-        usersActions: bindActionCreators(usersActions, dispatch)
+        usersActions: bindActionCreators(usersActions, dispatch),
+        callActions: bindActionCreators(callActions, dispatch)
     }
 }
 
