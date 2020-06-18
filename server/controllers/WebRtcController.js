@@ -31,6 +31,17 @@ function checkBusy(userId) {
     return false
 }
 
+function checkIncominmgCall(userId) {
+    for (let [key, call] of Object.entries(Calls)) {
+        if(String(call.userFrom._id) == String(userId) || call.userTo._id == String(userId)) {
+            if(call.status != 'active')
+                return call
+        }
+    }
+
+    return false
+}
+
 function getUserExistBySocketId(id) {
     for (let [key, room] of Object.entries(Rooms)) {
         for (let [key, user] of Object.entries(room.users)) {
@@ -45,7 +56,16 @@ function getUserExistBySocketId(id) {
 
 function addUserCall(userId, userIdOther, socketId) {
     if(!Calls[userId])
-        Calls[userId] = {userFrom: {_id: userId, socketId}, userTo: {_id: userIdOther}, status: 'calling'}
+        Calls[userId] = {userFrom: {_id: userId, socketId}, userTo: {_id: userIdOther, socketId: ''}, status: 'calling'}
+}
+
+function acceptCall(myId, userId, socketId) {
+    for (let [key, call] of Object.entries(Calls)) {
+        if(((String(call.userFrom._id) == String(userId)) && call.userTo._id == String(myId))) {
+            Calls[call.userFrom._id].status = 'active'
+            Calls[call.userFrom._id].userTo.socketId = socketId
+        }
+    }
 }
 
 function addUserRoom(roomId, userId, socketId) {
@@ -248,23 +268,27 @@ function stopRoomBySocketId(socketId) {
 function stopCall(socketId, userId, stopUserCall, io, reject = false) {
     for (let [key, call] of Object.entries(Calls)) {
         if(((call.userFrom.socketId == socketId && String(call.userFrom._id) == String(userId)) || call.userTo._id == String(userId))) {
-            if(call.userFrom.socketId == socketId && String(call.userFrom._id) == String(userId)) {
+            if(call.userFrom.socketId == socketId && String(call.userFrom._id) == String(userId) && call.status === 'calling') {
                 stopUserCall({userId, otherId: call.userTo._id, socketId})
 
-                if(call.status === 'calling') {
-                    sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'missed_call')
-                }
+                sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'missed_call')
+                
 
                 delete Calls[call.userFrom._id]
             }
                 
-            if(call.userTo._id == String(userId) && reject) {
+            if(call.userTo._id == String(userId) && reject && call.status === 'calling') {
                 stopUserCall({userId, otherId: call.userFrom._id, socketId})
 
-                if(call.status === 'calling') {
-                    sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'canceled_call')
-                }
+                sendCallMessage(String(call.userFrom._id), call.userTo._id, io, 'canceled_call')
+                
 
+                delete Calls[call.userFrom._id]
+            }
+
+            if(call.status === 'active' && (call.userFrom.socketId == socketId || call.userTo.socketId == socketId)) {
+                stopUserCall({userId, otherId: call.userFrom._id, socketId})
+                stopUserCall({userId, otherId: call.userTo._id, socketId})
                 delete Calls[call.userFrom._id]
             }
         }
@@ -281,5 +305,7 @@ module.exports = {
     getUserExistBySocketId,
     addUserCall,
     stopCall,
-    checkBusy
+    checkBusy,
+    acceptCall,
+    checkIncominmgCall
 }

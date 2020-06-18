@@ -903,18 +903,18 @@
     justify-content: center;
 }
 
-.media-options .media-option {
+.media-option {
     box-shadow: none!important;
     width: 40px!important;
     height: 40px!important;
-    margin: 0 4px;
+    margin: 0 4px!important;
 }
 
 .media-options .media-option.reject {
     background-color: #FF3333!important;
 }
 
-.media-options .media-option.active {
+.media-option.active {
     background-color: #008FF7!important;
 }
 
@@ -1177,4 +1177,8 @@
 
 .contacts-tabs span.active {
     color: #008FF7;
+}
+
+.other-video {
+    width: 100%;
 }

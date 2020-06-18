@@ -11,5 +11,6 @@ const CallController = require('../controllers/CallController')
 router.post('/call', verifyToken, CallController.call);
 router.post('/stop', verifyToken, CallController.stop);
 router.post('/check', verifyToken, CallController.check);
+router.post('/accept', verifyToken, CallController.accept);
 
 module.exports = router;

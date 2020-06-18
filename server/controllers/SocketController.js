@@ -2,7 +2,7 @@ const User = require('../models/User');
 const Room = require('../models/Room');
 const jwt = require('jsonwebtoken')
 
-const {roomOnIceCandidate, roomOfferSdp, stop, stopRoomBySocketId, getUserExistById, getUserExistBySocketId, stopCall} = require('./WebRtcController')
+const {roomOnIceCandidate, roomOfferSdp, stop, stopRoomBySocketId, getUserExistById, getUserExistBySocketId, stopCall, checkBusy} = require('./WebRtcController')
 
 let idCounter = 0;
 let io = false
@@ -192,6 +192,75 @@ function initSocket(initIo) {
         socket.on('roomStopSpeaking', (roomId) => {
             socket.to(`room.${roomId}`).emit('roomStopSpeaking', user._id)
         })
+
+        // Calls
+        socket.on('callIceCandidate', ({userId, candidate}) => {
+            let call = checkBusy(userId)
+            if(call) {
+                if((String(call.userFrom._id) == userId && String(call.userTo._id) == String(user._id)) || 
+                (String(call.userTo._id) == userId && String(call.userFrom._id) == String(user._id))) {
+                    // if(call.status == 'acitve') {
+                        if(String(call.userTo._id) == userId && io.sockets.connected[call.userTo.socketId]) {
+                            io.sockets.connected[call.userTo.socketId].emit('callOnIceCandidate', candidate)
+                        }
+                        if(String(call.userFrom._id) == userId && io.sockets.connected[call.userFrom.socketId]) {
+                            io.sockets.connected[call.userFrom.socketId].emit('callOnIceCandidate', candidate)
+                        }
+                    // }
+                }
+            }
+        })
+
+        socket.on('toggleCameraCall', ({userId, media}) => {
+            let call = checkBusy(userId)
+            if(call) {
+                if((String(call.userFrom._id) == userId && String(call.userTo._id) == String(user._id)) || 
+                (String(call.userTo._id) == userId && String(call.userFrom._id) == String(user._id))) {
+                    // if(call.status == 'acitve') {
+                        if(String(call.userTo._id) == userId && io.sockets.connected[call.userTo.socketId]) {
+                            io.sockets.connected[call.userTo.socketId].emit('toggleCameraCall', {media, userId: user._id})
+                        }
+                        if(String(call.userFrom._id) == userId && io.sockets.connected[call.userFrom.socketId]) {
+                            io.sockets.connected[call.userFrom.socketId].emit('toggleCameraCall', {media, userId: user._id})
+                        }
+                    // }
+                }
+            }
+        })
+
+        socket.on('callOfferSdp', ({userId, offerSdp, media}) => {
+            let call = checkBusy(userId)
+            if(call) {
+                if((String(call.userFrom._id) == userId && String(call.userTo._id) == String(user._id)) || 
+                (String(call.userTo._id) == userId && String(call.userFrom._id) == String(user._id))) {
+                    // if(call.status == 'acitve') {
+                        if(String(call.userTo._id) == userId && io.sockets.connected[call.userTo.socketId]) {
+                            io.sockets.connected[call.userTo.socketId].emit('callOfferSdp', {offerSdp, media})
+                        }
+                        if(String(call.userFrom._id) == userId && io.sockets.connected[call.userFrom.socketId]) {
+                            io.sockets.connected[call.userFrom.socketId].emit('callOfferSdp', {offerSdp, media})
+                        }
+                    // }
+                }
+            }
+        })
+
+        socket.on('callAnswerSdp', ({userId, answerSdp}) => {
+            let call = checkBusy(userId)
+            if(call) {
+                if((String(call.userFrom._id) == userId && String(call.userTo._id) == String(user._id)) || 
+                (String(call.userTo._id) == userId && String(call.userFrom._id) == String(user._id))) {
+                    // if(call.status == 'acitve') {
+                        if(String(call.userTo._id) == userId && io.sockets.connected[call.userTo.socketId]) {
+                            io.sockets.connected[call.userTo.socketId].emit('callAnswerSdp', answerSdp)
+                        }
+                        if(String(call.userFrom._id) == userId && io.sockets.connected[call.userFrom.socketId]) {
+                            io.sockets.connected[call.userFrom.socketId].emit('callAnswerSdp', answerSdp)
+                        }
+                    // }
+                }
+            }
+        })
     })
 }
 
@@ -285,6 +354,13 @@ function sendUserCall({userId, otherId, socketId}) {
     io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendUserCall', userId)
 }
 
+function sendUserAcceptCall({userId, otherId, socketId}) {
+    io.to(`user.${otherId}`).emit('sendUserAcceptCall', userId)
+    if(io.sockets.connected[socketId]) {
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('stopUserCall', otherId)
+    }
+}
+
 function stopUserCall({userId, otherId, socketId}) {
     if(io.sockets.connected[socketId]) {
         io.sockets.connected[socketId].to(`user.${otherId}`).emit('stopUserCall', userId)
@@ -316,4 +392,5 @@ module.exports = {
     deleteRoom,
     stopUserCall,
     sendUserCall,
+    sendUserAcceptCall
 }

@@ -4,8 +4,8 @@
  */
 'use strict';
 
-const { addUserCall, stopCall, checkBusy } = require("./WebRtcController");
-const { sendUserCall, stopUserCall, getIO } = require("./SocketController");
+const { addUserCall, stopCall, checkBusy, checkIncominmgCall, acceptCall } = require("./WebRtcController");
+const { sendUserCall, stopUserCall, getIO, sendUserAcceptCall } = require("./SocketController");
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
 const User = require('../models/User');
@@ -38,7 +38,7 @@ module.exports = {
         const { user } = res.locals;
 
         try {
-            let call = checkBusy(user._id)
+            let call = checkIncominmgCall(user._id)
             if(call) {
                 return res.json({call, have: true});
             }
@@ -59,6 +59,19 @@ module.exports = {
 
             return res.json({error: false});
         } catch (e) {
+            return next(new Error(e));
+        }
+    },
+    
+    accept: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, socketId } = req.body;
+
+        try {
+            acceptCall(user._id, userId, socketId)
+            sendUserAcceptCall({userId: user._id, otherId: userId, socketId})
+            return res.json({error: false});
+        } catch(err) {
             return next(new Error(e));
         }
     }

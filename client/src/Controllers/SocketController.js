@@ -36,7 +36,8 @@ import {
     ROOMS_EDIT_IN_ROOM,
     ROOMS_DELETE_ROOM,
     CALL_SET_USER,
-    CALL_SET_STATUS
+    CALL_SET_STATUS,
+    CALL_SET_MEDIA
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -528,6 +529,22 @@ export default {
             });
         })
 
+        socket.on('sendUserAcceptCall', userId => {
+            if(store.getState().call.user && store.getState().call.user._id === userId) {
+                store.dispatch({
+                    type: CALL_SET_STATUS,
+                    payload: 'active'
+                })
+                WebRtcController.call(userId, true)
+            }
+        })
+
+        socket.on('callOnIceCandidate', candidate => {
+            if(store.getState().call.user) {
+                WebRtcController.callOnIceCandidate(candidate)
+            }
+        })
+
         socket.on('stopUserCall', userId => {
             if(store.getState().call.user && store.getState().call.user._id === userId) {
                 if(store.getState().call.status === 'outcoming')
@@ -541,6 +558,36 @@ export default {
                         type: CALL_SET_USER,
                         payload: {user: false, status: 'none'}
                     })
+                
+                if(store.getState().call.status === 'active') {
+                    store.dispatch({
+                        type: CALL_SET_USER,
+                        payload: {user: false, status: 'none'}
+                    })
+
+                    WebRtcController.stopCall()
+                }
+            }
+        })
+
+        socket.on('callOfferSdp', ({offerSdp, media}) => {
+            if(store.getState().call.user) {
+                WebRtcController.onCallOfferSdp({offerSdp, media})
+            }
+        })
+
+        socket.on('callAnswerSdp', sdp => {
+            if(store.getState().call.user) {
+                WebRtcController.onCallAnswerSdp(sdp)
+            }
+        })
+
+        socket.on('toggleCameraCall', ({userId, media}) => {
+            if(store.getState().call.user && store.getState().call.user._id === userId) {
+                store.dispatch({
+                    type: CALL_SET_MEDIA,
+                    payload: media
+                })
             }
         })
     },
@@ -559,7 +606,6 @@ export default {
     },
     joinRoom: ({roomId, lang}) => {
         socket.emit('joinRoom', {roomId, lang, userId: store.getState().user._id})
-        // console.log(123)
     },
     leaveRoom: ({roomId, lang}) => {
         socket.emit('leaveRoom', {roomId, lang})
@@ -586,6 +632,20 @@ export default {
     },
     typingDialog: (otherId, userId) => {
         socket.emit('typingDialog', {otherId, userId})
+    },
+
+    // Calls
+    sendCallOfferSdp: ({userId, offerSdp, media}) => {
+        socket.emit('callOfferSdp', {userId, offerSdp, media})
+    },
+    sendCallAnswerSdp: ({userId, answerSdp}) => {
+        socket.emit('callAnswerSdp', {userId, answerSdp})
+    },
+    sendCallIceCandidate: ({userId, candidate}) => {
+        socket.emit('callIceCandidate', {userId, candidate})
+    },
+    toggleCameraCall: (userId, media) => {
+        socket.emit('toggleCameraCall', {userId, media})
     }
 }
 

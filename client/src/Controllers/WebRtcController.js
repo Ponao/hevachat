@@ -1,11 +1,12 @@
 import adapter from 'webrtc-adapter'
 import SocketController from './SocketController';
 import store from '../Redux/store';
-import { ROOMS_SET_REMOTE_STREAM, MEDIA_TOGGLE_MICROPHONE, MEDIA_TOGGLE_MUSIC } from '../Redux/constants';
+import { ROOMS_SET_REMOTE_STREAM, MEDIA_TOGGLE_MICROPHONE, MEDIA_TOGGLE_MUSIC, CALL_SET_REMOTE_STREAM, MEDIA_TOGGLE_CAMERA, CALL_SET_MEDIA } from '../Redux/constants';
 import hark from 'hark'
 
 let WebRtcPeerConnection = false
 let activeRoomId = false
+let activeCallId = false
 let localStream = false
 let remoteStream = false
 let speechEvents = false
@@ -20,7 +21,11 @@ const RTCPC = RTCPeerConnection || window.RTCPeerConnection || window.mozRTCPeer
 const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.RTCSessionDescription;
 const RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
-const mediaConstraints = {
+const mediaConstraintsCall = {
+    offerToReceiveAudio: true,
+    offerToReceiveVideo: true
+}
+const mediaConstraintsRoom = {
     offerToReceiveAudio: true,
     offerToReceiveVideo: false
 }
@@ -44,23 +49,31 @@ function createEmptyStream(callback) {
 
 const getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 // navigator.mediaDevices.getUserMedia 
-function getUserMedia(callback) {    
+function getUserMedia(media, callback) {    
     if(isIE || isEdge) {
-        navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(stream => {
+        navigator.mediaDevices.getUserMedia(media).then(stream => {
             callback(stream)
         })
         .catch((err) => {
             createEmptyStream(callback)
         })
     } else {
-        getMedia({
-            audio: true,
-            video: false
-        }, 
-        callback, 
-        () => {
-            createEmptyStream(callback)
-        });
+        getMedia(
+            media, 
+            callback, 
+            () => {
+                if(media.video)
+                    getMedia(
+                        {audio: true, video: false}, 
+                        callback, 
+                        () => {
+                            createEmptyStream(callback)
+                        }
+                    );
+                else
+                    createEmptyStream(callback)
+            }
+        );
     }
 
     function onerror(e) {
@@ -77,6 +90,18 @@ function onRoomOffer(error, offer) {
 function onRoomIceCandidate(e) {  
     if(e.candidate) {
         SocketController.sendRoomIceCandidate({roomId: activeRoomId, candidate: e.candidate})
+    } 
+}
+
+function onCallOffer(error, offer, media) {
+    if(error) return console.log(error);
+
+    SocketController.sendCallOfferSdp({userId: activeCallId, offerSdp: offer, media})
+}
+
+function onCallIceCandidate(e) {
+    if(e.candidate) {
+        SocketController.sendCallIceCandidate({userId: activeCallId, candidate: e.candidate})
     } 
 }
 
@@ -102,18 +127,20 @@ export default {
     connectRoom: (roomId) => {
         activeRoomId = roomId
         
-        getUserMedia((stream) => {
+        getUserMedia({audio: true, video: false}, (stream) => {
             localStream = stream
 
             localStream.getAudioTracks()[0].enabled = false
 
             WebRtcPeerConnection = new RTCPC(options)
-            
-            WebRtcPeerConnection.addStream(stream)
+                        
+            for (const track of stream.getTracks()) {
+                WebRtcPeerConnection.addTrack(track, stream)
+            }
 
             WebRtcPeerConnection.onicecandidate = onRoomIceCandidate
 
-            WebRtcPeerConnection.createOffer(mediaConstraints).then((offer) => {
+            WebRtcPeerConnection.createOffer(mediaConstraintsRoom).then((offer) => {
                 WebRtcPeerConnection.setLocalDescription(offer)
                 
                 onRoomOffer(null, offer)
@@ -132,12 +159,16 @@ export default {
         }
 
         if(localStream) {
-            localStream.getAudioTracks()[0].stop()
+            localStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
             localStream = false
         }
 
         if(remoteStream) {
-            remoteStream.getAudioTracks()[0].stop()
+            remoteStream.getTracks().forEach(function(track) {
+                track.stop();
+            });
             remoteStream = false
         }
 
@@ -150,10 +181,21 @@ export default {
             type: MEDIA_TOGGLE_MICROPHONE,
             payload: false
         })
+
+        store.dispatch({
+            type: MEDIA_TOGGLE_MUSIC,
+            payload: true
+        })
     },
     roomOnIceCandidate: (e) => {
-        if(WebRtcPeerConnection && e.candidate)
-            WebRtcPeerConnection.addIceCandidate(e)
+        if(e.candidate) {
+            let wait = setInterval(() => {
+                if(WebRtcPeerConnection) {
+                    clearInterval(wait)
+                    WebRtcPeerConnection.addIceCandidate(e)
+                }
+            }, 100)
+        }
     },
     onRoomAnswerSdp: (sdpAnswer) => {
         let answer = new RTCSessionDescription({
@@ -165,9 +207,9 @@ export default {
 
         let stream = new MediaStream();
 
-        WebRtcPeerConnection.getReceivers().forEach(function (sender) {
+        for (const sender of WebRtcPeerConnection.getReceivers()) {
             stream.addTrack(sender.track);
-        });
+        }
 
         remoteStream = stream
 
@@ -185,5 +227,175 @@ export default {
         speechEvents.on('stopped_speaking', function() {
             SocketController.sendRoomStopSpeaking({roomId: activeRoomId})
         });
-    }
+    },
+
+    call: (userId, create = false) => {
+        activeCallId = userId
+
+        getUserMedia({audio: true, video: true}, (stream) => {
+            localStream = stream
+            localStream.getVideoTracks()[0].enabled = false
+
+            WebRtcPeerConnection = new RTCPC(options)
+            
+            for (const track of stream.getTracks()) {
+                WebRtcPeerConnection.addTrack(track, stream)
+            }
+
+            WebRtcPeerConnection.onicecandidate = onCallIceCandidate
+
+            if(create)
+                WebRtcPeerConnection.createOffer(mediaConstraintsCall).then((offer) => {
+                    WebRtcPeerConnection.setLocalDescription(offer)
+                    onCallOffer(null, offer, 'audio')
+                })
+            
+            store.dispatch({
+                type: MEDIA_TOGGLE_MICROPHONE,
+                payload: true
+            })
+        })
+    },
+
+    stopCall: () => {
+        if(WebRtcPeerConnection) {
+            WebRtcPeerConnection.close()
+            WebRtcPeerConnection = false
+        }
+
+        if(activeCallId) {
+            activeCallId = false
+        }
+
+        if(localStream) {
+            for (const track of localStream.getTracks()) {
+                track.stop()
+            }
+
+            localStream = false
+        }
+
+        if(remoteStream) {
+            for (const track of remoteStream.getTracks()) {
+                track.stop()
+            }
+            remoteStream = false
+            store.dispatch({
+                type: CALL_SET_REMOTE_STREAM,
+                payload: false
+            })
+        }
+
+        store.dispatch({
+            type: CALL_SET_REMOTE_STREAM,
+            payload: false
+        })
+
+        store.dispatch({
+            type: MEDIA_TOGGLE_MICROPHONE,
+            payload: false
+        })
+
+        store.dispatch({
+            type: MEDIA_TOGGLE_MUSIC,
+            payload: true
+        })
+
+        store.dispatch({
+            type: MEDIA_TOGGLE_CAMERA,
+            payload: false
+        })
+    },
+
+    callToggleCamera: () => {
+        if(localStream) {
+            if(localStream.getVideoTracks()[0]) {
+                localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled
+                store.dispatch({
+                    type: MEDIA_TOGGLE_CAMERA,
+                    payload: localStream.getVideoTracks()[0].enabled
+                })
+
+                SocketController.toggleCameraCall(activeCallId, localStream.getVideoTracks()[0].enabled ? 'video' : 'audio')
+            }
+        }
+    },
+
+    onCallOfferSdp: ({offerSdp, media}) => {
+        let wait = setInterval(() => {
+            if(WebRtcPeerConnection) {
+                clearInterval(wait)
+                WebRtcPeerConnection.setRemoteDescription(offerSdp);
+
+                WebRtcPeerConnection.createAnswer(mediaConstraintsCall).then((answer) => {
+                    WebRtcPeerConnection.setLocalDescription(answer)
+                    SocketController.sendCallAnswerSdp({userId: activeCallId, answerSdp: answer})
+
+                    let stream = new MediaStream();
+
+                    if(remoteStream) {
+                        for (const track of remoteStream.getTracks()) {
+                            track.stop();
+                        }
+                        remoteStream = false
+                    }
+
+                    for (const sender of WebRtcPeerConnection.getReceivers()) {
+                        stream.addTrack(sender.track);
+                    }
+
+                    remoteStream = stream
+
+                    store.dispatch({
+                        type: CALL_SET_REMOTE_STREAM,
+                        payload: stream
+                    })
+                    store.dispatch({
+                        type: CALL_SET_MEDIA,
+                        payload: media
+                    })
+                })
+            }
+        }, 100);
+    },
+
+    onCallAnswerSdp: (answer) => {
+        let wait = setInterval(() => {
+            if(WebRtcPeerConnection) {
+                clearInterval(wait)
+                WebRtcPeerConnection.setRemoteDescription(answer);
+
+                let stream = new MediaStream();
+
+                if(remoteStream) {
+                    for (const track of remoteStream.getTracks()) {
+                        track.stop();
+                    }
+                    remoteStream = false
+                }
+
+                for (const sender of WebRtcPeerConnection.getReceivers()) {
+                    stream.addTrack(sender.track);
+                }
+                
+                remoteStream = stream
+
+                store.dispatch({
+                    type: CALL_SET_REMOTE_STREAM,
+                    payload: remoteStream
+                })
+            }
+        }, 100);
+    },
+
+    callOnIceCandidate: (candidate) => {
+        if(candidate) {
+            let wait = setInterval(() => {
+                if(WebRtcPeerConnection) {
+                    clearInterval(wait)
+                    WebRtcPeerConnection.addIceCandidate(candidate)
+                }
+            }, 100)
+        }
+    },
 }
