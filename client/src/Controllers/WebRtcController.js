@@ -33,6 +33,11 @@ const mediaConstraintsRoom = {
 const options = {
     iceServers: [
         {urls: 'stun:173.194.66.127:19302'}, 
+        {urls: 'stun:stun.l.google.com:19302'}, 
+        {urls: 'stun:stun1.l.google.com:19302'}, 
+        {urls: 'stun:stun2.l.google.com:19302'}, 
+        {urls: 'stun:stun3.l.google.com:19302'}, 
+        {urls: 'stun:stun4.l.google.com:19302'},
         {
           urls: 'turn:89.223.100.223:3478',
           credential: 'TkYUraQew3RjwTA2JPjAaWL1Q7FIamc',
