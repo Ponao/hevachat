@@ -31,7 +31,7 @@ const mediaConstraintsRoom = {
 }
 
 const optionsRoom = {
-    iceServers: [
+    'iceServers': [
         {urls: 'stun:173.194.66.127:19302'},
         {
           urls: 'turn:89.223.100.223:3478',
@@ -42,7 +42,7 @@ const optionsRoom = {
 };
 
 const optionsCall = {
-    iceServers: [
+    'iceServers': [
         {urls: 'stun:stun01.sipphone.com'}, 
         {urls: 'stun:stun.ekiga.net'}, 
         {urls: 'stun:stun.fwdnet.net'}, 
