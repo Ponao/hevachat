@@ -263,7 +263,9 @@ export default {
 
         getUserMedia({audio: true, video: true}, (stream) => {
             localStream = stream
-            localStream.getVideoTracks()[0].enabled = false
+
+            if(localStream.getVideoTracks()[0])
+                localStream.getVideoTracks()[0].enabled = false
 
             WebRtcPeerConnection = new RTCPC(optionsCall)
             
