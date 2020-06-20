@@ -30,14 +30,38 @@ const mediaConstraintsRoom = {
     offerToReceiveVideo: false
 }
 
-const options = {
+const optionsRoom = {
     iceServers: [
-        {urls: 'stun:173.194.66.127:19302'}, 
+        {urls: 'stun:173.194.66.127:19302'},
+        {
+          urls: 'turn:89.223.100.223:3478',
+          credential: 'TkYUraQew3RjwTA2JPjAaWL1Q7FIamc',
+          username: 'hevachat'
+        }
+    ],
+};
+
+const optionsCall = {
+    iceServers: [
+        {urls: 'stun:stun01.sipphone.com'}, 
+        {urls: 'stun:stun.ekiga.net'}, 
+        {urls: 'stun:stun.fwdnet.net'}, 
+        {urls: 'stun:stun.ideasip.com'}, 
+        {urls: 'stun:stun.iptel.org'}, 
+        {urls: 'stun:stun.rixtelecom.se'}, 
+        {urls: 'stun:stun.schlund.de'}, 
         {urls: 'stun:stun.l.google.com:19302'}, 
         {urls: 'stun:stun1.l.google.com:19302'}, 
         {urls: 'stun:stun2.l.google.com:19302'}, 
         {urls: 'stun:stun3.l.google.com:19302'}, 
-        {urls: 'stun:stun4.l.google.com:19302'},
+        {urls: 'stun:stun4.l.google.com:19302'}, 
+        {urls: 'stun:stunserver.org'}, 
+        {urls: 'stun:stun.softjoys.com'}, 
+        {urls: 'stun:stun.voiparound.com'}, 
+        {urls: 'stun:stun.voipbuster.com'}, 
+        {urls: 'stun:stun.voipstunt.com'}, 
+        {urls: 'stun:stun.voxgratia.org'}, 
+        {urls: 'stun:stun.xten.com'}, 
         {
           urls: 'turn:89.223.100.223:3478',
           credential: 'TkYUraQew3RjwTA2JPjAaWL1Q7FIamc',
@@ -137,7 +161,7 @@ export default {
 
             localStream.getAudioTracks()[0].enabled = false
 
-            WebRtcPeerConnection = new RTCPC(options)
+            WebRtcPeerConnection = new RTCPC(optionsRoom)
                         
             for (const track of stream.getTracks()) {
                 WebRtcPeerConnection.addTrack(track, stream)
@@ -241,7 +265,7 @@ export default {
             localStream = stream
             localStream.getVideoTracks()[0].enabled = false
 
-            WebRtcPeerConnection = new RTCPC(options)
+            WebRtcPeerConnection = new RTCPC(optionsCall)
             
             for (const track of stream.getTracks()) {
                 WebRtcPeerConnection.addTrack(track, stream)
