@@ -57,6 +57,17 @@ module.exports = {
                 return res.status(401).json({ error: true, errors: [err] });
             }
 
+            if(room.isPrivate) {
+                let existInvite = await Notification.findOne({type: 'invite', userId: user._id, room: {_id: room._id}})
+
+                if(!existInvite && room.ownerId != String(user._id)) {
+                    const err = {};
+                    err.param = `all`;
+                    err.msg = `you_are_not_invited`;
+                    return res.status(401).json({ error: true, errors: [err] });
+                }
+            }
+
             if(getUserExistById(user._id)) {
                 const err = {};
                 err.param = `all`;
@@ -64,17 +75,6 @@ module.exports = {
                 return res.status(401).json({ error: true, errors: [err] });
             } else {
                 addUserRoom(room._id, user._id, socketId)
-            }
-
-            if(room.isPrivate) {
-                let existInvite = await Notification.findOne({type: 'invite', userId: user._id, room: {_id: room._id}})
-
-                if(!existInvite && room.ownerId != user._id) {
-                    const err = {};
-                    err.param = `all`;
-                    err.msg = `you_are_not_invited`;
-                    return res.status(401).json({ error: true, errors: [err] });
-                }
             }
 
             let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
