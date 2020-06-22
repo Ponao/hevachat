@@ -21,6 +21,7 @@ import store from '../store';
 import WebRtcController from '../../Controllers/WebRtcController'
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
 import {urlApi} from '../../config'
+import { toast } from 'react-toastify';
 
 export const roomsGet = (apiToken, lang) => (dispatch) => {
     dispatch({
@@ -200,6 +201,11 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
         .then(response => response.json())
         .then(messageRes => {
             if(messageRes.error) {
+                if(messageRes.errors[0].msg === 'max_size') {
+                    toast.error("Max file size upload 10 Mb.", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                }
                 return dispatch({
                     type: ROOMS_ERROR_MESSAGE,
                     payload: _id
@@ -306,6 +312,11 @@ export const editMessage = (message, apiToken) => (dispatch) => {
         .then(response => response.json())
         .then(messageRes => {
             if(messageRes.error) {
+                if(messageRes.errors[0].msg === 'max_size') {
+                    toast.error("Max file size upload 10 Mb.", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                }
                 return dispatch({
                     type: ROOMS_ERROR_MESSAGE,
                     payload: message._id

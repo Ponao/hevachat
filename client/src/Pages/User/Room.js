@@ -49,7 +49,7 @@ class Members extends React.Component {
         >
             {this.props.users.map((user, index) => 
                 <div key={index} className="member">
-                    <Avatar name={user.name.first.charAt(0)+user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${user.color})`}}  />
+                    <Avatar avatarStyle={{borderRadius: 0}} avatar={user.avatar ? user.avatar : false} name={user.name.first.charAt(0)+user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${user.color})`}}  />
                     {user.speaking && <span className="speaking"></span>}
                 </div>
             )}

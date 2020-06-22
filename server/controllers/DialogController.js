@@ -148,16 +148,23 @@ module.exports = {
                     if(!req.files['images'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    images.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
-                        name: req.files['images'+i].name
-                    })
-                    nowCount++
+                    if(req.files['images'+i].size / 1000 <= 10000) {
+                        req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        images.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
+                            name: req.files['images'+i].name
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
 
                 for (let i = 0; i < 10; i++) {
@@ -166,16 +173,23 @@ module.exports = {
                     if(!req.files['sounds'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    sounds.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
-                        name: req.files['sounds'+i].name
-                    })
-                    nowCount++
+                    if(req.files['sounds'+i].size / 1000 <= 10000) {
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        sounds.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
 
                 for (let i = 0; i < 10; i++) {
@@ -184,17 +198,24 @@ module.exports = {
                     if(!req.files['files'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    files.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
-                        name: req.files['files'+i].name,
-                        size: req.files['files'+i].size / 1000
-                    })
-                    nowCount++
+                    if(req.files['files'+i].size / 1000 <= 10000) {
+                        req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        files.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
             }
             
@@ -306,16 +327,23 @@ module.exports = {
                     if(!req.files['images'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    message.images.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
-                        name: req.files['images'+i].name
-                    })
-                    nowCount++
+                    if(req.files['images'+i].size / 1000 <= 10000) {
+                        req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        message.images.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
+                            name: req.files['images'+i].name
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
 
                 let soundI = 0
@@ -327,16 +355,23 @@ module.exports = {
                     if(!req.files['sounds'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    message.sounds.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
-                        name: req.files['sounds'+i].name
-                    })
-                    nowCount++
+                    if(req.files['sounds'+i].size / 1000 <= 10000) {
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        message.sounds.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
 
                 let fileI = 0
@@ -348,17 +383,24 @@ module.exports = {
                     if(!req.files['files'+i] || nowCount >= maxCount)
                         break
 
-                    req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
-                        if (err)
-                        return res.status(500).send(err);
-                    });
-                    
-                    message.files.push({
-                        path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
-                        name: req.files['files'+i].name,
-                        size: req.files['files'+i].size / 1000
-                    })
-                    nowCount++
+                    if(req.files['files'+i].size / 1000 <= 10000) {
+                        req.files['files'+i].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['files'+i].name.split('.').pop(), function(err) {
+                            if (err)
+                            return res.status(500).send(err);
+                        });
+                        
+                        message.files.push({
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        })
+                        nowCount++
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
                 }
             }
             

@@ -35,14 +35,23 @@ class NotificationItem extends React.Component {
                         search: `?user=${this.props.notification.user._id}`
                     })
             }}>
-                <Avatar status={this.props.notification.type} style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.notification.user.color})`}} name={this.props.notification.user.name.first.charAt(0) + this.props.notification.user.name.last.charAt(0)} />
+                <Avatar 
+                avatar={this.props.notification.user.avatar ? this.props.notification.user.avatar : false}
+                status={this.props.notification.type} 
+                style={{minWidth: 40, maxWidth: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.notification.user.color})`}} 
+                name={this.props.notification.user.name.first.charAt(0) + this.props.notification.user.name.last.charAt(0)} />
 
-                <div>
-                    <p className="user-name">{`${this.props.notification.user.name.first} ${this.props.notification.user.name.last}`}</p>
+                <div style={{
+                        flexGrow: 1,
+                        minWidth: 0,
+                        maxWidth: '100%',
+                        paddingRight: 10
+                    }}>
+                    <p className="user-name"><span>{`${this.props.notification.user.name.first} ${this.props.notification.user.name.last}`}</span></p>
                     
-                    {this.props.notification.type === 'invite' && <p className="last-message">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></p>}
-                    {this.props.notification.type === 'accept' && <p className="last-message">Accept your friend request</p>}
-                    {this.props.notification.type === 'request' && <p className="last-message">Send you friend request</p>}
+                    {this.props.notification.type === 'invite' && <p className="last-message"><span className="content">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></span></p>}
+                    {this.props.notification.type === 'accept' && <p className="last-message"><span className="content">Accept your friend request</span></p>}
+                    {this.props.notification.type === 'request' && <p className="last-message"><span className="content">Send you friend request</span></p>}
                 </div>
                 <div className="dialog-info">
                     <span className="time-at">{LastMessageDate(this.props.notification.createdAt)}</span>

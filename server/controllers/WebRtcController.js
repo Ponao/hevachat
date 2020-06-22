@@ -147,65 +147,69 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
 }
 
 function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) {
-    Rooms[roomId].MediaPipeline.create('WebRtcEndpoint', function(error, webRtcEndpoint) {
-        if(error) {
-            return console.log(error)
-        }
-        Rooms[roomId].users[userId].webRtcEndpoint = webRtcEndpoint
-
-        webRtcEndpoint.on('OnIceCandidate', function(event) {
-            let candidate = kurento.getComplexType('IceCandidate')(event.candidate);
-            socket.emit('roomOnIceCandidate', candidate);
-        });
-
-        if (candidatesQueues[userId]) {
-            while(candidatesQueues[userId].length) {
-                let candidate = candidatesQueues[userId].shift();
-                webRtcEndpoint.addIceCandidate(candidate);
+    try {
+        Rooms[roomId].MediaPipeline.create('WebRtcEndpoint', function(error, webRtcEndpoint) {
+            if(error) {
+                return console.log(error)
             }
-        }
+            Rooms[roomId].users[userId].webRtcEndpoint = webRtcEndpoint
 
-        webRtcEndpoint.processOffer(offerSdp, function(error, sdpAnswer) {
-            if (error) {
-                stop(roomId, userId);
-                return callback(error);
+            webRtcEndpoint.on('OnIceCandidate', function(event) {
+                let candidate = kurento.getComplexType('IceCandidate')(event.candidate);
+                socket.emit('roomOnIceCandidate', candidate);
+            });
+
+            if (candidatesQueues[userId]) {
+                while(candidatesQueues[userId].length) {
+                    let candidate = candidatesQueues[userId].shift();
+                    webRtcEndpoint.addIceCandidate(candidate);
+                }
             }
 
-            if (!Rooms[roomId].users[userId]) {
-                stop(roomId, userId);
-                return callback('Error not find user');
-            }
+            webRtcEndpoint.processOffer(offerSdp, function(error, sdpAnswer) {
+                if (error) {
+                    stop(roomId, userId);
+                    return callback(error);
+                }
 
-            callback(null, sdpAnswer);
-        });
-        
-        webRtcEndpoint.gatherCandidates(function(error) {
-            if (error) {
-                stop(roomId, userId);
-                return callback(error);
-            }
-        });
+                if (!Rooms[roomId].users[userId]) {
+                    stop(roomId, userId);
+                    return callback('Error not find user');
+                }
 
-        Rooms[roomId].composite.createHubPort( function(error, hubPort) {
-            if (error) {
-                return callback(error);
-            }
+                callback(null, sdpAnswer);
+            });
+            
+            webRtcEndpoint.gatherCandidates(function(error) {
+                if (error) {
+                    stop(roomId, userId);
+                    return callback(error);
+                }
+            });
 
-            Rooms[roomId].users[userId].hubPort = hubPort
-
-            Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+            Rooms[roomId].composite.createHubPort( function(error, hubPort) {
                 if (error) {
                     return callback(error);
                 }
-            })
 
-            Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
-                if (error) {
-                    return callback(error);
-                }
-            })
-        });
-    })
+                Rooms[roomId].users[userId].hubPort = hubPort
+
+                Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+                    if (error) {
+                        return callback(error);
+                    }
+                })
+
+                Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
+                    if (error) {
+                        return callback(error);
+                    }
+                })
+            });
+        })
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 function clearCandidatesQueue(userId) {

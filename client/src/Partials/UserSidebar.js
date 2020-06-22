@@ -13,6 +13,7 @@ import Rooms from '../Sidebar/Rooms';
 import Notifications from '../Sidebar/Notifications';
 import Languages from '../Sidebar/Languages';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 class UserSidebar extends React.Component {
     state = {
@@ -24,7 +25,11 @@ class UserSidebar extends React.Component {
             <>
                 <div className="col-xl-3 col-lg-6 col-md-6 user-header">
                     <ul>
-                        <li><Avatar style={{width: 32, height: 32, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} /></li>
+                        <li onClick={() => {
+                            this.props.history.push({
+                                search: `?user=${this.props.user._id}`
+                            })
+                        }}><Avatar avatar={this.props.user.avatar ? this.props.user.avatar : false} style={{width: 32, height: 32, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} /></li>
                         <li style={{position: 'relative'}} className={`${this.state.activeTab === 'messages' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'messages'})}}>
                             <ChatBubbleOutlineIcon style={{color: '#CCD1D6'}} />
                             {!!this.props.dialogs.noReadCount && <span 
@@ -71,4 +76,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(UserSidebar)
+export default connect(mapStateToProps)(withRouter(UserSidebar))

@@ -2,6 +2,7 @@
 export const USER_LOGIN = 'USER_LOGIN'
 export const USER_LOGOUT = 'USER_LOGOUT'
 export const USER_UPDATE_ROOM_LANG = 'USER_UPDATE_ROOM_LANG'
+export const USER_SET_AVATAR = 'USER_SET_AVATAR'
 
 // Rooms
 export const ROOMS_GET = 'ROOMS_GET'

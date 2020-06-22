@@ -11,6 +11,8 @@ const Friend = require('../models/Friends')
 const Notification = require('../models/Notification');
 const mongoose = require("../database");
 const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification} = require('./SocketController')
+const imageThumbnail = require('image-thumbnail');
+const fs = require('fs');
 
 module.exports = {
     // Get user data
@@ -129,15 +131,49 @@ module.exports = {
         const { user } = res.locals;
         const { q } = req.body;
 
-        let search = new RegExp(q, 'ig');
-        
+        let searchFirst = false
+        let searchLast = false
+        let search = false
+
         try {
-            const users = await User.find({
-                '$or': [
-                    {'name.first': search},
-                    {'name.last': search}
+            let words = q.split(' ')
+
+            for (let i = 0; i < 2; i++) {
+                if(words[i]) {
+                    if(/\S/.test(words[i]) && i === 0)
+                        searchFirst = new RegExp(words[i], 'ig')
+                    if(/\S/.test(words[i]) && i === 1)
+                        searchLast = new RegExp(words[i], 'ig')
+                }
+            }
+
+            if(searchFirst && searchLast) {
+                search = [
+                    {'name.first': searchFirst, 'name.last': searchLast}, 
+                    {'name.first': searchLast, 'name.last': searchFirst}, 
                 ]
-            }).limit(20)
+            }
+
+            if(searchFirst && !searchLast) {
+                search = [
+                    {'name.first': searchFirst}, 
+                    {'name.last': searchFirst}, 
+                ]
+            }
+
+            if(!searchFirst && searchLast) {
+                search = [
+                    {'name.first': searchLast}, 
+                    {'name.last': searchLast}, 
+                ]
+            }
+
+            let users = false
+            
+            if(searchFirst || searchLast)
+                users = await User.find(
+                    {'$or': search}
+                ).limit(20)
 
             if(users)
                 return res.json(users);
@@ -406,5 +442,59 @@ module.exports = {
         }
     },
 
-    
+    uploadAvatar: async (req, res, next) => {
+        // Get this account as JSON
+        const { user } = res.locals;
+
+        try {
+            if(req.files) {
+                if(req.files['avatar']) {
+                    if(req.files['avatar'].size / 1000 <= 10000) {
+                        let fileName = randomString(24)
+                        let thubmName = randomString(24)
+                        req.files['avatar'].mv('./uploads/' + user._id + '/' + fileName+'.' + req.files['avatar'].name.split('.').pop(), async (err) => {
+                            if (err)
+                            return res.status(500).send(err);
+
+                            let options = { responseType: 'base64' }
+                            const imageBuffer = fs.readFileSync(__dirname + '/../uploads/' + user._id + '/' + fileName+'.' + req.files['avatar'].name.split('.').pop());
+                            const thumbnail = await imageThumbnail(imageBuffer, options);
+
+                            require("fs").writeFile(__dirname + '/../uploads/' + user._id + '/' + thubmName+'.' + req.files['avatar'].name.split('.').pop(), thumbnail, 'base64', function(err) {
+                                console.log(err);
+                            });
+
+                            user.avatar = {
+                                original: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['avatar'].name.split('.').pop(), 
+                                min: process.env.API_URL + '/media/' + user._id + '/'  + thubmName + '.' + req.files['avatar'].name.split('.').pop()
+                            }
+
+                            await user.save()
+                        });
+                    } else {
+                        let err = {};
+                        err.param = `all`;
+                        err.msg = `max_size`;
+                        return res.status(401).json({ error: true, errors: [err] });
+                    }
+                }
+            } else {
+
+            }         
+
+            res.json({ error: false }); 
+        } catch (e) {
+            return next(new Error(e));
+        }
+    }
+}
+
+function randomString(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }

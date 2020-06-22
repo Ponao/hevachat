@@ -32,7 +32,10 @@ class UserItem extends React.Component {
     render() {
         return (
             <Button className={`user-item`} onClick={() => {this.props.onClick(this.props.user._id)}}>
-                <Avatar style={{minWidth: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} />
+                <Avatar 
+                avatar={this.props.user.avatar ? this.props.user.avatar : false}
+                style={{minWidth: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
+                name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} />
 
                 <div style={{display: 'flex', flexWrap: 'wrap', width: 'calc(100% - 82px)'}}>
                     <p className="user-name">{`${this.props.user.name.first} ${this.props.user.name.last}`}</p>

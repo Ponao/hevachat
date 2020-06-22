@@ -103,7 +103,7 @@ class Message extends React.PureComponent {
             >
                 {
                     (isFirst || isHistoryDate) && !this.props.isRecent && 
-                    <span onClick={(e) => {
+                    <span style={{height: 'max-content'}} onClick={(e) => {
                         e.stopPropagation();
                         this.props.history.push({
                             search: `?user=${this.props.message.user._id}`
@@ -111,7 +111,9 @@ class Message extends React.PureComponent {
                     }}>
                         <Avatar 
                             style={{width: 32, height: 32, fontSize: 14, lineHeight: '14px', fontWeight: 600, backgroundColor: `rgb(${this.props.message.user.color})`}} 
-                            name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} />
+                            name={this.props.message.user.name.first.charAt(0)+this.props.message.user.name.last.charAt(0)} 
+                            avatar={this.props.user._id === this.props.message.user._id ? this.props.user.avatar ? this.props.user.avatar : false : this.props.message.user.avatar ? this.props.message.user.avatar : false}
+                        />
                     </span>
                 }
 

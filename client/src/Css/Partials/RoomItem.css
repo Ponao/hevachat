@@ -27,6 +27,12 @@
     line-height: 22px;
 }
 
+.room-item p span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .room-item .users {
     display: flex;
     margin-left: 12px;

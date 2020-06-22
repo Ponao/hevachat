@@ -48,6 +48,7 @@ class OtherUser extends React.Component {
                 <Avatar 
                     style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
                     name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)} 
+                    avatar={this.props.user.avatar ? this.props.user.avatar : false}
                 />
 
                 <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
@@ -66,7 +67,7 @@ class OtherUser extends React.Component {
                         <p>Message</p>
                     </div>    
 
-                    <div className="user-btn">
+                    {this.props.call.status === 'none' && <div className="user-btn">
                         <NavLink style={{textDecoration: 'none'}} onClick={(e) => {
                             this.props.callActions.call(this.props.user, this.props.myUser.apiToken)
                         }} className="dialog-link" to={`/chats/${this.props.user._id}`}>
@@ -75,7 +76,7 @@ class OtherUser extends React.Component {
                             </CustomFab>
                         </NavLink>
                         <p>Call</p>
-                    </div>  
+                    </div>}
 
                     {this.props.user.friendStatus === 0 && <div className="user-btn">
                         <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
@@ -120,7 +121,8 @@ class OtherUser extends React.Component {
 const mapStateToProps = state => {
     return {
         users: state.users,
-        myUser: state.user
+        myUser: state.user,
+        call: state.call,
     }
 }
 

@@ -2,6 +2,7 @@
 import React from 'react'
 import './App.css'
 import {PageSettings} from './Pages/PageSettings'
+import 'react-toastify/dist/ReactToastify.css';
 
 // Partials
 import UserSidebar from './Partials/UserSidebar'

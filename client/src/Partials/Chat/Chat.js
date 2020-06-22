@@ -3,7 +3,6 @@ import React from 'react'
 import Dialog from './Dialog'
 import {CSSTransitionGroup} from 'react-transition-group'
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Redux
 import { connect } from 'react-redux'
@@ -370,7 +369,7 @@ class Chat extends React.Component {
         if(!paste && !drag) {
             for (let i = 0; i < e.target.files.length; i++) {
                 if(counter > 9) {
-                    toast.error("Max upload 10 attachment!", {
+                    toast.error("Max upload 10 attachments!", {
                         position: toast.POSITION.TOP_CENTER
                     });
                     break

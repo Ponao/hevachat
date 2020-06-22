@@ -88,18 +88,21 @@ class Dialog extends React.PureComponent {
                         fontSize: 14, 
                         fontWeight: 600, 
                         backgroundColor: `rgb(${dialog.user.color})`
-                    }} name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} /></div>
+                    }} 
+                    name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} 
+                    avatar={dialog.user.avatar ? dialog.user.avatar : false}
+                    /></div>
                     <div className="user-info" onClick={() => {
                         this.props.history.push({
                             search: `?user=${dialog.user._id}`
-                         })
+                        })
                     }}>
                         <p className="user-name">{`${dialog.user.name.first} ${dialog.user.name.last}`}</p>
                         {!dialog.user.online && <p className="last-message">{OnlineDate(dialog.user.onlineAt)}</p>}
                         {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>online</p>}
                     </div></>
 
-                    {dialog.user._id !== this.props.user._id && <CustomFab color="primary" size="small" aria-label="call" onClick={() => {
+                    {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CustomFab color="primary" size="small" aria-label="call" onClick={() => {
                         this.props.callActions.call(dialog.user, this.props.user.apiToken)
                     }}>
                         <CallIcon style={{color: '#fff'}} />
@@ -137,7 +140,8 @@ class Dialog extends React.PureComponent {
 const mapStateToProps = state => {
     return {
         user: state.user,
-        dialogs: state.dialogs
+        dialogs: state.dialogs,
+        call: state.call
     }
 }
 

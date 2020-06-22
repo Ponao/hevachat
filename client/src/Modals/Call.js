@@ -20,6 +20,8 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import WebRtcController from '../Controllers/WebRtcController'
 import MusicOffIcon from '@material-ui/icons/MusicOff';
 import VideocamOutlinedIcon from '@material-ui/icons/VideocamOutlined';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 const fabCallStyles = theme => ({
     root: {
@@ -105,12 +107,12 @@ const customStylesModalActive = {
         height: 'max-content',
         top: 70,
         left: 'unset',
-        right: 70,
+        right: 40,
         zIndex: 4
     },
     content : {
         border: 'none',
-        minWidth              : '260px',
+        minWidth              : '320px',
         height: 'max-content',
         borderRadius          : '10px',
         boxShadow             : '0px 5px 30px rgba(0, 0, 0, 0.16)',
@@ -121,6 +123,35 @@ const customStylesModalActive = {
         maxWidth              : '260px',
         padding               : '20px 0',
         position: 'unset'
+    }
+};
+
+const customStylesModalActiveFullScreen = {
+    overlay: {
+        position: 'fixed',
+        width: '100%',
+        height: '100vh',
+        top: 0,
+        left: 0,
+        zIndex: 4
+    },
+    content : {
+        border: 'none',
+        minWidth              : '100%',
+        height: '100vh',
+        borderRadius          : '10px',
+        boxShadow             : '0px 5px 30px rgba(0, 0, 0, 0.16)',
+        display               : 'flex',
+        justifyContent        : 'center',
+        flexWrap              : 'wrap',
+        width                 : 'max-content',
+        maxWidth              : '260px',
+        padding               : '20px 0',
+        position: 'unset',
+        alignItems: 'center',
+        justifyContent: 'center',
+        justifyItems: 'center',
+        alignContent: 'center',
     }
 };
 
@@ -140,6 +171,9 @@ class MediaStream extends React.PureComponent {
 }
 
 class CreateDialog extends React.Component {
+    state = {
+        fullScreen: false
+    }
     render() {
         return <Modal
             isOpen={this.props.isOpen}
@@ -148,32 +182,46 @@ class CreateDialog extends React.Component {
                     this.props.callActions.clear()
                 }
             }}
-            style={this.props.call.status === 'active' ? customStylesModalActive : customStylesModal}
+            style={this.props.call.status === 'active' ? this.state.fullScreen ? customStylesModalActiveFullScreen : customStylesModalActive : customStylesModal}
             contentLabel="Call"
+            overlayClassName="call-modal"
         >
             {this.props.call.remoteStream && <MediaStream media={this.props.call.media} key={this.props.call.remoteStream.id+this.props.call.media} stream={this.props.call.remoteStream} />}
             {this.props.call.status !== 'exist' && <>
                 {(this.props.call.status === 'outcoming' || this.props.call.status === 'busy' || this.props.call.status === 'canceled') && <h2 style={{width: '100%'}} className="modal-title">Outcoming call</h2>}
                 {this.props.call.status === 'incoming' && <h2 style={{width: '100%'}} className="modal-title">Incoming call</h2>}
 
-                <Avatar 
-                    style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.call.user.color})`}} 
-                    name={this.props.call.user.name.first.charAt(0)+this.props.call.user.name.last.charAt(0)} 
-                />
+                {this.props.call.media === 'audio' && <>
+                    <Avatar 
+                        style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.call.user.color})`}} 
+                        name={this.props.call.user.name.first.charAt(0)+this.props.call.user.name.last.charAt(0)}
+                        avatar={this.props.call.user.avatar ? this.props.call.user.avatar : false}
+                    />
 
-                <p className="user-profile-name">{this.props.call.user.name.first} {this.props.call.user.name.last}</p>
-                <p className="user-profile-city">Moscow</p>
+                    <p className="user-profile-name">{this.props.call.user.name.first} {this.props.call.user.name.last}</p>
+                    <p className="user-profile-city">Moscow</p>
+                </>}
+
+                {this.props.call.media === 'video' && <>
+                    <div style={{height: this.state.fullScreen ? 'calc(100% - 80px)' : 200, width: '100%'}}></div>
+                </>}
 
                 {this.props.call.status !== 'busy' && this.props.call.status !== 'canceled' && <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
-                    {this.props.call.status === 'active' && <><CustomFab className={`media-option ${this.props.media.micOn ? '' : 'active'}`} onClick={() => {WebRtcController.toggleMicrophone()}}>
-                        <MicOffIcon style={{color: this.props.media.micOn ? '#008FF7' : '#fff'}} />
-                    </CustomFab>
-                    <CustomFab className={`media-option ${this.props.media.musicOn ? '' : 'active'}`} onClick={() => {WebRtcController.toggleMusic()}}>
-                        <MusicOffIcon style={{color: this.props.media.musicOn ? '#008FF7' : '#fff'}} />
-                    </CustomFab>
-                    <CustomFab className={`media-option ${this.props.media.cameraOn ? 'active' : ''}`} onClick={() => {WebRtcController.callToggleCamera()}}>
-                        <VideocamOutlinedIcon style={{color: this.props.media.cameraOn ? '#fff' : '#008FF7'}} />
-                    </CustomFab></>}
+                    {this.props.call.status === 'active' && <>
+                        <CustomFab className={`media-option ${this.props.media.micOn ? '' : 'active'}`} onClick={() => {WebRtcController.toggleMicrophone()}}>
+                            <MicOffIcon style={{color: this.props.media.micOn ? '#008FF7' : '#fff'}} />
+                        </CustomFab>
+                        <CustomFab className={`media-option ${this.props.media.musicOn ? '' : 'active'}`} onClick={() => {WebRtcController.toggleMusic()}}>
+                            <MusicOffIcon style={{color: this.props.media.musicOn ? '#008FF7' : '#fff'}} />
+                        </CustomFab>
+                        <CustomFab className={`media-option ${this.props.media.cameraOn ? 'active' : ''}`} onClick={() => {WebRtcController.callToggleCamera()}}>
+                            <VideocamOutlinedIcon style={{color: this.props.media.cameraOn ? '#fff' : '#008FF7'}} />
+                        </CustomFab>
+                        <CustomFab className={`media-option ${this.state.fullScreen ? 'active' : ''}`} onClick={() => {this.setState({fullScreen: !this.state.fullScreen})}}>
+                            {!this.state.fullScreen && <FullscreenIcon style={{color: '#008FF7'}} />}
+                            {this.state.fullScreen && <FullscreenExitIcon style={{color: '#fff'}} />}
+                        </CustomFab>
+                    </>}
 
                     {this.props.call.status === 'incoming' && <CallFab color="primary" size="small" aria-label="call" onClick={() => {
                         this.props.callActions.accept(this.props.user.apiToken)

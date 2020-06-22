@@ -16,6 +16,7 @@ import {
 import store from '../store';
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
 import SocketController from '../../Controllers/SocketController';
+import { toast } from 'react-toastify';
 import {urlApi} from '../../config'
 
 export const dialogsGet = (apiToken) => (dispatch) => {
@@ -222,6 +223,12 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
         .then(response => response.json())
         .then(messageRes => {
             if(messageRes.error) {
+                if(messageRes.errors[0].msg === 'max_size') {
+                    toast.error("Max file size upload 10 Mb.", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                }
+
                 return dispatch({
                     type: DIALOGS_ERROR_MESSAGE,
                     payload: {_id, dialogId: message.dialogId}
@@ -333,6 +340,11 @@ export const editMessage = (message, apiToken) => (dispatch) => {
         .then(response => response.json())
         .then(messageRes => {
             if(messageRes.error) {
+                if(messageRes.errors[0].msg === 'max_size') {
+                    toast.error("Max file size upload 10 Mb.", {
+                        position: toast.POSITION.TOP_CENTER
+                    });
+                }
                 return dispatch({
                     type: DIALOGS_ERROR_MESSAGE,
                     payload: {_id: message._id, dialogId: message.dialogId}

@@ -336,6 +336,11 @@ export default {
             type: MEDIA_TOGGLE_CAMERA,
             payload: false
         })
+
+        store.dispatch({
+            type: CALL_SET_MEDIA,
+            payload: 'audio'
+        })
     },
 
     callToggleCamera: () => {

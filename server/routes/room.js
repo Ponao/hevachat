@@ -17,7 +17,11 @@ router.post('/create', verifyToken, [
         .isLength({ max: 50 }).withMessage('title_is_max'),
 ], RoomController.create);
 router.post('/delete', verifyToken, RoomController.delete);
-router.post('/edit', verifyToken, RoomController.edit);
+router.post('/edit', verifyToken, verifyToken, [
+    check('title')
+        .notEmpty().withMessage('title_not_empty')
+        .isLength({ max: 50 }).withMessage('title_is_max'),
+], RoomController.edit);
 router.post('/invite', verifyToken, RoomController.invite);
 router.post('/send-message', verifyToken, RoomController.sendMessage);
 router.post('/delete-message', verifyToken, RoomController.deleteMessage);

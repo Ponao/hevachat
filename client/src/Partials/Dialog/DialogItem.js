@@ -34,48 +34,66 @@ class DialogItem extends React.Component {
                     e.preventDefault()
             }} className="dialog-link" to={`/chats/${this.props.user._id}`}>
                 <Button className={`dialog-item`}>
-                    <Avatar online={this.props.user.online} style={{width: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} />
+                    <Avatar 
+                        avatar={this.props.user.avatar ? this.props.user.avatar : false}
+                        online={this.props.user.online} 
+                        style={{minWidth: 40, maxWidth: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
+                        name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} 
+                    />
 
-                    <div>
-                        <p className="user-name">{`${this.props.user.name.first} ${this.props.user.name.last}`}</p>
+                    <div style={{
+                        flexGrow: 1,
+                        minWidth: 0,
+                        maxWidth: '100%',
+                        paddingRight: 10
+                    }}>
+                        <p className="user-name"><span>{`${this.props.user.name.first} ${this.props.user.name.last}`}</span></p>
                         {!this.props.typing && <p className="last-message">
                             {this.props.lastMessage.user._id === this.props.myUser._id && <span style={{color: '#999999'}}>You:&nbsp;</span>}
-                            {this.props.lastMessage.text && <>{this.props.lastMessage.text}</>}
+                            {this.props.lastMessage.text && <span className="content">{this.props.lastMessage.text}</span>}
                             
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length === 1 && 
-                                <><span style={{color: '#008FF7'}}>{this.props.lastMessage.images[0].name}</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.images[0].name}</span></>
                             }
 
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length > 1 && 
-                                <><span style={{color: '#008FF7'}}>Фотографии [{this.props.lastMessage.images.length}]</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>Фотографии [{this.props.lastMessage.images.length}]</span></>
                             }
 
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             this.props.lastMessage.sounds.length === 1 &&
-                                <><span style={{color: '#008FF7'}}>{this.props.lastMessage.sounds[0].name}</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.sounds[0].name}</span></>
                             }
 
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             this.props.lastMessage.sounds.length > 1 &&
-                                <><span style={{color: '#008FF7'}}>Аудио [{this.props.lastMessage.sounds.length}]</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>Аудио [{this.props.lastMessage.sounds.length}]</span></>
                             }
 
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             !this.props.lastMessage.sounds.length &&
                             this.props.lastMessage.files.length === 1 &&
-                                <><span style={{color: '#008FF7'}}>{this.props.lastMessage.files[0].name}</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.files[0].name}</span></>
                             }
 
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             !this.props.lastMessage.sounds.length &&
                             this.props.lastMessage.files.length > 1 &&
-                                <><span style={{color: '#008FF7'}}>Файлы [{this.props.lastMessage.files.length}]</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>Файлы [{this.props.lastMessage.files.length}]</span></>
+                            }
+
+                            {!this.props.lastMessage.text && 
+                            !this.props.lastMessage.images.length && 
+                            !this.props.lastMessage.sounds.length &&
+                            !this.props.lastMessage.files.length &&
+                            !!this.props.lastMessage.recentMessages.length &&
+                                <><span className="content" style={{color: '#008FF7'}}>Attachment messages [{this.props.lastMessage.recentMessages.length}]</span></>
                             }
                         </p>}
                         {this.props.typing && <p className="last-message typing">typing</p>}

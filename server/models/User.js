@@ -16,6 +16,7 @@ const UserSchema = new Schema({
     last: String
   },
   email: { type: String, select: false },
+  avatar: { type: Object, select: true },
   password: { type: String, select: false },
   roomLang: { type: String, default: 'eng', select: false },
   online: { type: Boolean, default: true },

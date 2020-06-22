@@ -1046,12 +1046,25 @@
     line-height: 22px;
 }
 
+.dialog-item .user-name span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .dialog-item .last-message {
     display: flex;
     font-size: 14px;
     color: #667788;
     margin: 0 0 0 12px;
     line-height: 16px;
+    text-align: left;
+}
+
+.dialog-item .last-message .content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .dialog-item .users {
@@ -1072,6 +1085,7 @@
     position: relative;
     height: 40px;
     width: max-content;
+    white-space: nowrap;
 }
 
 .dialog-item .dialog-info svg {
@@ -1181,4 +1195,139 @@
 
 .other-video {
     width: 100%;
+    position: absolute;
+    top: 0;
+    height: 100%;
+}
+
+/** Used to define container behavior: width, position: fixed etc... **/
+.Toastify__toast-container {
+}
+
+/** Used to define the position of the ToastContainer **/
+.Toastify__toast-container--top-left {
+}
+.Toastify__toast-container--top-center {
+}
+.Toastify__toast-container--top-right {
+}
+.Toastify__toast-container--bottom-left {
+}
+.Toastify__toast-container--bottom-center {
+}
+.Toastify__toast-container--bottom-right {
+}
+
+/** Classes for the displayed toast **/
+.Toastify__toast {
+    margin: 0 auto;
+    border-radius: 50px!important;
+    padding: 8px 20px!important;
+    max-height: 40px!important;
+    min-height: 40px!important;
+    height: 40px!important;
+    width: max-content!important;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15)!important;
+    font-size: 12px!important;
+    font-family: Open Sans!important;
+}
+.Toastify__toast--rtl {
+}
+.Toastify__toast--dark {
+}
+.Toastify__toast--default {
+    background-color: #fff!important;
+    color: #667788!important;
+}
+.Toastify__toast--info {
+}
+.Toastify__toast--success {
+}
+.Toastify__toast--warning {
+}
+.Toastify__toast--error {
+    background-color: #FF3333!important;
+}
+.Toastify__toast-body {
+    margin: 3px 0!important;
+}
+
+/** Classes for the close button. Better use your own closeButton **/
+.Toastify__close-button {
+    display: none;
+}
+.Toastify__close-button--default {
+    display: none;
+}
+.Toastify__close-button > svg {
+    display: none;
+}
+.Toastify__close-button:hover, .Toastify__close-button:focus {
+    display: none;
+}
+
+/** Classes for the progress bar **/
+.Toastify__progress-bar {
+    display: none;
+}
+.Toastify__progress-bar--animated {
+    display: none;
+}
+.Toastify__progress-bar--controlled {
+    display: none;
+}
+.Toastify__progress-bar--rtl {
+    display: none;
+}
+.Toastify__progress-bar--default {
+    display: none;
+}
+.Toastify__progress-bar--dark {
+    display: none;
+}
+
+.user-avatar-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50px;
+    position: absolute;
+    object-fit: cover;
+}
+.upload-avatar-icon {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    z-index: 2;
+}
+.upload-avatar {
+    position: relative;
+}
+.upload-avatar:hover {
+    background-color: rgba(85, 102, 119, 0.3);
+    border-radius: 50px;
+}
+.upload-avatar:hover .upload-avatar-icon {
+    opacity: 1;  
+}
+.upload-avatar-background {
+    opacity: 0;
+    position: absolute;
+    background-color: rgba(85, 102, 119, 0.3);
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border-radius: 50px;
+}
+
+.upload-avatar:hover .upload-avatar-background {
+    opacity: 1;
+}
+
+.call-modal {
+    transition: all 0.2s;
 }

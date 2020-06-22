@@ -10,6 +10,7 @@ import { withStyles } from '@material-ui/core'
 // Redux
 import { connect } from 'react-redux'
 import * as usersActions from '../../Redux/actions/users'
+import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
 import {urlApi} from '../../config'
 
@@ -18,6 +19,7 @@ import Avatar from '../../Partials/User/Avatar';
 import { NavLink, withRouter } from 'react-router-dom';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import PermMediaOutlinedIcon from '@material-ui/icons/PermMediaOutlined';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 
 const fabStyles = theme => ({
     root: {
@@ -44,10 +46,22 @@ class MyUser extends React.Component {
 
     render() {
         return <>
-            <Avatar 
-                style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
-                name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)} 
-            />
+            <label style={{cursor: 'pointer'}} className="upload-avatar">
+                <Avatar 
+                    style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
+                    name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)}
+                    avatar={this.props.user.avatar ? this.props.user.avatar : false}
+                />
+                <AddAPhotoIcon className="upload-avatar-icon" style={{color: '#fff'}} />
+                <div className="upload-avatar-background"></div>
+                <input 
+                    type="file"
+                    onChange={(e) => {this.props.userActions.uploadAvatar(e, this.props.user.apiToken)}}
+                    id="uploadAvatar" 
+                    style={{display: 'none'}} 
+                    accept="image/jpeg,image/png" 
+                />
+            </label>
 
             <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
             <p className="user-profile-city">Moscow</p>
@@ -90,6 +104,7 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         usersActions: bindActionCreators(usersActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
