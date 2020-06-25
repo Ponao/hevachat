@@ -4,7 +4,7 @@ import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
-import GroupIcon from '@material-ui/icons/Group';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 // Redux
 import { connect } from 'react-redux'
@@ -99,7 +99,7 @@ class Images extends React.Component {
                 )
             })}
             {(!this.state.files.length && !this.state.isFetching) && <div className="data-empty">
-                <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+                <FileCopyIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
                 <p>Here will placed files from this dialog</p>
             </div>}

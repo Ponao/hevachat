@@ -4,7 +4,7 @@ import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
-import GroupIcon from '@material-ui/icons/Group';
+import AudiotrackIcon from '@material-ui/icons/Audiotrack';
 
 // Redux
 import { connect } from 'react-redux'
@@ -92,7 +92,7 @@ class Images extends React.Component {
                 )
             })}
             {(!this.state.sounds.length && !this.state.isFetching) && <div className="data-empty">
-                <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+                <AudiotrackIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
                 <p>Here will placed sounds from this dialog</p>
             </div>}

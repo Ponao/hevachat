@@ -18,6 +18,7 @@ import { DIALOGS_SET_FORWARD, SLIDER_SET } from '../Redux/constants';
 import Call from './Call';
 import Slider from '../Partials/Chat/Slider';
 import Investments from './Investments';
+import Settings from './Settings';
 
 class MainModal extends React.Component {
     state = {
@@ -57,6 +58,12 @@ class MainModal extends React.Component {
             }} />}
 
             <Contacts isOpen={this.state.modal === 'contacts'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />
+
+            <Settings isOpen={this.state.modal === 'settings'} close={() => {
                 this.props.history.push({
                     search: ""
                 })

@@ -4,7 +4,7 @@ import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
-import GroupIcon from '@material-ui/icons/Group';
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 
 // Redux
 import { connect } from 'react-redux'
@@ -100,7 +100,7 @@ class Images extends React.Component {
                 )
             })}
             {(!this.state.images.length && !this.state.isFetching) && <div className="data-empty">
-                <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
+                <PhotoLibraryIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
                 <p>Here will placed images from this dialog</p>
             </div>}

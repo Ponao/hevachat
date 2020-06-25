@@ -22,3 +22,7 @@ button {
   padding-right: 0;
   padding-left: 0;
 }
+
+#root {
+  height: 100%;
+}

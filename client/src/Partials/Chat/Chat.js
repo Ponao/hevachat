@@ -111,7 +111,7 @@ class Chat extends React.Component {
     sendMessage(text) {
         if(/\S/.test(text) || !!this.state.attachedRecentMessages.length || !!this.state.images.length || !!this.state.files.length|| !!this.state.sounds.length) {
             let drafts = {...JSON.parse(localStorage.getItem('drafts'))}
-            drafts['draft-'+this.props.dialogId] = ''
+            delete drafts['draft-'+this.props.dialogId]
             localStorage.setItem('drafts', JSON.stringify(drafts));
             switch (this.props.type) {
                 case 'room': 

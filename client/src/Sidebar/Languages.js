@@ -10,6 +10,7 @@ import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom'
 import {urlApi} from '../config'
 import SocketController from '../Controllers/SocketController'
+import LanguageItem from '../Partials/Language/LanguageItem'
 
 class Languages extends React.Component {
     static contextType = PageSettings;
@@ -24,8 +25,6 @@ class Languages extends React.Component {
 
     updateRoomLang(lang) {
         this.props.userActions.updateRoomLang(lang)
-
-        this.props.history.push('/')
 
         this.props.roomsActions.roomsGet(this.props.user.apiToken, lang)
 
@@ -50,12 +49,12 @@ class Languages extends React.Component {
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar">
                     <h2 className="sidebar-title">Language</h2>
 
-                    <span style={{color: this.props.user.roomLang === 'eng' ? 'red' : '#000'}} onClick={() => {
+                    <LanguageItem onClick={() => {
                         this.updateRoomLang('eng')
-                    }}>English</span>
-                    <span style={{color: this.props.user.roomLang === 'rus' ? 'red' : '#000'}} onClick={() => {
+                    }} title={'English'} />
+                    <LanguageItem onClick={() => {
                         this.updateRoomLang('rus')
-                    }}>Russian</span>
+                    }} title={'Russian'} />
                 </div>
             </>
         )

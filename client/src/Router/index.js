@@ -48,9 +48,11 @@ class AppRouter extends React.Component {
           this.setState({isRender: true})
         })
         .catch(() => {
+          localStorage.setItem('drafts', JSON.stringify([]));
           this.setState({isRender: true})
         })
     } else {
+      localStorage.setItem('drafts', JSON.stringify([]));
       this.setState({isRender: true})
     }
   }

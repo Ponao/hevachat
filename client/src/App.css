@@ -1360,3 +1360,10 @@
     justify-self: flex-end;
     align-content: flex-start;
 }
+@media screen and (max-width: 767px) {
+    .user-header {
+        order: 4;
+        border: none;
+        border-top: 1px #ededed solid;
+    }
+}

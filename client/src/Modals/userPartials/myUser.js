@@ -67,7 +67,11 @@ class MyUser extends React.Component {
             <p className="user-profile-city">Moscow</p>
             
             <div className="user-btn">
-                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push({
+                        search: `?modal=settings`
+                    })
+                }}>
                     <SettingsOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
                 <p>Settings</p>
@@ -82,13 +86,6 @@ class MyUser extends React.Component {
                     <BookOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
                 <p>Contacts</p>
-            </div>
-
-            <div className="user-btn">
-                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>
-                    <PermMediaOutlinedIcon style={{color: '#99AABB'}} />
-                </CustomFab>
-                <p>Media</p>
             </div>
         </>
     }

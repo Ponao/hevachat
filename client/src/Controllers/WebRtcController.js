@@ -227,35 +227,39 @@ export default {
         }
     },
     onRoomAnswerSdp: (sdpAnswer) => {
-        let answer = new RTCSessionDescription({
-            type: 'answer',
-            sdp: sdpAnswer
-        })
-        
-        WebRtcPeerConnection.setRemoteDescription(answer);
-
-        let stream = new MediaStream();
-
-        for (const sender of WebRtcPeerConnection.getReceivers()) {
-            stream.addTrack(sender.track);
-        }
-
-        remoteStream = stream
-
-        store.dispatch({
-            type: ROOMS_SET_REMOTE_STREAM,
-            payload: stream
-        })
-
-        speechEvents = hark(localStream, {});
- 
-        speechEvents.on('speaking', function() {
-            SocketController.sendRoomSpeaking({roomId: activeRoomId})
-        });
+        try {
+            let answer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: sdpAnswer
+            })
+            
+            WebRtcPeerConnection.setRemoteDescription(answer);
     
-        speechEvents.on('stopped_speaking', function() {
-            SocketController.sendRoomStopSpeaking({roomId: activeRoomId})
-        });
+            let stream = new MediaStream();
+    
+            for (const sender of WebRtcPeerConnection.getReceivers()) {
+                stream.addTrack(sender.track);
+            }
+    
+            remoteStream = stream
+    
+            store.dispatch({
+                type: ROOMS_SET_REMOTE_STREAM,
+                payload: stream
+            })
+    
+            speechEvents = hark(localStream, {});
+     
+            speechEvents.on('speaking', function() {
+                SocketController.sendRoomSpeaking({roomId: activeRoomId})
+            });
+        
+            speechEvents.on('stopped_speaking', function() {
+                SocketController.sendRoomStopSpeaking({roomId: activeRoomId})
+            });
+        } catch (error) {
+            
+        }
     },
 
     call: (userId, create = false) => {

@@ -93,6 +93,9 @@ class Dialog extends React.Component {
 
         if(this.messagesBlock) {
             this.messagesBlock.view.scrollTop = 100000
+            setTimeout(() => {
+                this.messagesBlock.view.scrollTop = 100000
+            }, 300);
         }
     }
 
@@ -100,7 +103,7 @@ class Dialog extends React.Component {
         if(
             prevProps.messages.length < this.props.messages.length && 
             JSON.stringify(prevProps.messages[0]) === JSON.stringify(this.props.messages[0]) &&
-            ((this.messagesBlock.getScrollHeight() - this.messagesBlock.getClientHeight() - this.messagesBlock.getScrollTop()) < this.messagesBlock.getClientHeight()/3 ||
+            ((this.messagesBlock.getScrollHeight() - this.messagesBlock.getScrollTop()) < this.messagesBlock.getClientHeight() + 100 ||
             prevProps.messages[prevProps.messages.length-1].user._id === this.props.user._id)
         ) {
             if(this.state.activePage) {
