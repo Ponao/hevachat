@@ -25,6 +25,7 @@ import CallEndIcon from '@material-ui/icons/CallEnd';
 import { randomInteger } from '../../Controllers/FunctionsController'
 import Avatar from '../../Partials/User/Avatar';
 import ActionMenu from '../../Partials/ActionMenu';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 const fabStyles = theme => ({
     root: {
@@ -38,6 +39,25 @@ const fabStyles = theme => ({
 })
 
 const CustomFab = withStyles(fabStyles)(Fab);
+
+const fabStylesCustom = theme => ({
+    root: {
+        backgroundColor: '#fff',
+        color: '#008FF7',
+        zIndex: 2,
+        width: 36,
+        height: 36,
+        boxShadow: 'none!important',
+        marginLeft: 'auto',
+        marginRight: '14px',
+        '&:hover': {
+            backgroundColor: '#fff',
+            boxShadow: 'none',
+        }
+    }
+})
+
+const CustomFab2 = withStyles(fabStylesCustom)(Fab);
 
 class Members extends React.Component {
     render() {
@@ -102,47 +122,56 @@ class Room extends React.Component {
                             <ArrowBackIcon fontSize="small" style={{color: '#008FF7'}} />
                         </IconButton>
                         
-                        <div className="theme-info" id={this.props.rooms.activeRoom._id}>
+                        <div className="theme-info">
                             <h2 className="theme-title">{this.props.rooms.activeRoom.title}</h2>
                             <h3 className="theme-online-counter">{this.props.rooms.activeRoom.users.length + 1} online</h3>
                         </div>
 
-                        <ActionMenu 
-                            actions={
-                                this.props.rooms.activeRoom.ownerId === this.props.user._id ? [
-                                    {text: 'Invite friends', action: () => {
-                                        this.props.history.push({
-                                            search: '?act=invite'
-                                        })
-                                    }},
-                                    {
-                                        text: 'Edit room',
-                                        action: () => {
-                                            this.props.history.push({
-                                                search: '?act=editRoom'
-                                            })
-                                        }
-                                    },
-                                    {
-                                        text: 'Delete room',
-                                        action: () => {
-                                            this.props.history.push({
-                                                search: '?act=deleteRoom'
-                                            })
-                                        }
-                                    }
-                                ] : [
-                                    {
-                                        text: 'Invite friends', action: () => {
-                                            this.props.history.push({
-                                                search: '?act=invite'
-                                            })
-                                        }
-                                    }
-                                ]} 
-                            from={this.props.rooms.activeRoom._id} 
-                            bottom={true} 
-                        />
+                        <CustomFab2 id={'dialog-more-actions-'+this.props.rooms.activeRoom._id} color="primary" size="small" aria-label="more">
+                            <MoreVertIcon style={{color: '#008FF7'}} />
+                        </CustomFab2>
+                        <ActionMenu event="click" bottom={true} right={true} actions={
+                        this.props.rooms.activeRoom.ownerId === this.props.user._id ? [
+                            {text: 'Invite friends', action: () => {
+                                this.props.history.push({
+                                    search: '?act=invite'
+                                })
+                            }},
+                            {
+                                text: 'Edit room',
+                                action: () => {
+                                    this.props.history.push({
+                                        search: '?act=editRoom'
+                                    })
+                                }
+                            },
+                            {text: 'Show investments', action: () => {
+                                this.props.history.push({
+                                    search: `?modal=investments`
+                                })
+                            }},
+                            {
+                                text: 'Delete room',
+                                action: () => {
+                                    this.props.history.push({
+                                        search: '?act=deleteRoom'
+                                    })
+                                }
+                            }
+                        ] : [
+                            {
+                                text: 'Invite friends', action: () => {
+                                    this.props.history.push({
+                                        search: '?act=invite'
+                                    })
+                                }
+                            },
+                            {text: 'Show investments', action: () => {
+                                this.props.history.push({
+                                    search: `?modal=investments`
+                                })
+                            }}
+                        ]} from={'dialog-more-actions-'+this.props.rooms.activeRoom._id} />
                     </div>
 
 

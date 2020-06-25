@@ -84,3 +84,6 @@ export const CALL_SET_USER = 'CALL_SET_USER'
 export const CALL_SET_STATUS = 'CALL_SET_STATUS'
 export const CALL_SET_REMOTE_STREAM = 'CALL_SET_REMOTE_STREAM'
 export const CALL_SET_MEDIA = 'CALL_SET_MEDIA'
+
+// Slider
+export const SLIDER_SET = 'SLIDER_SET'

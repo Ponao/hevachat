@@ -12,7 +12,7 @@ router.post('/get-all', verifyToken, DialogController.getAll);
 router.post('/get', verifyToken, DialogController.get);
 router.post('/send-message', verifyToken, DialogController.sendMessage);
 router.post('/read-messages', verifyToken, DialogController.readMessages);
-// router.post('/get', verifyToken, DialogController.get);
+router.post('/get-investments', verifyToken, DialogController.getInvestments);
 // router.post('/create', verifyToken, DialogController.create);
 // router.post('/delete', verifyToken, DialogController.delete);
 // router.post('/edit', verifyToken, DialogController.edit);

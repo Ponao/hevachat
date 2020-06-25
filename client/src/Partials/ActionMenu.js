@@ -13,38 +13,61 @@ class ActionMenu extends React.Component {
         top: 0
     }
 
-    toggleActive() {
+    toggleActive(e) {
         let element = document.getElementById(this.props.from)
-        let rect = element.getBoundingClientRect()
+        if(element) {
+            let find = false
+            if(e.path.find(x => x.id === this.props.from)) {
+                e.stopPropagation()
+                find = true
+            }
+            
+            let rect = element.getBoundingClientRect()
 
-        let top
-        let left
-        if(this.props.bottom) {
-            top = rect.y + element.clientHeight
-            left = rect.x
+            let top
+            let left
+            if(this.props.bottom) {
+                top = rect.y + element.clientHeight
+                left = rect.x
+                if(this.props.right)
+                    left = rect.x+element.clientWidth
+            }
+            else {
+                top = rect.y
+                left = rect.x+element.clientWidth
+            }
+            
+            this.setState({left, top})
+            if((this.props.event === 'click' && (this.state.active || find)) || this.props.event === 'hover')
+                this.setState({active: !this.state.active})
         }
-        else {
-            top = rect.y
-            left = rect.x+element.clientWidth
-        }
-        
-        this.setState({left, top})
-        this.setState({active: !this.state.active})
     }
 
     componentDidMount() {
-        document.getElementById(this.props.from).addEventListener('mouseenter', this.toggleActive.bind(this))
-        document.getElementById(this.props.from).addEventListener('mouseleave', this.toggleActive.bind(this))
+        if(this.props.event === 'hover') {
+            document.getElementById(this.props.from).addEventListener('mouseenter', this.toggleActive.bind(this))
+            document.getElementById(this.props.from).addEventListener('mouseleave', this.toggleActive.bind(this))
+        }
+        if(this.props.event === 'click') {
+            document.getElementById(this.props.from).addEventListener('click', this.toggleActive.bind(this))
+            document.body.addEventListener('click', this.toggleActive.bind(this))
+        }
     }
 
     componentWillUnmount() {
-        document.getElementById(this.props.from).removeEventListener('mouseenter', this.toggleActive.bind(this))
-        document.getElementById(this.props.from).removeEventListener('mouseleave', this.toggleActive.bind(this))
+        if(this.props.event === 'hover') {
+            document.getElementById(this.props.from).removeEventListener('mouseenter', this.toggleActive.bind(this))
+            document.getElementById(this.props.from).removeEventListener('mouseleave', this.toggleActive.bind(this))
+        }
+        if(this.props.event === 'click') {
+            document.getElementById(this.props.from).removeEventListener('click', this.toggleActive.bind(this))
+            document.body.removeEventListener('click', this.toggleActive.bind(this))
+        }
     }
 
     render() {
         return (
-            <div style={{left: this.state.left, top: this.state.top, transform: this.props.bottom ? 'none' : null}} className={`action-menu-container ${this.state.active ? 'active' : ''}`}>
+            <div style={{left: this.state.left, top: this.state.top, transform: this.props.bottom ? this.props.right ? 'translateX(-100%)' : 'none' : null}} className={`action-menu-container ${this.state.active ? 'active' : ''}`}>
                 <div className={`action-menu`}>
                     {this.props.actions.map((action, index) => {
                         return action ? <Button key={index} onClick={() => {action.action()}} className="action-button">{action.text}</Button> : null

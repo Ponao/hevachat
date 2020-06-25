@@ -14,8 +14,10 @@ import Invite from './Invite';
 import EditRoom from './EditRoom';
 import DeleteRoom from './DeleteRoom';
 import Forward from './Forward';
-import { DIALOGS_SET_FORWARD } from '../Redux/constants';
+import { DIALOGS_SET_FORWARD, SLIDER_SET } from '../Redux/constants';
 import Call from './Call';
+import Slider from '../Partials/Chat/Slider';
+import Investments from './Investments';
 
 class MainModal extends React.Component {
     state = {
@@ -85,7 +87,28 @@ class MainModal extends React.Component {
                 })
             }} />
 
-        {this.props.call.user && <Call isOpen={true} />}
+            {this.state.modal === 'slider' && !!this.props.slider.images.length && <Slider index={this.props.slider.index} images={this.props.slider.images} close={() => {
+                this.props.dispatch({
+                    type: SLIDER_SET,
+                    payload: {
+                        images: [],
+                        index: 0
+                    }
+                })
+                this.props.history.goBack()
+            }} />}
+            
+            {this.props.match.params.id && this.state.modal === 'investments' && <Investments 
+                isOpen={this.props.match.params.id && this.state.modal === 'investments'} 
+                dialogId={this.props.match.params.id} 
+                close={() => {
+                    this.props.history.push({
+                        search: ""
+                    })
+                }}
+            />}
+
+            {this.props.call.user && <Call isOpen={true} />}
         </>
     }
 }
@@ -95,7 +118,8 @@ const mapStateToProps = state => {
         rooms: state.rooms,
         user: state.user,
         dialogs: state.dialogs,
-        call: state.call
+        call: state.call,
+        slider: state.slider
     }
 }
 

@@ -46,7 +46,7 @@ class Contacts extends React.Component {
                 }} />}
             {this.props.users.pending.users.map((user, index) => {
                 return (
-                    <UserItem key={index} user={user} />
+                    <UserItem key={index} user={user} onClick={(id) => {this.props.onClick(id)}} />
                 )
             })}
             {(!this.props.users.pending.users.length && !this.props.users.pending.isFetching) && <div className="data-empty">

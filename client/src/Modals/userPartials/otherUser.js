@@ -23,6 +23,8 @@ import {urlApi} from '../../config'
 import SocketController from '../../Controllers/SocketController';
 import Avatar from '../../Partials/User/Avatar';
 import { NavLink, withRouter } from 'react-router-dom';
+import store from '../../Redux/store';
+import { SLIDER_SET } from '../../Redux/constants';
 
 const fabStyles = theme => ({
     root: {
@@ -45,11 +47,22 @@ const CustomFab = withStyles(fabStyles)(Fab);
 class OtherUser extends React.Component {
     render() {
         return <>
-                <Avatar 
+                <span style={{cursor: 'pointer'}} onClick={() => {
+                    this.props.history.push({
+                        search: `?modal=slider`
+                    })
+                    store.dispatch({
+                        type: SLIDER_SET,
+                        payload: {
+                            images: [{path: this.props.user.avatar.original}],
+                            index: 0
+                        }
+                    })
+                }}><Avatar 
                     style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
                     name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)} 
                     avatar={this.props.user.avatar ? this.props.user.avatar : false}
-                />
+                /></span>
 
                 <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
                 <p className="user-profile-city">Moscow</p>

@@ -332,7 +332,7 @@
 }
 
 .message .message-images .image-blur img {
-    filter: blur(3px) brightness(0.3);
+    filter: blur(2px) brightness(0.7);
 }
 
 .message-files {
@@ -1067,6 +1067,11 @@
     white-space: nowrap;
 }
 
+.dialog-item .last-message .notif-content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .dialog-item .users {
     display: flex;
     margin-left: 12px;
@@ -1330,4 +1335,28 @@
 
 .call-modal {
     transition: all 0.2s;
+}
+.investment-image {
+    display: flex;
+    width: 100px;
+    position: relative;
+    margin: 3px;
+    
+}
+.investment-image::after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+}
+.investment-image img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    object-fit: cover;
+}
+.investment-images > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-self: flex-end;
+    align-content: flex-start;
 }

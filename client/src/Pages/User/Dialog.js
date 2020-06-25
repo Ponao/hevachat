@@ -20,6 +20,8 @@ import { OnlineDate } from '../../Controllers/TimeController';
 import Fab from '@material-ui/core/Fab';
 import CallIcon from '@material-ui/icons/Call';
 import { withStyles } from '@material-ui/core'
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ActionMenu from '../../Partials/ActionMenu'
 
 const fabStyles = theme => ({
     root: {
@@ -38,7 +40,24 @@ const fabStyles = theme => ({
     }
 })
 
-const CustomFab = withStyles(fabStyles)(Fab);
+const fabStylesCustom = theme => ({
+    root: {
+        backgroundColor: '#fff',
+        color: '#008FF7',
+        zIndex: 2,
+        width: 36,
+        height: 36,
+        boxShadow: 'none!important',
+        marginRight: '14px',
+        '&:hover': {
+            backgroundColor: '#fff',
+            boxShadow: 'none',
+        }
+    }
+})
+
+const CallFab = withStyles(fabStyles)(Fab);
+const CustomFab = withStyles(fabStylesCustom)(Fab);
 
 class Dialog extends React.PureComponent {
     static contextType = PageSettings;
@@ -83,8 +102,8 @@ class Dialog extends React.PureComponent {
                             search: `?user=${dialog.user._id}`
                          })
                      }}><Avatar style={{
-                        width: 32, 
-                        height: 32, 
+                        width: 36, 
+                        height: 36, 
                         fontSize: 14, 
                         fontWeight: 600, 
                         backgroundColor: `rgb(${dialog.user.color})`
@@ -102,11 +121,22 @@ class Dialog extends React.PureComponent {
                         {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>online</p>}
                     </div></>
 
-                    {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CustomFab color="primary" size="small" aria-label="call" onClick={() => {
+                    {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CallFab color="primary" size="small" aria-label="call" onClick={() => {
                         this.props.callActions.call(dialog.user, this.props.user.apiToken)
                     }}>
                         <CallIcon style={{color: '#fff'}} />
-                    </CustomFab>}
+                    </CallFab>}
+
+                    <CustomFab id={'dialog-more-actions-'+dialog._id} color="primary" size="small" aria-label="more">
+                        <MoreVertIcon style={{color: '#008FF7'}} />
+                    </CustomFab>
+                    <ActionMenu event="click" bottom={true} right={true} actions={[
+                        {text: 'Show investments', action: () => {
+                            this.props.history.push({
+                                search: `?modal=investments`
+                             })
+                        }},
+                    ]} from={'dialog-more-actions-'+dialog._id} />
                 </div>
                 <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>
                     <Chat 

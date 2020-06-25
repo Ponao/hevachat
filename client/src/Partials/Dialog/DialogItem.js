@@ -110,7 +110,7 @@ class DialogItem extends React.Component {
                         {(this.props.lastMessage.user._id !== this.props.myUser._id && !!this.props.noRead) && <span className="unread-messages-count">{this.props.noRead}</span>}
                         {(this.props.lastMessage.user._id !== this.props.myUser._id && !this.props.noRead) && <span style={{height: 18}}></span>}
                         {(this.props.lastMessage.user._id === this.props.myUser._id && !this.props.lastMessage.isLoading && this.props.lastMessage.isError) && <>
-                            <ActionMenu actions={[
+                            <ActionMenu event="hover" actions={[
                                 {text: 'Retry', action: () => {
                                     let message = this.props.lastMessage
                                     message.userId = this.props.user._id

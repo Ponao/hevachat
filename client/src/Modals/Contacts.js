@@ -68,8 +68,16 @@ class Contacts extends React.Component {
                     search: `?user=${id}`
                  })
             }} type={'normal'} />}
-            {this.state.activeTab === 'inbox' && <Inbox />}
-            {this.state.activeTab === 'outbox' && <Outbox />}
+            {this.state.activeTab === 'inbox' && <Inbox onClick={(id) => {
+                this.props.history.push({
+                    search: `?user=${id}`
+                 })
+            }} />}
+            {this.state.activeTab === 'outbox' && <Outbox onClick={(id) => {
+                this.props.history.push({
+                    search: `?user=${id}`
+                 })
+            }} />}
         </Modal>
     }
 }

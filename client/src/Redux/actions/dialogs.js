@@ -373,7 +373,7 @@ export const readMessages = ({dialogId, userId, otherId}, apiToken) => (dispatch
                 payload: {dialogId, userId: otherId, noRead: true, noReadCount: true}
             })
         }
-    }, 750)
+    }, 1)
 
     if(!!readMessages.length) {
         fetch(`${urlApi}/api/dialog/read-messages`, {

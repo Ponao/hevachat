@@ -15,6 +15,7 @@ import Avatar from '../Partials/User/Avatar';
 import { NavLink, withRouter } from 'react-router-dom';
 import OtherUser from './userPartials/otherUser';
 import MyUser from './userPartials/myUser';
+import { CircularProgress } from '@material-ui/core';
 
 const customStylesModal = {
     overlay: {
@@ -39,7 +40,8 @@ const customStylesModal = {
         display               : 'flex',
         justifyContent        : 'center',
         flexWrap              : 'wrap',
-        width                 : '300px'
+        width                 : '300px',
+        minHeight: 100
     }
 };
 
@@ -61,6 +63,15 @@ class User extends React.Component {
             {user && 
                 <OtherUser userId={this.props.userId} user={user} />
             }
+
+            {!user && this.props.user._id !== this.props.userId && <CircularProgress style={{
+                color: '#008FF7',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                margin: 'auto',
+                top: 'calc(50% - 20px)'
+            }} />}
 
             {this.props.user._id === this.props.userId && 
                 <MyUser />

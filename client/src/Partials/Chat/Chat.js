@@ -34,8 +34,6 @@ class Chat extends React.Component {
         files: [],
         images: [],
         inputMessageHeight: 0,
-        isOpenSlider: false,
-        sliderImages: [],
         isEdit: false,
         editMessage: {},
         canTyping: true,
@@ -330,7 +328,7 @@ class Chat extends React.Component {
                         roomId: this.props.roomId, 
                         userId: this.props.user._id
                     }, this.props.user.apiToken)
-                }, 1000)
+                }, 100)
                 break;
             case 'dialog': 
                 waitFastRead = setTimeout(() => {
@@ -339,7 +337,7 @@ class Chat extends React.Component {
                         otherId: this.props.userId, 
                         userId: this.props.user._id
                     }, this.props.user.apiToken)
-                }, 1000)
+                }, 100)
                 break;
             default:
                 break;
@@ -514,8 +512,6 @@ class Chat extends React.Component {
                     </div>
                 }
 
-                {this.state.isOpenSlider && <Slider images={this.state.sliderImages} close={() => {this.setState({isOpenSlider: false, sliderImages: []})}} />}
-
                 <Dialog 
                     loadMessages={() => {this.loadMessages()}}
                     retrySendMessage={(message) => {this.retrySendMessage(message)}}
@@ -529,7 +525,6 @@ class Chat extends React.Component {
                     type={this.props.type}
                     unRead={this.props.messages.filter(x => !x.isRead && x.user._id !== this.props.user._id)}
                     recentMessages={this.state.recentMessages}
-                    openSlider={(sliderImages) => {this.setState({sliderImages, isOpenSlider: true})}}
                     onSelect={(message) => {
                         this.setState({recentMessages: [...this.state.recentMessages, message]})
                     }} 

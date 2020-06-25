@@ -28,5 +28,6 @@ router.post('/delete-message', verifyToken, RoomController.deleteMessage);
 router.post('/read-messages', verifyToken, RoomController.readMessages);
 router.post('/edit-message', verifyToken, RoomController.editMessage);
 router.post('/load-messages', verifyToken, RoomController.loadMessage);
+router.post('/get-investments', verifyToken, RoomController.getInvestments);
 
 module.exports = router;

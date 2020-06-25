@@ -46,6 +46,7 @@
     height: 60px;
     border-bottom: 1px #ededed solid;
     display: flex;
+    align-items: center;
 }
 
 .theme-sidebar {

@@ -29,6 +29,8 @@ import { randomInteger } from '../../Controllers/FunctionsController'
 import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom';
+import store from '../../Redux/store';
+import { SLIDER_SET } from '../../Redux/constants';
 
 let ogsLink = false
 
@@ -200,7 +202,16 @@ class Message extends React.PureComponent {
                                 return <div key={index} className="image" style={{width}}>
                                     <div className="image-blur" onClick={(e) => {
                                         e.stopPropagation()
-                                        this.props.openSlider(images)
+                                        this.props.history.push({
+                                            search: `?modal=slider`
+                                        })
+                                        store.dispatch({
+                                            type: SLIDER_SET,
+                                            payload: {
+                                                images,
+                                                index: 0
+                                            }
+                                        })
                                     }}>
                                         <span>{`+${images.length-3}`}</span>
                                         <img draggable="false" key={index} src={image.path} alt={image.name} />
@@ -210,7 +221,16 @@ class Message extends React.PureComponent {
                             return  <div key={index} className="image" style={{width}}>
                                 <img draggable="false" onClick={(e) => {
                                     e.stopPropagation()
-                                    this.props.openSlider(images)
+                                    this.props.history.push({
+                                        search: `?modal=slider`
+                                    })
+                                    store.dispatch({
+                                        type: SLIDER_SET,
+                                        payload: {
+                                            images,
+                                            index
+                                        }
+                                    })
                                 }} src={image.path} alt={image.name} />
                             </div>
                         })}
@@ -269,7 +289,7 @@ class Message extends React.PureComponent {
                             {!this.props.canSelect && this.props.message.user._id === this.props.user._id && !this.props.message.isLoading && !this.props.message.isError && !this.props.message.isRead && <DoneIcon style={{color: '#B8C3CF'}} />}
                             {!this.props.canSelect && this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && !this.props.message.isError && this.props.message.isRead && <DoneAllIcon style={{color: '#008FF7'}} />}
                             {!this.props.canSelect && this.props.message.user._id === this.props.user._id &&!this.props.message.isLoading && this.props.message.isError &&<>
-                            <ActionMenu actions={[
+                            <ActionMenu event="hover" actions={[
                                 {text: 'Retry', action: () => {
                                     this.props.retrySendMessage(this.props.message)
                                 }},

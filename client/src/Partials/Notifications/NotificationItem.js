@@ -49,9 +49,9 @@ class NotificationItem extends React.Component {
                     }}>
                     <p className="user-name"><span>{`${this.props.notification.user.name.first} ${this.props.notification.user.name.last}`}</span></p>
                     
-                    {this.props.notification.type === 'invite' && <p className="last-message"><span className="content">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></span></p>}
-                    {this.props.notification.type === 'accept' && <p className="last-message"><span className="content">Accept your friend request</span></p>}
-                    {this.props.notification.type === 'request' && <p className="last-message"><span className="content">Send you friend request</span></p>}
+                    {this.props.notification.type === 'invite' && <p className="last-message"><span className="notif-content">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></span></p>}
+                    {this.props.notification.type === 'accept' && <p className="last-message"><span className="notif-content">Accept your friend request</span></p>}
+                    {this.props.notification.type === 'request' && <p className="last-message"><span className="notif-content">Send you friend request</span></p>}
                 </div>
                 <div className="dialog-info">
                     <span className="time-at">{LastMessageDate(this.props.notification.createdAt)}</span>

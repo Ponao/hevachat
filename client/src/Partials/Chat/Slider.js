@@ -36,7 +36,7 @@ const customStylesModal = {
 
 class Slider extends React.Component {
     state = {
-        index: 0
+        index: this.props.index
     }
 
     render() {

@@ -6,6 +6,7 @@
 
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
+const Investment = require('../models/Investment');
 const User = require('../models/User');
 
 const {sendMessageDialog, readMessageDialog, editMessageDialog, deleteMessageDialog} = require('./SocketController')
@@ -29,7 +30,7 @@ module.exports = {
                         path: 'user'
                     }
                 },
-            ]).sort({createdAt: 'DESC'});
+            ]).sort({updatedAt: 'DESC'});
 
             return res.json(dialogs);
         } catch (e) {
@@ -117,9 +118,13 @@ module.exports = {
 
     sendMessage: async (req, res, next) => {
         const { user } = res.locals;
-        let { userId, text, dialogId, socketId, recentMessages } = req.body;
+        let { userId, text, socketId, recentMessages } = req.body;
         
         try {
+            let query = {'$all': [user._id, userId]}
+            let dialog = await Dialog.findOne({'users': query}).populate('lastMessage')
+            const dialogId = String(dialog._id)
+
             if(!/\S/.test(text) && !recentMessages.length && !req.files) {
                 let err = {};
                 err.param = `all`;
@@ -153,6 +158,16 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'image'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop()
+                        }
+                        
+                        await investment.save()
                         
                         images.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
@@ -178,6 +193,17 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'sound'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        }
+                        
+                        await investment.save()
                         
                         sounds.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
@@ -203,6 +229,18 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'file'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        }
+                        
+                        await investment.save()
                         
                         files.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
@@ -253,8 +291,6 @@ module.exports = {
             
             await message.save()
 
-            let dialog = await Dialog.findById(dialogId).populate('lastMessage')
-
             dialog.lastMessage = message
             dialog.noRead = dialog.noRead + 1
             dialog.updatedAt = new Date()
@@ -271,9 +307,13 @@ module.exports = {
 
     editMessage: async (req, res, next) => {
         const { user } = res.locals;
-        let { _id, text, oldImages, oldSounds, oldFiles, dialogId, socketId, userId, recentMessages } = req.body;    
+        let { _id, text, oldImages, oldSounds, oldFiles, socketId, userId, recentMessages } = req.body;    
         
         try {
+            let query = {'$all': [user._id, userId]}
+            let dialog = await Dialog.findOne({'users': query})
+            const dialogId = String(dialog._id)
+
             if(!/\S/.test(text) && !recentMessages.length && !oldImages.length && !oldSounds.length && !oldFiles.length && !req.files) {
                 let err = {};
                 err.param = `all`;
@@ -332,6 +372,16 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'image'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop()
+                        }
+                        
+                        await investment.save()
                         
                         message.images.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
@@ -360,6 +410,17 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'sound'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        }
+                        
+                        await investment.save()
                         
                         message.sounds.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
@@ -388,6 +449,18 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'file'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        }
+                        
+                        await investment.save()
                         
                         message.files.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
@@ -576,12 +649,15 @@ module.exports = {
 
     readMessages: async (req, res, next) => {
         const { user } = res.locals;
-        const { otherId, dialogId, socketId } = req.body;
+        const { otherId, socketId } = req.body;
 
         try {
+            let query = {'$all': [user._id, otherId]}
+            let dialog = await Dialog.findOne({'users': query})
+            const dialogId = String(dialog._id)
             let result = await Message.updateMany({dialogId, 'user': { "$ne": user._id } }, {"$set":{"isRead": true}})
 
-            let dialog = await Dialog.findById(dialogId)
+            // let dialog = await Dialog.findById(dialogId)
 
             dialog.noRead = 0
 
@@ -596,6 +672,36 @@ module.exports = {
             return next(new Error(e));
         }
     },
+
+    getInvestments: async(req, res, next) => {
+        const { user } = res.locals;
+        const { type, userId } = req.body;
+
+        try {
+            if(!userId.match(/^[0-9a-fA-F]{24}$/)) {
+                return res.json([]);
+            }
+
+            let query = {'$all': [user._id, userId]}
+            let dialog = await Dialog.findOne({'users': query}).populate('lastMessage')
+
+            if(!dialog) {
+                return res.json([]);
+            }
+
+            const dialogId = String(dialog._id)
+
+            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'}).limit(20)
+
+            if(investments) {
+                return res.json(investments);
+            } else {
+                return res.json([]);
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    }
 }
 
 function randomInteger(min, max) {

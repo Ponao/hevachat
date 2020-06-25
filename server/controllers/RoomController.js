@@ -9,6 +9,7 @@ const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const { validationResult } = require("express-validator");
+const Investment = require('../models/Investment');
 
 const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom} = require('./SocketController')
 const {getUserExistById, addUserRoom} = require('./WebRtcController')
@@ -343,6 +344,16 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'image'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop()
+                        }
+                        
+                        await investment.save()
                         
                         images.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
@@ -368,6 +379,17 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'sound'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        }
+                        
+                        await investment.save()
                         
                         sounds.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
@@ -393,6 +415,18 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'file'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        }
+                        
+                        await investment.save()
                         
                         files.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
@@ -514,6 +548,16 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'image'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop()
+                        }
+                        
+                        await investment.save()
                         
                         message.images.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
@@ -542,6 +586,17 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'sound'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            name: req.files['sounds'+i].name
+                        }
+                        
+                        await investment.save()
                         
                         message.sounds.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
@@ -570,6 +625,18 @@ module.exports = {
                             if (err)
                             return res.status(500).send(err);
                         });
+
+                        let investment = new Investment()
+
+                        investment.dialogId = dialogId
+                        investment.type = 'file'
+                        investment.data = {
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
+                            name: req.files['files'+i].name,
+                            size: req.files['files'+i].size / 1000
+                        }
+                        
+                        await investment.save()
                         
                         message.files.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['files'+i].name.split('.').pop(),
@@ -658,6 +725,43 @@ module.exports = {
             return next(new Error(e));
         }
     },
+
+    getInvestments: async(req, res, next) => {
+        const { user } = res.locals;
+        const { type, roomId } = req.body;
+
+        try {
+            if(!roomId.match(/^[0-9a-fA-F]{24}$/)) {
+                return res.json([]);
+            }
+
+            let room = await Room.findById(roomId).populate('dialog')
+            
+            if(!room) {
+                return res.json([]);
+            }
+
+            if(room.isPrivate) {
+                let existInvite = await Notification.findOne({type: 'invite', userId: user._id, room: {_id: room._id}})
+
+                if(!existInvite && room.ownerId != String(user._id)) {
+                    return res.json([]);
+                }
+            }
+
+            const dialogId = String(room.dialog._id)
+
+            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'}).limit(20)
+
+            if(investments) {
+                return res.json(investments);
+            } else {
+                return res.json([]);
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    }
 }
 
 function randomInteger(min, max) {

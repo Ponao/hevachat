@@ -7,6 +7,7 @@ import dialogs from './dialogs'
 import users from './users'
 import notifications from './notifications'
 import call from './call'
+import slider from './slider'
 
 export default combineReducers({
     user,
@@ -15,5 +16,6 @@ export default combineReducers({
     dialogs,
     users,
     notifications,
-    call
+    call,
+    slider
 })

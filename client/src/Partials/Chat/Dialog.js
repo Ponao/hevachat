@@ -183,7 +183,6 @@ class Dialog extends React.Component {
                         return <Message 
                             countRecent={0}
                             isRecent={false}
-                            openSlider={(sliderImages) => {this.props.openSlider(sliderImages)}}
                             selected={this.props.recentMessages.find(x => x._id === message._id)}
                             canSelect={!!this.props.recentMessages.length}
                             key={index} 
