@@ -19,6 +19,8 @@ import Call from './Call';
 import Slider from '../Partials/Chat/Slider';
 import Investments from './Investments';
 import Settings from './Settings';
+import Profile from './Profile';
+import Language from './Language';
 
 class MainModal extends React.Component {
     state = {
@@ -68,6 +70,18 @@ class MainModal extends React.Component {
                     search: ""
                 })
             }} />
+            
+            {this.state.modal === 'profile' && <Profile isOpen={this.state.modal === 'profile'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.modal === 'language' && <Language isOpen={this.state.modal === 'language'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
 
             <Invite isOpen={this.state.act === 'invite' && this.props.rooms.activeRoom} close={() => {
                 this.props.history.push({

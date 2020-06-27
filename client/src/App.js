@@ -3,6 +3,8 @@ import React from 'react'
 import './App.css'
 import {PageSettings} from './Pages/PageSettings'
 import 'react-toastify/dist/ReactToastify.css';
+import { MultiLang, withLang } from "react-multi-language";
+import Languages from './languages'
 
 // Partials
 import UserSidebar from './Partials/UserSidebar'
@@ -33,6 +35,7 @@ class App extends React.Component {
                     <div className="row">
                         {this.props.user.isAuth && <UserSidebar show={this.state.userHeader} />}
                         <AppRouter />
+                        <MultiLang lang={this.props.user.isAuth ? this.props.user.lang : 'en'}/>
                     </div>
                 </div>
             </PageSettings.Provider>

@@ -26,6 +26,8 @@ import { randomInteger } from '../../Controllers/FunctionsController'
 import Avatar from '../../Partials/User/Avatar';
 import ActionMenu from '../../Partials/ActionMenu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 const fabStyles = theme => ({
     root: {
@@ -124,7 +126,7 @@ class Room extends React.Component {
                         
                         <div className="theme-info">
                             <h2 className="theme-title">{this.props.rooms.activeRoom.title}</h2>
-                            <h3 className="theme-online-counter">{this.props.rooms.activeRoom.users.length + 1} online</h3>
+                            <h3 className="theme-online-counter">{this.props.rooms.activeRoom.users.length + 1} {this.props.langProps.online}</h3>
                         </div>
 
                         <CustomFab2 id={'dialog-more-actions-'+this.props.rooms.activeRoom._id} color="primary" size="small" aria-label="more">
@@ -132,26 +134,26 @@ class Room extends React.Component {
                         </CustomFab2>
                         <ActionMenu event="click" bottom={true} right={true} actions={
                         this.props.rooms.activeRoom.ownerId === this.props.user._id ? [
-                            {text: 'Invite friends', action: () => {
+                            {text: this.props.langProps.invite_friends, action: () => {
                                 this.props.history.push({
                                     search: '?act=invite'
                                 })
                             }},
                             {
-                                text: 'Edit room',
+                                text: this.props.langProps.edit_room,
                                 action: () => {
                                     this.props.history.push({
                                         search: '?act=editRoom'
                                     })
                                 }
                             },
-                            {text: 'Show investments', action: () => {
+                            {text: this.props.langProps.show_investments, action: () => {
                                 this.props.history.push({
                                     search: `?modal=investments`
                                 })
                             }},
                             {
-                                text: 'Delete room',
+                                text: this.props.langProps.delete_room,
                                 action: () => {
                                     this.props.history.push({
                                         search: '?act=deleteRoom'
@@ -160,13 +162,13 @@ class Room extends React.Component {
                             }
                         ] : [
                             {
-                                text: 'Invite friends', action: () => {
+                                text: this.props.langProps.invite_friends, action: () => {
                                     this.props.history.push({
                                         search: '?act=invite'
                                     })
                                 }
                             },
-                            {text: 'Show investments', action: () => {
+                            {text: this.props.langProps.show_investments, action: () => {
                                 this.props.history.push({
                                     search: `?modal=investments`
                                 })
@@ -176,7 +178,12 @@ class Room extends React.Component {
 
 
                     <div className="theme-sidebar">
-                        <Chat messages={this.props.rooms.activeRoom.dialog.messages} type="room" to={this.props.rooms.activeRoom.title} dialogId={this.props.rooms.activeRoom.dialog._id} roomId={this.props.rooms.activeRoom._id} />
+                        <Chat 
+                        messages={this.props.rooms.activeRoom.dialog.messages} 
+                        type="room" 
+                        to={this.props.rooms.activeRoom.title} 
+                        dialogId={this.props.rooms.activeRoom.dialog._id} 
+                        roomId={this.props.rooms.activeRoom._id} />
                     </div>
                 </div>
                 
@@ -215,4 +222,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Room))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Room)))

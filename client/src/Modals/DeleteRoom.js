@@ -7,6 +7,8 @@ import { connect } from 'react-redux'
 import {urlApi} from '../config'
 
 import { withRouter } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModalCreate = {
     overlay: {
@@ -58,10 +60,10 @@ class DeleteRoom extends React.Component {
             style={customStylesModalCreate}
             contentLabel="Delete room"
         >
-            <h2 className="modal-title" style={{width: '100%'}}>You sure?</h2>
+            <h2 className="modal-title" style={{width: '100%'}}>{this.props.langProps.you_sure}</h2>
             
-            <button className="button-blue" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>Back</button>
-            <button className="button-gray" onClick={() => {this.onSubmit()}} style={{width: 'max-content', marginTop: 5}}>Delete</button>
+            <button className="button-blue" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>
+            <button className="button-gray" onClick={() => {this.onSubmit()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.delete}</button>
         </Modal>
     }
 }
@@ -73,4 +75,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(DeleteRoom))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(DeleteRoom)))

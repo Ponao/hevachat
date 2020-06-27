@@ -11,6 +11,9 @@ import { bindActionCreators } from 'redux'
 import { withCookies } from 'react-cookie'
 
 import { withRouter } from 'react-router-dom';
+import ActionMenu from '../Partials/ActionMenu';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModal = {
     overlay: {
@@ -47,15 +50,26 @@ class Settings extends React.Component {
             isOpen={this.props.isOpen}
             onRequestClose={() => {this.props.close()}}
             style={customStylesModal}
-            contentLabel="Contacts"
+            contentLabel="Settings"
         >
-            <h2 className="modal-title">Settings</h2>
+            <h2 className="modal-title">{this.props.langProps.settings}</h2>
 
-            <p onClick={() => {
+            <p className="settings-item" onClick={() => {
+                this.props.history.push({
+                    search: '?modal=profile'
+                })
+            }}>{this.props.langProps.change_profile}</p>
+            <p className="settings-item" onClick={() => {
+                this.props.history.push({
+                    search: '?modal=language'
+                })
+            }}>{this.props.langProps.language}</p>
+
+            <p className="settings-item" onClick={() => {
                 const { cookies } = this.props;
                 cookies.remove("apiToken", { path: "/" });
                 window.location.reload()
-            }}>Logout</p>
+            }}>{this.props.langProps.logout}</p>
         </Modal>
     }
 }
@@ -73,4 +87,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withCookies(Settings))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(withCookies(Settings))))

@@ -10,6 +10,8 @@ import { CircularProgress } from '@material-ui/core';
 import NotificationItem from '../Partials/Notifications/NotificationItem'
 import * as notificationsActions from '../Redux/actions/notifications'
 import { bindActionCreators } from 'redux'
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 class Notifications extends React.Component {
     static contextType = PageSettings;
@@ -30,7 +32,7 @@ class Notifications extends React.Component {
         return (
             <> 
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar">
-                    <h2 className="sidebar-title">Notifications</h2>
+                    <h2 className="sidebar-title">{this.props.langProps.notifications}</h2>
 
                     <Scrollbars
                         ref={(ref) => {this.roomsBlock = ref}}
@@ -79,4 +81,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Notifications))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Notifications)))

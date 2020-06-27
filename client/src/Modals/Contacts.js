@@ -13,6 +13,8 @@ import { withRouter } from 'react-router-dom';
 import Friends from './contactsPartials/Friends';
 import Inbox from './contactsPartials/Inbox';
 import Outbox from './contactsPartials/Outbox';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModal = {
     overlay: {
@@ -55,12 +57,12 @@ class Contacts extends React.Component {
             style={customStylesModal}
             contentLabel="Contacts"
         >
-            <h2 className="modal-title">Contacts</h2>
+            <h2 className="modal-title">{this.props.langProps.contacts}</h2>
 
             <div className="contacts-tabs">
-                <span className={this.state.activeTab === 'friends' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'friends'})}}>Friends</span>
-                <span className={this.state.activeTab === 'inbox' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'inbox'})}}>Inbox</span>
-                <span className={this.state.activeTab === 'outbox' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'outbox'})}}>Outbox</span>
+                <span className={this.state.activeTab === 'friends' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'friends'})}}>{this.props.langProps.friends}</span>
+                <span className={this.state.activeTab === 'inbox' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'inbox'})}}>{this.props.langProps.inbox}</span>
+                <span className={this.state.activeTab === 'outbox' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'outbox'})}}>{this.props.langProps.outbox}</span>
             </div>
 
             {this.state.activeTab === 'friends' && <Friends onClick={(id) => {
@@ -95,4 +97,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts)))

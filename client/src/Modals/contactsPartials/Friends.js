@@ -15,6 +15,8 @@ import { NavLink, withRouter } from 'react-router-dom';
 import UserItem from '../../Partials/User/UserItem';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
+import languages from '../../languages';
+import { withLang } from 'react-multi-language';
 
 let waitSearch = false
 
@@ -67,7 +69,7 @@ class Contacts extends React.Component {
     
     render() {
         return <>
-            <input type="text" value={this.state.q} onChange={(e) => {this.onSearch(e)}} className="friends-search-input" placeholder="Search" />
+            <input type="text" value={this.state.q} onChange={(e) => {this.onSearch(e)}} className="friends-search-input" placeholder={this.props.langProps.search} />
 
             {!this.state.searchResult.length && !this.state.q.length && <Scrollbars
                 ref={(ref) => {this.roomsBlock = ref}}
@@ -94,7 +96,7 @@ class Contacts extends React.Component {
                 {(!this.props.users.friends.users.length && !this.props.users.friends.isFetching) && <div className="data-empty">
                     <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                    <p>You dont have friends, lets add him</p>
+                    <p>{this.props.langProps.you_dont_have_friends}</p>
                 </div>}
             </Scrollbars>}
 
@@ -123,7 +125,7 @@ class Contacts extends React.Component {
                 {(!this.state.searchResult.length) && <div className="data-empty">
                     <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                    <p>Users not found</p>
+                    <p>{this.props.langProps.users_not_found}</p>
                 </div>}
             </Scrollbars>}
         </>
@@ -143,4 +145,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts)))

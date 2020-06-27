@@ -49,6 +49,6 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
     }
 
     // Success: include decoded data in the request
-    res.locals.user = await User.findById(user.data.userId).select('+email').select('+roomLang').select("-friends")
+    res.locals.user = await User.findById(user.data.userId).select('+email').select('+lang').select('+roomLang').select("-friends")
     return next()
 }

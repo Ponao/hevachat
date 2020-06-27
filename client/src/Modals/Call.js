@@ -22,6 +22,8 @@ import MusicOffIcon from '@material-ui/icons/MusicOff';
 import VideocamOutlinedIcon from '@material-ui/icons/VideocamOutlined';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const fabCallStyles = theme => ({
     root: {
@@ -188,8 +190,8 @@ class CreateDialog extends React.Component {
         >
             {this.props.call.remoteStream && <MediaStream media={this.props.call.media} key={this.props.call.remoteStream.id+this.props.call.media} stream={this.props.call.remoteStream} />}
             {this.props.call.status !== 'exist' && <>
-                {(this.props.call.status === 'outcoming' || this.props.call.status === 'busy' || this.props.call.status === 'canceled') && <h2 style={{width: '100%'}} className="modal-title">Outcoming call</h2>}
-                {this.props.call.status === 'incoming' && <h2 style={{width: '100%'}} className="modal-title">Incoming call</h2>}
+                {(this.props.call.status === 'outcoming' || this.props.call.status === 'busy' || this.props.call.status === 'canceled') && <h2 style={{width: '100%'}} className="modal-title">{this.props.langProps.outcoming_call}</h2>}
+                {this.props.call.status === 'incoming' && <h2 style={{width: '100%'}} className="modal-title">{this.props.langProps.incoming_call}</h2>}
 
                 {this.props.call.media === 'audio' && <>
                     <Avatar 
@@ -199,7 +201,7 @@ class CreateDialog extends React.Component {
                     />
 
                     <p className="user-profile-name">{this.props.call.user.name.first} {this.props.call.user.name.last}</p>
-                    <p className="user-profile-city">Moscow</p>
+                    <p className="user-profile-city">{this.props.call.user.city ? this.props.call.user.city : this.props.langProps.not_indicated}</p>
                 </>}
 
                 {this.props.call.media === 'video' && <>
@@ -267,4 +269,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateDialog))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateDialog)))

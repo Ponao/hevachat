@@ -23,6 +23,8 @@ const UserSchema = new Schema({
   onlineAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now, select: false },
   friends: [{ type: Schema.Types.ObjectId, ref: 'Friend'}],
+  city: { type: String, default: '', select: true },
+  lang: { type: String, default: 'en', select: false },
   color: { type: String },
   buff: Buffer
 });

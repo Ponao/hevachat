@@ -11,15 +11,12 @@ import * as dialogsActions from '../../Redux/actions/dialogs'
 import { bindActionCreators } from 'redux'
 
 import Attachment from './Attachment';
-import Slider from './Slider'
 import InputMessage from './InputMessage'
 import ToolbarMessage from './ToolbarMessage'
 import SocketController from '../../Controllers/SocketController'
-import { randomInteger } from '../../Controllers/FunctionsController';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 
 let waitFastRead = false
-let waitDraft = false
 
 class Chat extends React.Component {
     constructor(props) {

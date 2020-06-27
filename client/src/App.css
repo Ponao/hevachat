@@ -1168,6 +1168,10 @@
     margin-bottom: 5px;
     width: 100%;
     text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0 2px;
 }
 
 .dialog-header .user-avatar {
@@ -1366,4 +1370,23 @@
         border: none;
         border-top: 1px #ededed solid;
     }
+}
+
+.settings-item {
+    display: flex;
+    width: 100%;
+    padding: 5px 60px;
+    color: #556677;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.settings-item:hover {
+    color: #008FF7;
+}
+
+.settings-item.active {
+    color: #008FF7;
+    cursor: default;
 }

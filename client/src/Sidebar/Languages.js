@@ -11,6 +11,8 @@ import { withRouter } from 'react-router-dom'
 import {urlApi} from '../config'
 import SocketController from '../Controllers/SocketController'
 import LanguageItem from '../Partials/Language/LanguageItem'
+import { withLang } from 'react-multi-language'
+import languages from '../languages'
 
 class Languages extends React.Component {
     static contextType = PageSettings;
@@ -47,14 +49,14 @@ class Languages extends React.Component {
         return (
             <> 
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar">
-                    <h2 className="sidebar-title">Language</h2>
+                    <h2 className="sidebar-title">{this.props.langProps.language}</h2>
 
                     <LanguageItem onClick={() => {
                         this.updateRoomLang('eng')
-                    }} title={'English'} />
+                    }} title={this.props.langProps.english} />
                     <LanguageItem onClick={() => {
                         this.updateRoomLang('rus')
-                    }} title={'Russian'} />
+                    }} title={this.props.langProps.russian} />
                 </div>
             </>
         )
@@ -74,4 +76,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Languages))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Languages)))

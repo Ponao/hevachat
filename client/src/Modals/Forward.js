@@ -17,6 +17,8 @@ import SocketController from '../Controllers/SocketController';
 import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModalInvite = {
     overlay: {
@@ -55,7 +57,7 @@ class CreateRoom extends React.Component {
             style={customStylesModalInvite}
             contentLabel="Forward messages"
         >
-            <h2 className="modal-title">Forward messages</h2>
+            <h2 className="modal-title">{this.props.langProps.forward}</h2>
 
             <Friends onClick={(id) => {
                 this.props.history.push(`/chats/${id}`)
@@ -77,4 +79,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom)))

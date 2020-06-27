@@ -16,6 +16,8 @@ import Outbox from './contactsPartials/Outbox';
 import Images from './investmentsPartials/Images';
 import Sounds from './investmentsPartials/Sounds';
 import Files from './investmentsPartials/Files';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModal = {
     overlay: {
@@ -58,12 +60,12 @@ class Contacts extends React.Component {
             style={customStylesModal}
             contentLabel="Contacts"
         >
-            <h2 className="modal-title">Investments</h2>
+            <h2 className="modal-title">{this.props.langProps.investments}</h2>
 
             <div className="contacts-tabs">
-                <span className={this.state.activeTab === 'images' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'images'})}}>Photos</span>
-                <span className={this.state.activeTab === 'sounds' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'sounds'})}}>Sounds</span>
-                <span className={this.state.activeTab === 'files' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'files'})}}>Files</span>
+                <span className={this.state.activeTab === 'images' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'images'})}}>{this.props.langProps.photos}</span>
+                <span className={this.state.activeTab === 'sounds' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'sounds'})}}>{this.props.langProps.sounds}</span>
+                <span className={this.state.activeTab === 'files' ? 'active' : ''} onClick={() => {this.setState({activeTab: 'files'})}}>{this.props.langProps.files}</span>
             </div>
 
             {this.state.activeTab === 'images' && <Images />}
@@ -86,4 +88,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts)))

@@ -17,6 +17,8 @@ import SocketController from '../Controllers/SocketController';
 import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModalInvite = {
     overlay: {
@@ -85,7 +87,7 @@ class CreateRoom extends React.Component {
             style={customStylesModalInvite}
             contentLabel="Create room"
         >
-            <h2 className="modal-title">Select users</h2>
+            <h2 className="modal-title">{this.props.langProps.select_users}</h2>
 
             <form style={{display: 'contents'}} onSubmit={(e) => {this.onSubmit(e)}}>
                 <Friends onClick={(id) => {
@@ -95,8 +97,8 @@ class CreateRoom extends React.Component {
                         this.setState({selectUsers: [...this.state.selectUsers.filter(x => x !== id)]})
                 }} type={'select'} selectUsers={this.state.selectUsers} />
 
-                {!this.state.selectUsers.length && <button className="button-gray" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>Back</button>}
-                {!!this.state.selectUsers.length && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 5}}>Invite</button>}
+                {!this.state.selectUsers.length && <button className="button-gray" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>}
+                {!!this.state.selectUsers.length && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.invite}</button>}
             </form>
         </Modal>
     }
@@ -115,4 +117,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom)))

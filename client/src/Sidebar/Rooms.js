@@ -22,6 +22,8 @@ import showLoading from '../Partials/Loading'
 import WarningIcon from '@material-ui/icons/Warning';
 import AppsIcon from '@material-ui/icons/Apps';
 import { withRouter } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const fabStyles = theme => ({
     root: {
@@ -82,7 +84,7 @@ class Rooms extends React.Component {
         return (
             <>
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar" style={{overflow: 'hidden'}}>
-                    <h2 className="sidebar-title">Rooms</h2>
+                    <h2 className="sidebar-title">{this.props.langProps.rooms}</h2>
 
                     <Scrollbars
                         ref={(ref) => {this.roomsBlock = ref}}
@@ -117,12 +119,12 @@ class Rooms extends React.Component {
                     {!this.props.rooms.isFetching && this.props.rooms.isError && <div className="data-empty">
                         <WarningIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                        <p>Что то пошло не так...</p>
+                        <p>{this.props.langProps.something_goes_wrong}</p>
 
                         <button onClick={() => {this.props.roomsActions.roomsGet(this.props.user.apiToken, this.props.user.roomLang)}} className="button-gray" type="submit" style={{width: 'max-content'}}>Retry</button>
                     </div>}
 
-                    <Tooltip title="Create room" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
+                    <Tooltip title={this.props.langProps.create_room} className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">
                         <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
                             this.props.history.push({
                                 search: "?act=newRoom"
@@ -150,4 +152,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Rooms))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Rooms)))

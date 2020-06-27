@@ -16,6 +16,8 @@ import {urlApi} from '../config'
 import SocketController from '../Controllers/SocketController';
 import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModal = {
     overlay: {
@@ -54,7 +56,7 @@ class CreateDialog extends React.Component {
             style={customStylesModal}
             contentLabel="Create room"
         >
-            <h2 className="modal-title">New chat</h2>
+            <h2 className="modal-title">{this.props.langProps.new_chat}</h2>
 
             <Friends onClick={(id) => {
                 this.props.history.push(`/chats/${id}`)
@@ -75,4 +77,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateDialog))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateDialog)))

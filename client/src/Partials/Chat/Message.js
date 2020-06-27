@@ -31,6 +31,8 @@ import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom';
 import store from '../../Redux/store';
 import { SLIDER_SET } from '../../Redux/constants';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 let ogsLink = false
 
@@ -152,7 +154,8 @@ class Message extends React.PureComponent {
                                 search: `?user=${this.props.message.user._id}`
                             })
                         }} className="user-name" style={{color: this.props.message.user._id === this.props.user._id ? '#FF3333' : ''}}>
-                            {`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span>
+                            {this.props.message.user._id !== this.props.user._id && <>{`${this.props.message.user.name.first} ${this.props.message.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span></>}
+                            {this.props.message.user._id === this.props.user._id && <>{`${this.props.user.name.first} ${this.props.user.name.last}`} <span className="time-at">{getHM(this.props.message.createdAt)}</span></>}                            
                         </h3>
                     }
 
@@ -172,7 +175,7 @@ class Message extends React.PureComponent {
                             {this.props.message.type === 'call' && <>
                                 {this.props.message.user._id === this.props.user._id && <CallMadeIcon style={{color: '#008FF7', fontSize: 20, marginRight: 8}} />}
                                 {this.props.message.user._id !== this.props.user._id && <CallReceivedIcon style={{color: '#008FF7', fontSize: 20, marginRight: 8}} />}
-                                {this.props.message.text}
+                                {this.props.langProps[this.props.message.text]}
                             </>}
                         </Linkify>
                     </p>}
@@ -319,4 +322,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Message))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Message)))

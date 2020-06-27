@@ -6,6 +6,7 @@
 
 const router = require('express').Router();
 const verifyToken = require('../middleware/verifyToken');
+const { check } = require('express-validator');
 const UserController = require('../controllers/UserController')
 
 // Get the user for this user
@@ -21,6 +22,17 @@ router.get('/get-requested', verifyToken, UserController.getRequested)
 router.get('/get-pending', verifyToken, UserController.getPending)
 router.post('/search', verifyToken, UserController.search)
 router.post('/upload-avatar', verifyToken, UserController.uploadAvatar)
+router.post('/edit', [
+    check('firstName')
+    .notEmpty().withMessage('first_name_not_empty')
+    .isString().withMessage('first_name_is_string')
+    .isLength({ min: 2 }).withMessage('first_name_is_min'),
+  check('lastName')
+    .notEmpty().withMessage('last_name_not_empty')
+    .isString().withMessage('last_name_is_string')
+    .isLength({ min: 2 }).withMessage('last_name_is_min'),
+], verifyToken, UserController.edit)
+router.post('/set-lang', verifyToken, UserController.setLang)
 // router.get('/load-friends', verifyToken, UserController.loadFriends)
 // router.get('/load-requested', verifyToken, UserController.loadRequested)
 // router.get('/load-pending', verifyToken, UserController.loadPending)

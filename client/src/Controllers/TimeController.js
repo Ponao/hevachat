@@ -1,3 +1,6 @@
+import languages from "../languages";
+import store from "../Redux/store";
+
 export function getHM(date) {
     var time = new Date(date)
 
@@ -15,6 +18,7 @@ export function getHM(date) {
 }
 
 export function timeAt(date) {
+    let lang = store.getState().user.lang
     var time = new Date(date)
 
     var day_diff = new Date().getDate() - time.getDate(),
@@ -31,32 +35,33 @@ export function timeAt(date) {
         );
 
     var arr=[
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
+        languages[lang].january,
+        languages[lang].february,
+        languages[lang].march,
+        languages[lang].april,
+        languages[lang].may,
+        languages[lang].june,
+        languages[lang].july,
+        languages[lang].august,
+        languages[lang].september,
+        languages[lang].october,
+        languages[lang].november,
+        languages[lang].december
     ];
 
     var r =
     ( 
         (
-            day_diff === 0 && 'Today'
+            day_diff === 0 && languages[lang].today
         )
-        || (day_diff === 1 && 'Yesterday')
+        || (day_diff === 1 && languages[lang].yerstaday)
         || (year_diff === 0 && day + ' ' + arr[month-1])
     );
     return r;
 }
 
 export function LastMessageDate(time) {
+    let lang = store.getState().user.lang
     var time = new Date(time)
 
     var hours = time.getHours()
@@ -84,18 +89,18 @@ export function LastMessageDate(time) {
         );
 
     var arr=[
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
+        languages[lang].jan,
+        languages[lang].feb,
+        languages[lang].mar,
+        languages[lang].apr,
+        languages[lang].may,
+        languages[lang].jun,
+        languages[lang].jul,
+        languages[lang].aug,
+        languages[lang].sep,
+        languages[lang].oct,
+        languages[lang].nov,
+        languages[lang].dec,
     ];
 
     var r =
@@ -104,7 +109,7 @@ export function LastMessageDate(time) {
             day_diff == 0 && 
             (hours + ':' +  minutes)
         )
-        || (day_diff === 1 && 'Yesterday')
+        || (day_diff === 1 && languages[lang].yerstaday)
         || (year_diff === 0 && day + ' ' + arr[month-1])
     );
 
@@ -112,6 +117,7 @@ export function LastMessageDate(time) {
 }
 
 export function OnlineDate(time) {
+    let lang = store.getState().user.lang
     var time = new Date(time)
 
     var hours = time.getHours()
@@ -144,16 +150,16 @@ export function OnlineDate(time) {
         (
             day_diff == 0 && 
             (
-                (diff < 60 && 'just now')
+                (diff < 60 && languages[lang].just_now)
                 || (diff < 120 && "1 " + 'minute' + " " + 'ago' + "")
                 || (diff < 3600 && Math.floor(diff / 60) + " " + 'minutes' + " " + 'ago' + "")
                 || (diff < 7200 && "1 " + 'hour' + " " + 'ago' + "")
                 || (diff < 86400 && Math.floor(diff / 3600) + " " + 'hours' + " " + 'ago')
             )
         )
-        || (day_diff == 1 && 'yerstaday' + " " + 'in' + " " + hours + ':' +  minutes)
-        || (day_diff < 7 && day_diff + " " + 'days' + " " + 'ago' + " " + 'in' + " " + hours + ':' +  minutes)
-        || (day_diff < 31 && Math.ceil(day_diff / 7) + " " + 'weeks' + " " + 'ago' + " " + 'in' + " " + hours + ':' +  minutes)
+        || (day_diff == 1 && languages[lang].yerstaday + " " + languages[lang].in + " " + hours + ':' +  minutes)
+        || (day_diff < 7 && day_diff + " " + 'days' + " " + 'ago' + " " + languages[lang].in + " " + hours + ':' +  minutes)
+        || (day_diff < 31 && Math.ceil(day_diff / 7) + " " + 'weeks' + " " + 'ago' + " " + languages[lang].in + " " + hours + ':' +  minutes)
     );
     return r;
 }

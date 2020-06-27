@@ -16,6 +16,8 @@ import { bindActionCreators } from 'redux'
 import { randomInteger } from '../../Controllers/FunctionsController';
 import { Button } from '@material-ui/core';
 import { LastMessageDate } from '../../Controllers/TimeController';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class NotificationItem extends React.Component {
     state = {
@@ -49,9 +51,9 @@ class NotificationItem extends React.Component {
                     }}>
                     <p className="user-name"><span>{`${this.props.notification.user.name.first} ${this.props.notification.user.name.last}`}</span></p>
                     
-                    {this.props.notification.type === 'invite' && <p className="last-message"><span className="notif-content">Invited you to the room&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></span></p>}
-                    {this.props.notification.type === 'accept' && <p className="last-message"><span className="notif-content">Accept your friend request</span></p>}
-                    {this.props.notification.type === 'request' && <p className="last-message"><span className="notif-content">Send you friend request</span></p>}
+                    {this.props.notification.type === 'invite' && <p className="last-message"><span className="notif-content">{this.props.langProps.invited_you_to_the_room}&nbsp;<span style={{color: '#008FF7'}}>{this.props.notification.room.title}</span></span></p>}
+                    {this.props.notification.type === 'accept' && <p className="last-message"><span className="notif-content">{this.props.langProps.accept_your_friend_request}</span></p>}
+                    {this.props.notification.type === 'request' && <p className="last-message"><span className="notif-content">{this.props.langProps.send_you_friend_request}</span></p>}
                 </div>
                 <div className="dialog-info">
                     <span className="time-at">{LastMessageDate(this.props.notification.createdAt)}</span>
@@ -79,4 +81,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(NotificationItem))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(NotificationItem)))

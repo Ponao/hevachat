@@ -19,6 +19,8 @@ import showLoading from '../Partials/Loading'
 import DialogItem from '../Partials/Dialog/DialogItem';
 import { withRouter } from 'react-router-dom';
 import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const fabStyles = theme => ({
     root: {
@@ -78,7 +80,7 @@ class Messages extends React.Component {
         return (
             <> 
                 <div className="col-xl-3 col-lg-6 col-md-6 sidebar" style={{overflow: 'hidden'}}>
-                    <h2 className="sidebar-title">Chats</h2>
+                    <h2 className="sidebar-title">{this.props.langProps.chats}</h2>
 
                     <Scrollbars
                         ref={(ref) => {this.messagesBlock = ref}}
@@ -135,4 +137,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Messages))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Messages)))

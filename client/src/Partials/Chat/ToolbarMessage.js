@@ -6,6 +6,8 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import CloseIcon from '@material-ui/icons/Close';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import Button from '@material-ui/core/Button';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import ReplyIcon from '@material-ui/icons/Reply';
 
 // Redux
 import { connect } from 'react-redux'
@@ -19,11 +21,11 @@ class ToolbarMessage extends React.Component {
         return (
             <div className="dialog-input">
                 <Button className="btn-reply" onClick={() => {this.props.addAttachmentRecentMessage()}}>
-                    Reply
+                    <ReplyIcon style={{color: '#99AABB'}} />
                 </Button>
 
                 <Button className="btn-forward" onClick={() => {this.props.addAttachmentForwardMessage()}}>
-                    Forward
+                    <ArrowForwardIcon style={{color: '#99AABB'}} />
                 </Button>
 
                 <div className="col">

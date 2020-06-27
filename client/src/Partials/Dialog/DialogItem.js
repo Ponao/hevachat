@@ -21,6 +21,8 @@ import { bindActionCreators } from 'redux'
 
 import ActionMenu from '../ActionMenu'
 import { randomInteger } from '../../Controllers/FunctionsController';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class DialogItem extends React.Component {
     state = {
@@ -49,8 +51,8 @@ class DialogItem extends React.Component {
                     }}>
                         <p className="user-name"><span>{`${this.props.user.name.first} ${this.props.user.name.last}`}</span></p>
                         {!this.props.typing && <p className="last-message">
-                            {this.props.lastMessage.user._id === this.props.myUser._id && <span style={{color: '#999999'}}>You:&nbsp;</span>}
-                            {this.props.lastMessage.text && <span className="content">{this.props.lastMessage.text}</span>}
+                            {this.props.lastMessage.user._id === this.props.myUser._id && <span style={{color: '#999999'}}>{this.props.langProps.you}:&nbsp;</span>}
+                            {this.props.lastMessage.text && <span className="content">{this.props.lastMessage.type === 'call' ? this.props.langProps[this.props.lastMessage.text] : this.props.lastMessage.text}</span>}
                             
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length === 1 && 
@@ -59,7 +61,7 @@ class DialogItem extends React.Component {
 
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length > 1 && 
-                                <><span  className="content" style={{color: '#008FF7'}}>Фотографии [{this.props.lastMessage.images.length}]</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>{this.props.langProps.photos} [{this.props.lastMessage.images.length}]</span></>
                             }
 
                             {!this.props.lastMessage.text && 
@@ -71,7 +73,7 @@ class DialogItem extends React.Component {
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             this.props.lastMessage.sounds.length > 1 &&
-                                <><span className="content" style={{color: '#008FF7'}}>Аудио [{this.props.lastMessage.sounds.length}]</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>{this.props.langProps.sounds} [{this.props.lastMessage.sounds.length}]</span></>
                             }
 
                             {!this.props.lastMessage.text && 
@@ -85,7 +87,7 @@ class DialogItem extends React.Component {
                             !this.props.lastMessage.images.length && 
                             !this.props.lastMessage.sounds.length &&
                             this.props.lastMessage.files.length > 1 &&
-                                <><span className="content" style={{color: '#008FF7'}}>Файлы [{this.props.lastMessage.files.length}]</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>{this.props.langProps.files} [{this.props.lastMessage.files.length}]</span></>
                             }
 
                             {!this.props.lastMessage.text && 
@@ -143,4 +145,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(DialogItem))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(DialogItem)))

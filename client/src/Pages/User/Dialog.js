@@ -22,6 +22,8 @@ import CallIcon from '@material-ui/icons/Call';
 import { withStyles } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ActionMenu from '../../Partials/ActionMenu'
+import { withLang } from 'react-multi-language'
+import languages from '../../languages'
 
 const fabStyles = theme => ({
     root: {
@@ -118,7 +120,7 @@ class Dialog extends React.PureComponent {
                     }}>
                         <p className="user-name">{`${dialog.user.name.first} ${dialog.user.name.last}`}</p>
                         {!dialog.user.online && <p className="last-message">{OnlineDate(dialog.user.onlineAt)}</p>}
-                        {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>online</p>}
+                        {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>{this.props.langProps.online}</p>}
                     </div></>
 
                     {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CallFab color="primary" size="small" aria-label="call" onClick={() => {
@@ -131,7 +133,7 @@ class Dialog extends React.PureComponent {
                         <MoreVertIcon style={{color: '#008FF7'}} />
                     </CustomFab>
                     <ActionMenu event="click" bottom={true} right={true} actions={[
-                        {text: 'Show investments', action: () => {
+                        {text: this.props.langProps.show_investments, action: () => {
                             this.props.history.push({
                                 search: `?modal=investments`
                              })
@@ -158,7 +160,7 @@ class Dialog extends React.PureComponent {
                         <div className="data-empty">
                             <SearchIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                            <p>User not found</p>
+                            <p>{this.props.langProps.user_not_found}</p>
                         </div>
                     </div>
                 </>}     
@@ -183,4 +185,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Dialog))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Dialog)))

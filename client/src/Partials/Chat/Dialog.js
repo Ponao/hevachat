@@ -93,9 +93,6 @@ class Dialog extends React.Component {
 
         if(this.messagesBlock) {
             this.messagesBlock.view.scrollTop = 100000
-            setTimeout(() => {
-                this.messagesBlock.view.scrollTop = 100000
-            }, 300);
         }
     }
 

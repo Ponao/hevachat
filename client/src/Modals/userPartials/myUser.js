@@ -20,6 +20,8 @@ import { NavLink, withRouter } from 'react-router-dom';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import PermMediaOutlinedIcon from '@material-ui/icons/PermMediaOutlined';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 const fabStyles = theme => ({
     root: {
@@ -64,7 +66,7 @@ class MyUser extends React.Component {
             </label>
 
             <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
-            <p className="user-profile-city">Moscow</p>
+            <p className="user-profile-city">{this.props.user.city ? this.props.user.city : this.props.langProps.not_indicated}</p>
             
             <div className="user-btn">
                 <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
@@ -74,7 +76,7 @@ class MyUser extends React.Component {
                 }}>
                     <SettingsOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
-                <p>Settings</p>
+                <p>{this.props.langProps.settings}</p>
             </div>
 
             <div className="user-btn">
@@ -85,7 +87,7 @@ class MyUser extends React.Component {
                 }}>
                     <BookOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
-                <p>Contacts</p>
+                <p>{this.props.langProps.contacts}</p>
             </div>
         </>
     }
@@ -105,4 +107,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(MyUser))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(MyUser)))

@@ -25,6 +25,8 @@ import Avatar from '../../Partials/User/Avatar';
 import { NavLink, withRouter } from 'react-router-dom';
 import store from '../../Redux/store';
 import { SLIDER_SET } from '../../Redux/constants';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 const fabStyles = theme => ({
     root: {
@@ -65,7 +67,7 @@ class OtherUser extends React.Component {
                 /></span>
 
                 <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
-                <p className="user-profile-city">Moscow</p>
+                <p className="user-profile-city">{this.props.user.city ? this.props.user.city : this.props.langProps.not_indicated}</p>
                 
                 <>
                     <div className="user-btn">
@@ -77,7 +79,7 @@ class OtherUser extends React.Component {
                                 <ChatBubbleOutlineOutlinedIcon style={{color: '#99AABB'}} />
                             </CustomFab>
                         </NavLink>
-                        <p>Message</p>
+                        <p>{this.props.langProps.message}</p>
                     </div>    
 
                     {this.props.call.status === 'none' && <div className="user-btn">
@@ -88,7 +90,7 @@ class OtherUser extends React.Component {
                                 <CallIcon style={{color: '#99AABB'}} />
                             </CustomFab>
                         </NavLink>
-                        <p>Call</p>
+                        <p>{this.props.langProps.call}</p>
                     </div>}
 
                     {this.props.user.friendStatus === 0 && <div className="user-btn">
@@ -97,7 +99,7 @@ class OtherUser extends React.Component {
                         }}>
                             <PersonAddOutlinedIcon style={{color: '#99AABB'}} />
                         </CustomFab>
-                        <p>+ Friend</p>
+                        <p>{this.props.langProps.plus_friend}</p>
                     </div>}
 
                     {this.props.user.friendStatus === 2 && <div className="user-btn">
@@ -106,7 +108,7 @@ class OtherUser extends React.Component {
                         }}>
                             <CheckOutlinedIcon style={{color: '#99AABB'}} />
                         </CustomFab>
-                        <p>Accept</p>
+                        <p>{this.props.langProps.accept}</p>
                     </div>}
 
                     {(this.props.user.friendStatus === 2 || this.props.user.friendStatus === 1) && <div className="user-btn">
@@ -115,7 +117,7 @@ class OtherUser extends React.Component {
                         }}>
                             <CloseOutlinedIcon style={{color: '#99AABB'}} />
                         </CustomFab>
-                        <p>Decline</p>
+                        <p>{this.props.langProps.decline}</p>
                     </div>}
 
                     {this.props.user.friendStatus === 3 && <div className="user-btn">
@@ -124,7 +126,7 @@ class OtherUser extends React.Component {
                         }}>
                             <DeleteOutlineOutlinedIcon style={{color: '#99AABB'}} />
                         </CustomFab>
-                        <p>Remove</p>
+                        <p>{this.props.langProps.remove}</p>
                     </div>}
                 </>
             </>
@@ -146,4 +148,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(OtherUser))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(OtherUser)))

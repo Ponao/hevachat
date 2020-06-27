@@ -17,7 +17,7 @@ import { withRouter } from 'react-router-dom';
 
 class UserSidebar extends React.Component {
     state = {
-        activeTab: 'languages'
+        activeTab: this.props.history.location.pathname.substring(1,5) === 'chat' ? 'messages' : this.props.user.roomLang ? 'rooms' : 'languages'
     }
 
     render() {

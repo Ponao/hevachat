@@ -9,6 +9,12 @@ import SendIcon from '@material-ui/icons/Send';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
+
+const PlaceHolder = withLang(languages)((props) => {
+    return <div className="placeholder">{props.langProps.write_message}</div>
+})
 
 class InputMessage extends React.Component {
     state = {
@@ -96,7 +102,7 @@ class InputMessage extends React.Component {
                     value={this.state.text}
                 ></textarea>
 
-                {!this.state.text && <div className="placeholder">Write message...</div>}
+                {!this.state.text && <PlaceHolder />}
 
                 {!this.props.isEdit && <CSSTransitionGroup 
                     transitionName="btn-send-message"

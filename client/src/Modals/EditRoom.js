@@ -16,6 +16,8 @@ import {urlApi} from '../config'
 import SocketController from '../Controllers/SocketController';
 import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModalCreate = {
     overlay: {
@@ -98,7 +100,7 @@ class CreateRoom extends React.Component {
             style={customStylesModalCreate}
             contentLabel="Edit room"
         >
-            <h2 className="modal-title">Edit room</h2>
+            <h2 className="modal-title">{this.props.langProps.edit_room}</h2>
 
             <form style={{display: 'contents'}} onSubmit={(e) => {this.onSubmit(e)}}>
                 <input 
@@ -107,11 +109,11 @@ class CreateRoom extends React.Component {
                     className="input-field" 
                     type="text"
                     style={{marginBottom: 10}} 
-                    placeholder="Title"
+                    placeholder={this.props.langProps.title}
                     maxLength={50}
                 />
                 {this.state.errors.find(value => value.param === 'title') && <span className="input-error-label">
-                    {this.state.errors.find(value => value.param === 'title').msg} 
+                    {this.props.langProps[this.state.errors.find(value => value.param === 'title').msg]} 
                 </span>}
 
                 <FormControlLabel 
@@ -122,14 +124,14 @@ class CreateRoom extends React.Component {
                         />
                     }
                     style={{color: '#667788'}}
-                    label="Private theme"
+                    label={this.props.langProps.private_room}
                 />
 
                 {this.state.title === this.props.rooms.activeRoom.title && this.state.isPrivate === this.props.rooms.activeRoom.isPrivate && <button className="button-gray" onClick={() => {
                     this.props.close()
-                }} style={{width: 'max-content', marginTop: 5}}>Back</button>}
+                }} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>}
 
-                {(this.state.title !== this.props.rooms.activeRoom.title || this.state.isPrivate !== this.props.rooms.activeRoom.isPrivate) && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 5}}>Save</button>}
+                {(this.state.title !== this.props.rooms.activeRoom.title || this.state.isPrivate !== this.props.rooms.activeRoom.isPrivate) && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.save}</button>}
             </form>
         </Modal>
     }
@@ -148,4 +150,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateRoom)))

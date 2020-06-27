@@ -8,6 +8,7 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 const Dialog = require('../models/Dialog');
 const Friend = require('../models/Friends')
+const { validationResult } = require("express-validator");
 const Notification = require('../models/Notification');
 const mongoose = require("../database");
 const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification} = require('./SocketController')
@@ -481,6 +482,43 @@ module.exports = {
             } else {
 
             }         
+
+            res.json({ error: false }); 
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    edit: async (req, res, next) => {
+        const { user } = res.locals;
+        const { firstName, lastName, city } = req.body;
+
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ error: true, errors: errors.array() });
+            }
+
+            user.name.first = firstName
+            user.name.last = lastName
+            user.city = city
+
+            await user.save()
+
+            res.json({ error: false }); 
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    setLang: async (req, res, next) => {
+        const { user } = res.locals;
+        const { lang } = req.body;
+
+        try {
+            user.lang = lang
+
+            await user.save()
 
             res.json({ error: false }); 
         } catch (e) {
