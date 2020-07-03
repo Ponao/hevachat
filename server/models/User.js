@@ -24,6 +24,7 @@ const UserSchema = new Schema({
   createdAt: { type: Date, default: Date.now, select: false },
   friends: [{ type: Schema.Types.ObjectId, ref: 'Friend'}],
   city: { type: String, default: '', select: true },
+  role: { type: String, default: 'user', select: false },
   lang: { type: String, default: 'en', select: false },
   color: { type: String },
   buff: Buffer

@@ -13,8 +13,6 @@ import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
 import {urlApi} from '../config'
 
-import SocketController from '../Controllers/SocketController';
-import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../languages';

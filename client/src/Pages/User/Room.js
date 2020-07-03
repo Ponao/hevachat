@@ -14,15 +14,15 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Chat from '../../Partials/Chat/Chat'
 import RoomJoinError from '../../Modals/RoomJoinError'
 import IconButton from '@material-ui/core/IconButton';
+import MicOffIcon from '@material-ui/icons/MicOff';
 
 import MicIcon from '@material-ui/icons/Mic';
 import Fab from '@material-ui/core/Fab';
-import { withStyles } from '@material-ui/core'
+import { withStyles, Tooltip } from '@material-ui/core'
 import WebRtcController from '../../Controllers/WebRtcController'
 import SocketController from '../../Controllers/SocketController'
 import MusicOffIcon from '@material-ui/icons/MusicOff';
 import CallEndIcon from '@material-ui/icons/CallEnd';
-import { randomInteger } from '../../Controllers/FunctionsController'
 import Avatar from '../../Partials/User/Avatar';
 import ActionMenu from '../../Partials/ActionMenu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -61,23 +61,26 @@ const fabStylesCustom = theme => ({
 
 const CustomFab2 = withStyles(fabStylesCustom)(Fab);
 
-class Members extends React.Component {
-    render() {
-        return <Scrollbars
-            renderTrackVertical={props => <div className="track-vertical"/>}
-            renderThumbVertical={props => <div className="thumb-vertical"/>}
-            className="theme-members scroll"
-            autoHide
-        >
-            {this.props.users.map((user, index) => 
-                <div key={index} className="member">
-                    <Avatar avatarStyle={{borderRadius: 0}} avatar={user.avatar ? user.avatar : false} name={user.name.first.charAt(0)+user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${user.color})`}}  />
-                    {user.speaking && <span className="speaking"></span>}
-                </div>
-            )}
-        </Scrollbars>
-    }
-}
+const Members = withRouter((props) => {
+    return <Scrollbars
+        renderTrackVertical={() => <div className="track-vertical"/>}
+        renderThumbVertical={() => <div className="thumb-vertical"/>}
+        className="theme-members scroll"
+        autoHide
+    >
+        {props.users.map((user, index) => 
+            <div key={index} style={{cursor: 'pointer'}} className="member" onClick={() => {
+                props.history.push({
+                    search: `?user=${user._id}`
+                })
+            }}>
+                <Avatar avatarStyle={{borderRadius: 0}} avatar={user.avatar ? user.avatar : false} name={user.name.first.charAt(0)+user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${user.color})`}}  />
+                {user.speaking && <span className="speaking"></span>}
+                <span className="user-name">{user.name.first} {user.name.last}</span>
+            </div>
+        )}
+    </Scrollbars>
+})
 
 class MediaStream extends React.PureComponent {
     componentDidMount() {
@@ -139,6 +142,11 @@ class Room extends React.Component {
                                     search: '?act=invite'
                                 })
                             }},
+                            {text: this.props.langProps.show_investments, action: () => {
+                                this.props.history.push({
+                                    search: `?modal=investments`
+                                })
+                            }},
                             {
                                 text: this.props.langProps.edit_room,
                                 action: () => {
@@ -147,11 +155,6 @@ class Room extends React.Component {
                                     })
                                 }
                             },
-                            {text: this.props.langProps.show_investments, action: () => {
-                                this.props.history.push({
-                                    search: `?modal=investments`
-                                })
-                            }},
                             {
                                 text: this.props.langProps.delete_room,
                                 action: () => {
@@ -192,9 +195,12 @@ class Room extends React.Component {
                     {this.props.rooms.activeRoom && <Members users={this.props.rooms.activeRoom.users} />}
 
                     <div className="media-options">
-                        <CustomFab className={`media-option ${this.props.media.micOn ? 'active' : ''}`} onClick={() => {WebRtcController.toggleMicrophone()}}>
+                        {!!this.props.rooms.activeRoom.muted && <Tooltip title={`Blocked to ${new Date(this.props.rooms.activeRoom.muted.date).toLocaleString()}`} placement="top"><CustomFab className={`media-option reject`}>
+                            <MicOffIcon style={{color: '#fff'}} />
+                        </CustomFab></Tooltip>}
+                        {!this.props.rooms.activeRoom.muted && <CustomFab className={`media-option ${this.props.media.micOn ? 'active' : ''}`} onClick={() => {WebRtcController.toggleMicrophone()}}>
                             <MicIcon style={{color: this.props.media.micOn ? '#fff' : '#008FF7'}} />
-                        </CustomFab>
+                        </CustomFab>}
                         <CustomFab className={`media-option ${this.props.media.musicOn ? '' : 'active'}`} onClick={() => {WebRtcController.toggleMusic()}}>
                             <MusicOffIcon style={{color: this.props.media.musicOn ? '#008FF7' : '#fff'}} />
                         </CustomFab>

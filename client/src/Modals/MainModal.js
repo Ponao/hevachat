@@ -1,8 +1,5 @@
 // App
 import React from 'react'
-import {urlApi} from '../config'
-
-import SocketController from '../Controllers/SocketController';
 import { withRouter } from 'react-router-dom';
 import CreateRoom from './CreateRoom';
 import qs from 'qs'
@@ -21,12 +18,16 @@ import Investments from './Investments';
 import Settings from './Settings';
 import Profile from './Profile';
 import Language from './Language';
+import Mute from './Mute';
+import Unmute from './Unmute';
 
 class MainModal extends React.Component {
     state = {
         act: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).act,
         user: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).user,
         modal: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).modal,
+        mute: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).mute,
+        unmute: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).unmute,
     }
 
     componentDidMount() {
@@ -35,6 +36,8 @@ class MainModal extends React.Component {
                 act: qs.parse(location.search, { ignoreQueryPrefix: true }).act,
                 user: qs.parse(location.search, { ignoreQueryPrefix: true }).user,
                 modal: qs.parse(location.search, { ignoreQueryPrefix: true }).modal,
+                mute: qs.parse(location.search, { ignoreQueryPrefix: true }).mute,
+                unmute: qs.parse(location.search, { ignoreQueryPrefix: true }).unmute,
             })
         })
     }
@@ -54,6 +57,18 @@ class MainModal extends React.Component {
             }} />
 
             {this.state.user && <User userId={this.state.user} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.mute && this.props.user.role !== 'user' && <Mute userId={this.state.mute} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.unmute && this.props.user.role !== 'user' && <Unmute userId={this.state.unmute} close={() => {
                 this.props.history.push({
                     search: ""
                 })

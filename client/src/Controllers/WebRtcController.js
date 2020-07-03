@@ -1,4 +1,4 @@
-import adapter from 'webrtc-adapter'
+import 'webrtc-adapter'
 import SocketController from './SocketController';
 import store from '../Redux/store';
 import { ROOMS_SET_REMOTE_STREAM, MEDIA_TOGGLE_MICROPHONE, MEDIA_TOGGLE_MUSIC, CALL_SET_REMOTE_STREAM, MEDIA_TOGGLE_CAMERA, CALL_SET_MEDIA } from '../Redux/constants';
@@ -19,7 +19,7 @@ const isEdge = !isIE && !!window.StyleMedia;
 
 const RTCPC = RTCPeerConnection || window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 const RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.RTCSessionDescription;
-const RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
+// const RTCIceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 
 const mediaConstraintsCall = {
     offerToReceiveAudio: true,
@@ -103,10 +103,6 @@ function getUserMedia(media, callback) {
                     createEmptyStream(callback)
             }
         );
-    }
-
-    function onerror(e) {
-        console.log(JSON.stringify(e, null, '\t'));
     }
 }
 

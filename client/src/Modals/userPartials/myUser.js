@@ -1,6 +1,5 @@
 // App
 import React from 'react'
-import Modal from 'react-modal';
 
 // Material
 import Fab from '@material-ui/core/Fab';
@@ -12,13 +11,10 @@ import { connect } from 'react-redux'
 import * as usersActions from '../../Redux/actions/users'
 import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
-import {urlApi} from '../../config'
 
-import SocketController from '../../Controllers/SocketController';
 import Avatar from '../../Partials/User/Avatar';
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
-import PermMediaOutlinedIcon from '@material-ui/icons/PermMediaOutlined';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';

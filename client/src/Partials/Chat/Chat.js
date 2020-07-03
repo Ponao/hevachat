@@ -254,12 +254,15 @@ class Chat extends React.Component {
 
         this.state.recentMessages[0].images.map((x, i) => {
             x.id = i
+            return 1
         })
         this.state.recentMessages[0].sounds.map((x, i) => {
             x.id = i
+            return 1
         })
         this.state.recentMessages[0].files.map((x, i) => {
             x.id = i
+            return 1
         })
 
         this.setState({
@@ -278,12 +281,15 @@ class Chat extends React.Component {
 
         lastMyMessage.images.map((x, i) => {
             x.id = i
+            return 1
         })
         lastMyMessage.sounds.map((x, i) => {
             x.id = i
+            return 1
         })
         lastMyMessage.files.map((x, i) => {
             x.id = i
+            return 1
         })
 
         if(lastMyMessage) {
@@ -582,7 +588,6 @@ class Chat extends React.Component {
                     isEdit={this.state.isEdit}
                     editMessage={this.state.editMessage}
                     sendEditMessage={(text) => {this.sendEditMessage(text)}}
-                    cancelEditMessage={() => {this.cancelEditMessage()}}
                     images={this.state.images} 
                     sounds={this.state.sounds} 
                     files={this.state.files} 

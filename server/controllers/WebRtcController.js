@@ -68,7 +68,7 @@ function acceptCall(myId, userId, socketId) {
     }
 }
 
-function addUserRoom(roomId, userId, socketId) {
+function addUserRoom(roomId, userId, socketId, muted) {
     if(!Rooms[roomId])
         Rooms[roomId] = {_id: roomId, users: {}, composite: null, MediaPipeline: null}
     
@@ -76,7 +76,8 @@ function addUserRoom(roomId, userId, socketId) {
         _id: userId,
         socketId,
         webRtcEndpoint: false,
-        hubPort: false
+        hubPort: false,
+        muted: !!muted
     }
 }
 
@@ -197,11 +198,13 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                         try {
                             Rooms[roomId].users[userId].hubPort = hubPort
 
-                            Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
-                                if (error) {
-                                    return callback(error);
-                                }
-                            })
+                            if(!Rooms[roomId].users[userId].muted) {
+                                Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+                                    if (error) {
+                                        return callback(error);
+                                    }
+                                })
+                            }
 
                             Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
                                 if (error) {
@@ -309,6 +312,26 @@ function stopCall(socketId, userId, stopUserCall, io, reject = false) {
     }
 }
 
+function muteUserRoom(roomId, userId) {
+    if(Rooms[roomId] && Rooms[roomId].users[userId] && Rooms[roomId].users[userId].webRtcEndpoint && Rooms[roomId].users[userId].hubPort)
+        Rooms[roomId].users[userId].webRtcEndpoint.disconnect(Rooms[roomId].users[userId].hubPort, "AUDIO")
+
+    // Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
+    //     if (error) {
+    //         return callback(error);
+    //     }
+    // })
+}
+
+function unmuteUserRoom(roomId, userId) {
+    if(Rooms[roomId] && Rooms[roomId].users[userId] && Rooms[roomId].users[userId].webRtcEndpoint && Rooms[roomId].users[userId].hubPort)
+        Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+            if (error) {
+                return callback(error);
+            }
+        })
+}
+
 module.exports = {
     roomOnIceCandidate,
     roomOfferSdp,
@@ -321,5 +344,7 @@ module.exports = {
     stopCall,
     checkBusy,
     acceptCall,
-    checkIncominmgCall
+    checkIncominmgCall,
+    muteUserRoom,
+    unmuteUserRoom
 }

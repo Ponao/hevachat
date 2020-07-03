@@ -61,15 +61,12 @@ module.exports = {
             select: ['_id', 'name', 'online', 'color', 'onlineAt']
         },
         {
-            path: 'messages'
-        },
-        {
             path: 'lastMessage',
             populate: {
                 path: 'user'
             }
         },
-    ]).sort({updatedAt: 'DESC'});
+    ]).sort({updatedAt: 'DESC'}).limit(20);
 
     let noReadCount = 0
 
@@ -131,15 +128,12 @@ module.exports = {
                 select: ['_id', 'name', 'online', 'color', 'onlineAt']
             },
             {
-                path: 'messages'
-            },
-            {
                 path: 'lastMessage',
                 populate: {
                     path: 'user'
                 }
             },
-        ]).sort({updatedAt: 'DESC'});
+        ]).sort({updatedAt: 'DESC'}).limit(20);
 
         let noReadCount = 0
 

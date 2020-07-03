@@ -294,6 +294,14 @@ function deleteRoom({roomId, lang}) {
     io.to(`language.${lang}`).emit('deleteRoom', roomId)
 }
 
+function muteRoom({roomId, muted, userId}) {
+    io.to(`user.${userId}`).emit('muteRoom', {roomId, muted})
+}
+
+function unmuteRoom({roomId, userId}) {
+    io.to(`user.${userId}`).emit('unmuteRoom', roomId)
+}
+
 // Chat dialog
 function sendMessageDialog({userId, socketId, otherId, message}) {
     if(userId != otherId) {
@@ -392,5 +400,7 @@ module.exports = {
     deleteRoom,
     stopUserCall,
     sendUserCall,
-    sendUserAcceptCall
+    sendUserAcceptCall,
+    muteRoom,
+    unmuteRoom
 }

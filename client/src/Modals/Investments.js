@@ -10,9 +10,6 @@ import * as usersActions from '../Redux/actions/users'
 import { bindActionCreators } from 'redux'
 
 import { withRouter } from 'react-router-dom';
-import Friends from './contactsPartials/Friends';
-import Inbox from './contactsPartials/Inbox';
-import Outbox from './contactsPartials/Outbox';
 import Images from './investmentsPartials/Images';
 import Sounds from './investmentsPartials/Sounds';
 import Files from './investmentsPartials/Files';

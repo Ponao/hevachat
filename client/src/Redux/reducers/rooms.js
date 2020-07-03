@@ -1,8 +1,6 @@
 import { 
     ROOMS_GET,
     ROOMS_ADD,
-    ROOMS_DELETE,
-    ROOMS_EDIT,
     ROOMS_JOIN_ROOM,
     ROOMS_LEAVE_ROOM,
     ROOMS_USER_JOIN_ROOM,
@@ -27,7 +25,9 @@ import {
     ROOMS_GET_ERROR,
     ROOMS_EDIT_ROOM,
     ROOMS_EDIT_IN_ROOM,
-    ROOMS_DELETE_ROOM
+    ROOMS_DELETE_ROOM,
+    ROOMS_PRELOAD,
+    ROOMS_SET_MUTED
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -35,14 +35,17 @@ const INITIAL_STATE = {
     getted: false,
     activeRoom: false,
     isError: false,
-    rooms: []
+    rooms: [],
+    canLoad: false
 }
 
 const rooms = (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case ROOMS_GET: {
-            return { ...state, rooms: action.payload, isFetching: false, getted: true }
+            return { ...state, rooms: action.payload, isFetching: false, getted: true, canLoad: action.payload.length === 20 }
         }
+        case ROOMS_PRELOAD:
+            return { ...state, rooms: [ ...state.rooms, ...action.payload ], canLoad: action.payload.length === 20 }
         case ROOMS_SET_GET: {
             return { ...state, isFetching: true, getted: false, isError: false }
         }
@@ -58,7 +61,9 @@ const rooms = (state = INITIAL_STATE, action) => {
         case ROOMS_DELETE_ROOM:
             return { ...state, rooms: [...state.rooms.filter(room => room._id !== action.payload)] }
         case ROOMS_JOIN_ROOM:
-            return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false, remoteStream: false} }
+            return { ...state, activeRoom: {...action.payload.room, typers: [], canLoad: action.payload.canLoad, isLoading: false, remoteStream: false, muted: action.payload.muted} }
+        case ROOMS_SET_MUTED:
+            return { ...state, activeRoom: {...state.activeRoom, muted: action.payload} }
         case ROOMS_JOIN_ERROR:
             return { ...state, activeRoom: { error: action.payload } }
         case ROOMS_USER_LEAVE_IN_ROOM:

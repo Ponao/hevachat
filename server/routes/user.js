@@ -21,6 +21,7 @@ router.get('/get-friends', verifyToken, UserController.getFriends)
 router.get('/get-requested', verifyToken, UserController.getRequested)
 router.get('/get-pending', verifyToken, UserController.getPending)
 router.post('/search', verifyToken, UserController.search)
+router.post('/get-mute', verifyToken, UserController.getMute)
 router.post('/upload-avatar', verifyToken, UserController.uploadAvatar)
 router.post('/edit', [
     check('firstName')

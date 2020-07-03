@@ -33,7 +33,6 @@ const fabStyles = theme => ({
         width: 36,
         height: 36,
         boxShadow: 'none!important',
-        marginLeft: 'auto',
         marginRight: '14px',
         '&:hover': {
             backgroundColor: '#25D441',
@@ -123,22 +122,24 @@ class Dialog extends React.PureComponent {
                         {dialog.user.online && <p className="last-message" style={{color: '#35E551'}}>{this.props.langProps.online}</p>}
                     </div></>
 
-                    {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CallFab color="primary" size="small" aria-label="call" onClick={() => {
-                        this.props.callActions.call(dialog.user, this.props.user.apiToken)
-                    }}>
-                        <CallIcon style={{color: '#fff'}} />
-                    </CallFab>}
-
-                    <CustomFab id={'dialog-more-actions-'+dialog._id} color="primary" size="small" aria-label="more">
-                        <MoreVertIcon style={{color: '#008FF7'}} />
-                    </CustomFab>
-                    <ActionMenu event="click" bottom={true} right={true} actions={[
-                        {text: this.props.langProps.show_investments, action: () => {
-                            this.props.history.push({
-                                search: `?modal=investments`
-                             })
-                        }},
-                    ]} from={'dialog-more-actions-'+dialog._id} />
+                    <div style={{marginLeft: 'auto'}}>
+                        {dialog.user._id !== this.props.user._id && this.props.call.status === 'none' && <CallFab color="primary" size="small" aria-label="call" onClick={() => {
+                            this.props.callActions.call(dialog.user, this.props.user.apiToken)
+                        }}>
+                            <CallIcon style={{color: '#fff'}} />
+                        </CallFab>}
+                        
+                        <CustomFab id={'dialog-more-actions-'+dialog._id} color="primary" size="small" aria-label="more">
+                            <MoreVertIcon style={{color: '#008FF7'}} />
+                        </CustomFab>
+                        <ActionMenu event="click" bottom={true} right={true} actions={[
+                            {text: this.props.langProps.show_investments, action: () => {
+                                this.props.history.push({
+                                    search: `?modal=investments`
+                                })
+                            }},
+                        ]} from={'dialog-more-actions-'+dialog._id} />
+                    </div>
                 </div>
                 <div className="col-xl-9 col-lg-6 col-md-6" style={{order: 4}}>
                     <Chat 

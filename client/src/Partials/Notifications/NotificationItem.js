@@ -2,10 +2,9 @@
 import React from 'react'
 
 import Avatar from '../User/Avatar'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { CSSTransitionGroup } from 'react-transition-group';
 import '../../Css/Partials/RoomItem.css'
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 // Material
 import { connect } from 'react-redux';

@@ -8,11 +8,7 @@ import Modal from 'react-modal';
 import { connect } from 'react-redux'
 import * as usersActions from '../Redux/actions/users'
 import { bindActionCreators } from 'redux'
-import {urlApi} from '../config'
-
-import SocketController from '../Controllers/SocketController';
-import Avatar from '../Partials/User/Avatar';
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import OtherUser from './userPartials/otherUser';
 import MyUser from './userPartials/myUser';
 import { CircularProgress } from '@material-ui/core';

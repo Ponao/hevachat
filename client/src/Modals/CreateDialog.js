@@ -2,18 +2,10 @@
 import React from 'react'
 import Modal from 'react-modal';
 
-// Material
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { withStyles } from '@material-ui/core/styles';
-
 // Redux
 import { connect } from 'react-redux'
 import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
-import {urlApi} from '../config'
-
-import SocketController from '../Controllers/SocketController';
 import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';

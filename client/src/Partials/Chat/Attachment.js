@@ -9,7 +9,8 @@ import Button from '@material-ui/core/Button';
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 
-import { Scrollbars } from 'react-custom-scrollbars';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 const componentDecorator = (href, text, key) => (
     <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
@@ -30,19 +31,18 @@ class Attachment extends React.Component {
                         <h3 className="user-name">{`${this.props.recentMessages[0].user.name.first} ${this.props.recentMessages[0].user.name.last}`} <span className="time-at">{getHM(this.props.recentMessages[0].createdAt)}</span></h3>
                         <p className="message-text"><Linkify componentDecorator={componentDecorator}>{
                             this.props.recentMessages[0].text ? 
-                            this.props.recentMessages[0].text : `Вложения [${
+                            this.props.recentMessages[0].text : `${this.props.langProps.investments} [${
                                 this.props.recentMessages[0].images.length+
                                 this.props.recentMessages[0].files.length+
                                 this.props.recentMessages[0].sounds.length+
                                 this.props.recentMessages[0].recentMessages.length
-
                             }]`
                         }</Linkify></p>
                     </div>}
 
                     {this.props.recentMessages.length > 1 &&<div className="col message-recent">
-                        <h3 className="user-name">Attachment messages</h3>
-                        <p className="message-text">{`${this.props.recentMessages.length} messages`}</p>
+                        <h3 className="user-name">{this.props.langProps.attachment_messages}</h3>
+                        <p className="message-text">{`${this.props.langProps.messages} [${this.props.recentMessages.length}]`}</p>
                     </div>}
                 </div>}
 
@@ -89,4 +89,4 @@ class Attachment extends React.Component {
     }
 }
 
-export default Attachment
+export default withLang(languages)(Attachment)

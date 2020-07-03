@@ -930,6 +930,15 @@
     position: relative;
 }
 
+.member .user-name {
+    position: absolute;
+    left: 20px;
+    bottom: 15px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+}
+
 .member .speaking {
     position: absolute;
     background-color: #35E551;

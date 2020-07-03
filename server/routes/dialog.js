@@ -21,5 +21,6 @@ router.post('/delete-message', verifyToken, DialogController.deleteMessage);
 // router.post('/read-messages', verifyToken, DialogController.readMessages);
 router.post('/edit-message', verifyToken, DialogController.editMessage);
 router.post('/load-messages', verifyToken, DialogController.loadMessage);
+router.post('/load', verifyToken, DialogController.load)
 
 module.exports = router;

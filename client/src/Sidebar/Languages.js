@@ -32,6 +32,8 @@ class Languages extends React.Component {
 
         SocketController.joinLang(lang)
 
+        this.props.onClick()
+
         fetch(`${urlApi}/api/user/update-room-lang`, {
             method: "post",
             headers: {

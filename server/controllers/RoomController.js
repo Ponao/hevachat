@@ -6,13 +6,14 @@
 
 const Room = require('../models/Room');
 const Dialog = require('../models/Dialog');
+const Limit = require('../models/Limit');
 const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const { validationResult } = require("express-validator");
 const Investment = require('../models/Investment');
 
-const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom} = require('./SocketController')
-const {getUserExistById, addUserRoom} = require('./WebRtcController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom} = require('./SocketController')
+const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom} = require('./WebRtcController')
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -20,7 +21,7 @@ module.exports = {
         const { lang } = req.body;
 
         try {
-            const rooms = await Room.find({lang: lang}).populate('users').sort({createdAt: 'DESC'});
+            const rooms = await Room.find({lang: lang}).populate('users').sort({createdAt: 'DESC'}).limit(20);
 
             return res.json(rooms);
         } catch (e) {
@@ -50,7 +51,14 @@ module.exports = {
             }
             
             let room = await Room.findOne({_id: id}).populate('users').populate('dialog');
-                
+            let muted = await Limit.findOne({room: room._id, userId: user._id, type: 'mute', date: {$gte: new Date()}})
+            
+            if(muted) {
+                muted = {numDate: muted.numDate, date: muted.date}
+            } else {
+                muted = false
+            }
+
             if(room === null) {
                 const err = {};
                 err.param = `all`;
@@ -75,7 +83,7 @@ module.exports = {
                 err.msg = `have_active_call`;
                 return res.status(401).json({ error: true, errors: [err] });
             } else {
-                addUserRoom(room._id, user._id, socketId)
+                addUserRoom(room._id, user._id, socketId, muted)
             }
 
             let result = await Message.updateMany({"isRead": false, "dialogId": room.dialog._id, 'user': { "$ne": user._id }}, {"$set":{"isRead": true}})
@@ -111,9 +119,50 @@ module.exports = {
                 .sort({createdAt: 'DESC'})
                 .limit(50)
         
-            return res.json(room);
+            return res.json({room, muted});
         } catch (e) {
             return next(new Error(e));
+        }
+    },
+
+    load: async (req, res, next) => {
+        const { user } = res.locals;
+        const { lastRoomId, lang } = req.body;
+
+        try {
+            const rooms = await Room.find({ _id: { $lt: lastRoomId}, lang: lang})
+            .populate('users')
+            .sort({createdAt: 'DESC'})
+            .limit(20);
+
+            return res.json(rooms);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    search: async (req, res, next) => {
+        const { user } = res.locals;
+        const { q } = req.body;
+
+        let searchFirst = false
+        let searchLast = false
+        let search = false
+
+        try {
+            let search = new RegExp(q, 'ig')
+
+            let rooms = false
+            
+            if(search)
+                rooms = await Room.find(
+                    {'$or': [{'title': search}]}
+                )
+
+            if(rooms)
+                return res.json(rooms);
+        } catch (err) {
+            return next(new Error(err));
         }
     },
 
@@ -761,7 +810,55 @@ module.exports = {
         } catch(e) {
             return next(new Error(e));
         }
-    }
+    },
+
+    mute: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId, time } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                await Limit.deleteOne({userId: userId, room: {_id: roomId}, type: 'mute'})
+
+                let limit = new Limit()
+                limit.userId = userId
+                limit.room = await Room.findOne({_id: roomId})
+                limit.date = new Date(Date.now() + time*1000)
+                limit.numDate = time
+                limit.type = 'mute'
+                await limit.save()
+
+                let muted  = {numDate: limit.numDate, date: limit.date}
+
+                muteUserRoom(roomId, userId)
+                muteRoom({roomId, muted, userId})
+                return res.json({error: false});
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
+
+    unmute: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                await Limit.deleteOne({userId: userId, room: {_id: roomId}, type: 'mute'})
+
+                unmuteUserRoom(roomId, userId)
+                unmuteRoom({roomId, userId})
+                return res.json({error: false});
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
 }
 
 function randomInteger(min, max) {

@@ -7,14 +7,15 @@ import {
     ROOMS_SUCCESS_MESSAGE,
     ROOMS_ERROR_MESSAGE,
     ROOMS_EDIT_MESSAGE,
-    ROOMS_READ_MESSAGE,
     ROOMS_JOIN_ERROR,
     ROOMS_DELETE_MESSAGE,
     ROOMS_READ_MESSAGES,
     ROOMS_LOAD_MESSAGES,
     ROOMS_SET_LOADING,
     ROOMS_GET_ERROR,
-    ROOMS_SET_GET
+    ROOMS_SET_GET,
+    ROOMS_PRELOAD,
+    ROOMS_SET_MUTED
 } from '../constants'
 import SocketController from '../../Controllers/SocketController';
 import store from '../store';
@@ -22,6 +23,8 @@ import WebRtcController from '../../Controllers/WebRtcController'
 import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
 import {urlApi} from '../../config'
 import { toast } from 'react-toastify';
+
+let unmuteTimer = false
 
 export const roomsGet = (apiToken, lang) => (dispatch) => {
     dispatch({
@@ -62,6 +65,36 @@ export const roomsAdd = room => (dispatch) => {
     })
 }
 
+export const roomsLoad = (apiToken, lang) => (dispatch) => {
+    if(store.getState().rooms.canLoad) {
+        dispatch({
+            type: ROOMS_PRELOAD,
+            payload: []
+        })
+
+        fetch(`${urlApi}/api/room/load`, {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiToken}`,
+            },
+            body: JSON.stringify({
+                lastRoomId: store.getState().rooms.rooms[store.getState().rooms.rooms.length-1]._id,
+                firstRoomId: store.getState().rooms.rooms[0]._id,
+                lang
+            })
+        })
+        .then((response) => response.json())
+        .then((rooms) => {
+            dispatch({
+                type: ROOMS_PRELOAD,
+                payload: rooms
+            })
+        })
+    }
+}
+
 export const joinRoom = ({id, apiToken}) => (dispatch) => {
     fetch(`${urlApi}/api/room/get`, {
             method: "post",
@@ -76,7 +109,7 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
             })
         })
         .then(response => response.json())
-        .then(room => {
+        .then(({room, muted}) => {
             if(room.error) {
                 setForceTitle('Error')
 
@@ -92,14 +125,34 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
 
             room.users.map(x => {
                 x.speaking = false
+                return 1
             })
 
             setForceTitle(room.title)
 
             dispatch({
                 type: ROOMS_JOIN_ROOM,
-                payload: {room, canLoad: room.dialog.messages.length === 50}
+                payload: {room, canLoad: room.dialog.messages.length === 50, muted}
             })
+
+            if(unmuteTimer) {
+                clearTimeout(unmuteTimer)
+            }
+
+            if(muted && (new Date(muted.date).getTime() - new Date().getTime()) <= 86400000) {
+                unmuteTimer = setTimeout(() => {
+                    if(store.getState().rooms.activeRoom && 
+                    store.getState().rooms.activeRoom._id === room._id && 
+                    !!store.getState().rooms.activeRoom.muted && 
+                    store.getState().rooms.activeRoom.muted.date === muted.date) {
+                        store.dispatch({
+                            type: ROOMS_SET_MUTED,
+                            payload: false
+                        })
+                    }
+                    // console.log(unmuteTimer)
+                }, (new Date(muted.date).getTime() - new Date().getTime()) );
+            }
             
             SocketController.joinRoom({roomId: room._id, lang: room.lang})
 
@@ -177,6 +230,7 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages
@@ -286,6 +340,7 @@ export const editMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages
@@ -339,6 +394,7 @@ export const deleteMessage = ({roomId, deleteMessages}, apiToken) => (dispatch) 
     let messageIds = []
     deleteMessages.map(m => {
         messageIds.push(m._id)
+        return 1
     })
 
     dispatch({
@@ -410,6 +466,7 @@ export const retrySendMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages

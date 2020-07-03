@@ -19,10 +19,7 @@ module.exports = {
             const dialogs = await Dialog.find({'users': {'$all': [user._id]}}).populate([
                 {
                     path: 'users',
-                    select: ['_id', 'name', 'online', 'color']
-                },
-                {
-                    path: 'messages'
+                    select: ['_id', 'name', 'online', 'onlineAt', 'color']
                 },
                 {
                     path: 'lastMessage',
@@ -30,7 +27,7 @@ module.exports = {
                         path: 'user'
                     }
                 },
-            ]).sort({updatedAt: 'DESC'});
+            ]).sort({updatedAt: 'DESC'}).limit(20);
 
             return res.json(dialogs);
         } catch (e) {
@@ -64,7 +61,7 @@ module.exports = {
             let dialog = await Dialog.findOne({'users': query}).populate([
                 {
                     path: 'users',
-                    select: ['_id', 'name', 'online', 'color']
+                    select: ['_id', 'name', 'online', 'onlineAt', 'color']
                 },
                 {
                     path: 'messages'
@@ -116,12 +113,36 @@ module.exports = {
         }
     },
 
+    load: async (req, res, next) => {
+        const { user } = res.locals;
+        let { lastDialogId, firstDialogId } = req.body;
+
+        try {
+            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}, _id: { $gt: lastDialogId, $lt: firstDialogId }}).populate([
+                {
+                    path: 'users',
+                    select: ['_id', 'name', 'online', 'color', 'onlineAt']
+                },
+                {
+                    path: 'lastMessage',
+                    populate: {
+                        path: 'user'
+                    }
+                },
+            ]).sort({updatedAt: 'ASC'}).limit(20);
+
+            return res.json(dialogs);
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
     sendMessage: async (req, res, next) => {
         const { user } = res.locals;
         let { userId, text, socketId, recentMessages } = req.body;
         
         try {
-            let query = {'$all': [user._id, userId]}
+            let query = userId == user._id ? {'$eq': [user._id]} : {'$all': [user._id, userId]}
             let dialog = await Dialog.findOne({'users': query}).populate('lastMessage')
             const dialogId = String(dialog._id)
 

@@ -2,9 +2,9 @@
 import React from 'react'
 
 // Router
-import {
-    BrowserRouter as Router,
-} from "react-router-dom"
+// import {
+//     BrowserRouter as Router,
+// } from "react-router-dom"
 
 class NoMatch extends React.Component {
     render() {

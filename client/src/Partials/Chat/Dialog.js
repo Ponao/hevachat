@@ -8,9 +8,11 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import SendIcon from '@material-ui/icons/Send';
 import Fab from '@material-ui/core/Fab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { withStyles, LinearProgress, CircularProgress } from '@material-ui/core'
+import { withStyles, CircularProgress } from '@material-ui/core'
 
 import { connect } from 'react-redux';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 // Internet Explorer 6-11
 const isIE = /*@cc_on!@*/false || !!document.documentMode;
@@ -197,12 +199,12 @@ class Dialog extends React.Component {
                     })}
 
                     {this.props.type === 'room' && <div className="dialog-typers">
-                        {!!this.props.rooms.activeRoom.typers.length && <p className="typing">{this.viewTypers()} typing</p>}
+                        {!!this.props.rooms.activeRoom.typers.length && <p className="typing">{this.viewTypers()} {this.props.langProps.typing}</p>}
                         {!this.props.rooms.activeRoom.typers.length && <p style={{height: 18}}></p>}
                     </div>}
 
                     {this.props.type === 'dialog' && <div className="dialog-typers">
-                        {this.props.typing && <p className="typing">{this.props.userName} typing</p>}
+                        {this.props.typing && <p className="typing">{this.props.userName} {this.props.langProps.typing}</p>}
                         {!this.props.typing && <p style={{height: 18}}></p>}
                     </div>}
                 </Scrollbars>
@@ -224,7 +226,7 @@ class Dialog extends React.Component {
                 {(!this.props.messages.length && !this.props.loading) && <div className="data-empty">
                     <SendIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                    <p>Write your first message to {this.props.to}</p>
+                    <p>{this.props.langProps.write_your_first_message} {this.props.to}</p>
                 </div>}
             </div>  
         )
@@ -238,4 +240,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(Dialog)
+export default withLang(languages)(connect(mapStateToProps)(Dialog))

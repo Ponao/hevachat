@@ -26,6 +26,14 @@ class Audio extends React.Component {
 
         let audio = document.getElementById(this.state.randomId)
 
+        audio.onpause = () => {
+            audio.parentElement.className = 'message-sound'
+        }
+
+        audio.onplay = () => {
+            audio.parentElement.className = 'message-sound active'
+        }
+
         audio.onloadedmetadata = () => {
             this.getDuration()
         }
@@ -52,8 +60,8 @@ class Audio extends React.Component {
         if(audioDurationInterval)
             this.stopTimer()
 
-        if(this.state.audio) {
-            this.state.audio.parentElement.className = 'message-sound'
+        if(document.getElementsByName(this.props.src)) {
+            document.getElementsByName(this.props.src).className = 'message-sound'
             this.state.audio.pause()
         }
     }
@@ -65,15 +73,13 @@ class Audio extends React.Component {
         
         this.stopTimer()
 
-        for (let audio of otherAudio) { 
-            audio.parentElement.className = 'message-sound'
+        for (let audio of otherAudio) {
             audio.pause()
         }
 
         let thisAudio = document.getElementsByName(this.props.src)
 
         for(let audio of thisAudio) {
-            audio.parentElement.className = 'message-sound active'
             audio.play()
         }
 
@@ -133,7 +139,6 @@ class Audio extends React.Component {
         let thisAudio = document.getElementsByName(this.props.src)
 
         for(let audio of thisAudio) {
-            audio.parentElement.className = 'message-sound'
             audio.pause()
         }
     }

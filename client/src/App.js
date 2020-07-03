@@ -3,8 +3,7 @@ import React from 'react'
 import './App.css'
 import {PageSettings} from './Pages/PageSettings'
 import 'react-toastify/dist/ReactToastify.css';
-import { MultiLang, withLang } from "react-multi-language";
-import Languages from './languages'
+import { MultiLang } from "react-multi-language";
 
 // Partials
 import UserSidebar from './Partials/UserSidebar'

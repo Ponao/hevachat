@@ -4,7 +4,7 @@ import Avatar from '../User/Avatar'
 import { getHM, timeAt } from '../../Controllers/TimeController'
 import { CSSTransitionGroup } from 'react-transition-group';
 import MessageComponent from './Message'
-import ogs from 'ts-open-graph-scraper'
+// import ogs from 'ts-open-graph-scraper'
 
 // Material
 import CheckIcon from '@material-ui/icons/Check';
@@ -33,8 +33,9 @@ import store from '../../Redux/store';
 import { SLIDER_SET } from '../../Redux/constants';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
+// import urlMetadata from 'url-metadata'
 
-let ogsLink = false
+// let ogsLink = false
 
 const componentDecorator = (href, text, key) => {
     // ogsLink = ogs({url: href}, (error, results, response) => {
@@ -42,10 +43,12 @@ const componentDecorator = (href, text, key) => {
     //     console.log('results:', results); // This contains all of the Open Graph results
     //     console.log('response:', response); // This contains the HTML of page
     // })
-
+    // urlMetadata(href).then((metadata) => {
+    //     console.log(metadata)
+    // })
     return (
         <a href={href} onClick={(e) => {e.stopPropagation()}} key={key} target="_blank" rel="noopener noreferrer">
-        {text}
+            {text}
         </a>
     )
 };

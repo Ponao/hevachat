@@ -2,7 +2,6 @@ import io from 'socket.io-client'
 import store from '../Redux/store'
 import {
     ROOMS_ADD,
-    ROOMS_JOIN_ROOM,
     ROOMS_USER_JOIN_ROOM,
     ROOMS_USER_LEAVE_ROOM,
     ROOMS_ADD_MESSAGE,
@@ -37,13 +36,15 @@ import {
     ROOMS_DELETE_ROOM,
     CALL_SET_USER,
     CALL_SET_STATUS,
-    CALL_SET_MEDIA
+    CALL_SET_MEDIA,
+    ROOMS_SET_MUTED
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
 
 let socket = null
 let activeLang = false
+let unmuteTimer = false
 
 export default { 
     init: (apiToken) => {
@@ -588,6 +589,46 @@ export default {
                     type: CALL_SET_MEDIA,
                     payload: media
                 })
+            }
+        })
+
+        socket.on('muteRoom', ({roomId, muted}) => {
+            if(store.getState().rooms.activeRoom && store.getState().rooms.activeRoom._id === roomId) {
+                store.dispatch({
+                    type: ROOMS_SET_MUTED,
+                    payload: muted
+                })
+
+                if(unmuteTimer) {
+                    clearTimeout(unmuteTimer)
+                }
+
+                if((muted.numDate*1000) <= 86400000) {
+                    unmuteTimer = setTimeout(() => {
+                        if(store.getState().rooms.activeRoom && 
+                        store.getState().rooms.activeRoom._id === roomId && 
+                        !!store.getState().rooms.activeRoom.muted && 
+                        store.getState().rooms.activeRoom.muted.date === muted.date) {
+                            store.dispatch({
+                                type: ROOMS_SET_MUTED,
+                                payload: false
+                            })
+                        }
+                    }, muted.numDate*1000);
+                }
+            }
+        })
+
+        socket.on('unmuteRoom', roomId => {
+            if(store.getState().rooms.activeRoom && store.getState().rooms.activeRoom._id === roomId) {
+                store.dispatch({
+                    type: ROOMS_SET_MUTED,
+                    payload: false
+                })
+
+                if(unmuteTimer) {
+                    clearTimeout(unmuteTimer)
+                }
             }
         })
     },

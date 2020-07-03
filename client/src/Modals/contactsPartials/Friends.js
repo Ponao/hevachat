@@ -1,6 +1,5 @@
 // App
 import React from 'react'
-import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
@@ -11,7 +10,7 @@ import { connect } from 'react-redux'
 import * as usersActions from '../../Redux/actions/users'
 import { bindActionCreators } from 'redux'
 
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import UserItem from '../../Partials/User/UserItem';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';

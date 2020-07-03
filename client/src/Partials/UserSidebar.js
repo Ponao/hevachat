@@ -62,7 +62,7 @@ class UserSidebar extends React.Component {
                 {this.state.activeTab === 'messages' && <Messages />}
                 {this.state.activeTab === 'rooms' && <Rooms />}
                 {this.state.activeTab === 'notifications' && <Notifications />}
-                {this.state.activeTab === 'languages' && <Languages />}
+                {this.state.activeTab === 'languages' && <Languages onClick={() => {this.setState({activeTab: 'rooms'})}} />}
             </>
         )
     }

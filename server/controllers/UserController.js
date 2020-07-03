@@ -7,6 +7,7 @@
 const User = require('../models/User');
 const Message = require('../models/Message');
 const Dialog = require('../models/Dialog');
+const Limit = require('../models/Limit');
 const Friend = require('../models/Friends')
 const { validationResult } = require("express-validator");
 const Notification = require('../models/Notification');
@@ -28,15 +29,12 @@ module.exports = {
                     select: ['_id', 'name', 'online', 'color', 'onlineAt']
                 },
                 {
-                    path: 'messages'
-                },
-                {
                     path: 'lastMessage',
                     populate: {
                         path: 'user'
                     }
                 },
-            ]).sort({updatedAt: 'DESC'});
+            ]).sort({updatedAt: 'DESC'}).limit(20);
 
             let noReadCount = 0
 
@@ -180,6 +178,39 @@ module.exports = {
                 return res.json(users);
         } catch (err) {
             return next(new Error(err));
+        }
+    },
+
+    getMute: async(req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                let limits = await Limit.find({userId: userId, type: 'mute'}).populate('room')
+
+                // let limit = new Limit()
+                // limit.userId = userId
+                // limit.roomId = roomId
+                // limit.date = new Date(Date.now() + time*1000)
+                // limit.numDate = time
+                // limit.type = 'mute'
+                // await limit.save()
+
+                // let muted  = {numDate: limit.numDate, date: limit.date}
+
+                // muteUserRoom(roomId, userId)
+                // muteRoom({roomId, muted, userId})
+                if(!limits) {
+                    limits = []
+                }
+
+                return res.json(limits);
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
         }
     },
 

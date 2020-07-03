@@ -60,7 +60,7 @@ class Notifications extends React.Component {
                     {!this.props.notifications.isFetching &&!this.props.notifications.notifications.length && <div className="data-empty">
                         <NotificationsNoneIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                        <p>Here will placed your notifications</p>
+                        <p>{this.props.langProps.here_wiil_placed_your_notifications}</p>
                     </div>}
                 </div>
             </>

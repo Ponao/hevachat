@@ -151,7 +151,6 @@ const customStylesModalActiveFullScreen = {
         padding               : '20px 0',
         position: 'unset',
         alignItems: 'center',
-        justifyContent: 'center',
         justifyItems: 'center',
         alignContent: 'center',
     }

@@ -1,5 +1,4 @@
 import { 
-    USERS_GET,
     USERS_ADD,
     USERS_SET_ACTIVE_USER_ID,
     USERS_SET_FRIEND_STATUS,

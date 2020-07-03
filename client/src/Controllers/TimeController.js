@@ -60,22 +60,21 @@ export function timeAt(date) {
     return r;
 }
 
-export function LastMessageDate(time) {
+export function LastMessageDate(timeR) {
     let lang = store.getState().user.lang
-    var time = new Date(time)
+    var time = new Date(timeR)
 
     var hours = time.getHours()
     var minutes = time.getMinutes()
 
-    if (minutes.toString().length == 1) {
+    if (minutes.toString().length === 1) {
         minutes = "0" + minutes;
     }
-    if (hours.toString().length == 1) {
+    if (hours.toString().length === 1) {
         hours = "0" + hours;
     }
 
-    var diff = (((new Date()).getTime() - time.getTime()) / 1000),
-        day_diff = new Date().getDate() - time.getDate(),
+    var day_diff = new Date().getDate() - time.getDate(),
         year_diff = new Date().getFullYear() - time.getFullYear();
     var year = time.getFullYear(),
         month = time.getMonth()+1,
@@ -106,7 +105,7 @@ export function LastMessageDate(time) {
     var r =
     ( 
         (
-            day_diff == 0 && 
+            day_diff === 0 && 
             (hours + ':' +  minutes)
         )
         || (day_diff === 1 && languages[lang].yerstaday)
@@ -116,17 +115,17 @@ export function LastMessageDate(time) {
     return r;
 }
 
-export function OnlineDate(time) {
+export function OnlineDate(timeR) {
     let lang = store.getState().user.lang
-    var time = new Date(time)
+    var time = new Date(timeR)
 
     var hours = time.getHours()
     var minutes = time.getMinutes()
 
-    if (minutes.toString().length == 1) {
+    if (minutes.toString().length === 1) {
         minutes = "0" + minutes;
     }
-    if (hours.toString().length == 1) {
+    if (hours.toString().length === 1) {
         hours = "0" + hours;
     }
 
@@ -141,25 +140,25 @@ export function OnlineDate(time) {
         return (
             year.toString()+'.'
             +((month<10) ? '0'+month.toString() : month.toString())+'.'
-            +((day<10) ? '0'+day.toString() +  " " + 'in' + " " + hours + ':' +  minutes : day.toString() +  " " + 'in' + " " + hours + ':' +  minutes)
+            +((day<10) ? '0'+day.toString() + ' in ' + hours + ':' +  minutes : day.toString() + ' in ' + hours + ':' +  minutes)
         );
     
         
     var r =
     ( 
         (
-            day_diff == 0 && 
+            day_diff === 0 && 
             (
                 (diff < 60 && languages[lang].just_now)
-                || (diff < 120 && "1 " + 'minute' + " " + 'ago' + "")
-                || (diff < 3600 && Math.floor(diff / 60) + " " + 'minutes' + " " + 'ago' + "")
-                || (diff < 7200 && "1 " + 'hour' + " " + 'ago' + "")
-                || (diff < 86400 && Math.floor(diff / 3600) + " " + 'hours' + " " + 'ago')
+                || (diff < 120 && '1 minute ago')
+                || (diff < 3600 && Math.floor(diff / 60) + 'minutes ago')
+                || (diff < 7200 && '1 hour ago')
+                || (diff < 86400 && Math.floor(diff / 3600) + 'hours ago')
             )
         )
-        || (day_diff == 1 && languages[lang].yerstaday + " " + languages[lang].in + " " + hours + ':' +  minutes)
-        || (day_diff < 7 && day_diff + " " + 'days' + " " + 'ago' + " " + languages[lang].in + " " + hours + ':' +  minutes)
-        || (day_diff < 31 && Math.ceil(day_diff / 7) + " " + 'weeks' + " " + 'ago' + " " + languages[lang].in + " " + hours + ':' +  minutes)
+        || (day_diff === 1 && languages[lang].yerstaday + languages[lang].in + hours + ':' +  minutes)
+        || (day_diff < 7 && day_diff + 'days ago' + languages[lang].in + hours + ':' +  minutes)
+        || (day_diff < 31 && Math.ceil(day_diff / 7) + 'weeks ago' + languages[lang].in + hours + ':' +  minutes)
     );
     return r;
 }

@@ -1,6 +1,5 @@
 import { 
     USERS_ADD,
-    USERS_GET,
     USERS_SET_ACTIVE_USER_ID,
     USERS_SET_FRIEND_STATUS,
     USERS_SET,
@@ -54,6 +53,7 @@ export const friendsGet = (apiToken) => (dispatch) => {
         
         friends.map(user => {
             users.push(user.recipient)
+            return 1
         })
 
         dispatch({
@@ -78,6 +78,7 @@ export const requestedGet = (apiToken) => (dispatch) => {
         
         friends.map(user => {
             users.push(user.recipient)
+            return 1
         })
 
         dispatch({
@@ -102,6 +103,7 @@ export const pendingGet = (apiToken) => (dispatch) => {
         
         friends.map(user => {
             users.push(user.recipient)
+            return 1
         })
 
         dispatch({

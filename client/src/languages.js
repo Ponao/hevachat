@@ -91,7 +91,14 @@ export default {
         in: 'в',
         yerstaday: 'вчера',
         today: 'сегодня',
-        just_now: 'только что'
+        just_now: 'только что',
+        here_wiil_placed_your_notifications: 'Здесь будут находиться ваши уведомления',
+        create_your_first_room: 'Создайте свою первую комнату в этом языке',
+        you_dont_have_chats: 'У вас нет чатов, давайте создадим его',
+        write_your_first_message: 'Напишите свое первое сообщение для',
+        typing: 'печатает',
+        attachment_messages: 'Прикрепленные сообщения',
+        messages: 'Сообщения'
     },
     en: {
         settings: 'Settings',
@@ -185,6 +192,13 @@ export default {
         in: 'in',
         yerstaday: 'yerstaday',
         today: 'Today',
-        just_now: 'just now'
+        just_now: 'just now',
+        here_wiil_placed_your_notifications: 'Here will placed your notifications',
+        create_your_first_room: 'Create your first room in this language',
+        you_dont_have_chats: 'You dont have chats, lets create new',
+        write_your_first_message: 'Write your first message to',
+        typing: 'typing',
+        attachment_messages: 'Attachment messages',
+        messages: 'Messages'
     }
 }

@@ -7,7 +7,7 @@ class Avatar extends React.Component {
     render() {
         return (
             <div className="user-avatar" style={this.props.style}>
-                {this.props.avatar && <img src={this.props.avatar.min} style={this.props.avatarStyle} className="user-avatar-image" />}
+                {this.props.avatar && <img alt={this.props.name} src={this.props.avatar.min} style={this.props.avatarStyle} className="user-avatar-image" />}
                 <span>{this.props.name.toUpperCase()}</span>
                 {this.props.online && <span className="online-status"></span>}
 

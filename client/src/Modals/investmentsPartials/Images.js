@@ -1,6 +1,5 @@
 // App
 import React from 'react'
-import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
@@ -8,11 +7,8 @@ import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 
 // Redux
 import { connect } from 'react-redux'
-import * as usersActions from '../../Redux/actions/users'
-import { bindActionCreators } from 'redux'
 
-import { NavLink, withRouter } from 'react-router-dom';
-import UserItem from '../../Partials/User/UserItem';
+import { withRouter } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
 import { SLIDER_SET } from '../../Redux/constants';
@@ -84,7 +80,7 @@ class Images extends React.Component {
             {this.state.images.map((image, index) => {
                 return (
                     <div className="investment-image">
-                        <img key={index} style={{cursor: 'pointer'}} onClick={() => {
+                        <img key={index} alt={image.name} style={{cursor: 'pointer'}} onClick={() => {
                             this.props.history.push({
                                 search: `?modal=slider`
                             })

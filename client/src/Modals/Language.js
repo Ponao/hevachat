@@ -11,7 +11,6 @@ import { bindActionCreators } from 'redux'
 import { withCookies } from 'react-cookie'
 
 import { withRouter } from 'react-router-dom';
-import ActionMenu from '../Partials/ActionMenu';
 import store from '../Redux/store';
 import { USER_SET_LANG } from '../Redux/constants';
 import { urlApi } from '../config';

@@ -8,7 +8,6 @@ import {PageSettings} from '../Pages/PageSettings'
 import { connect } from 'react-redux'
 import * as dialogsActions from '../Redux/actions/dialogs'
 import { bindActionCreators } from 'redux'
-import RoomItem from '../Partials/Room/RoomItem'
 
 // Material
 import Fab from '@material-ui/core/Fab';
@@ -61,6 +60,10 @@ class Messages extends React.Component {
                 this.setState({showBtnAdd: true})
         }
 
+        if((this.messagesBlock.getScrollHeight() - (this.messagesBlock.getClientHeight() + this.messagesBlock.getScrollTop())) === 0) {
+            this.props.dialogsActions.dialogsLoad(this.props.user.apiToken)
+        }
+
         this.setState({scrollTop: this.messagesBlock.getScrollTop()})
     }
 
@@ -105,7 +108,7 @@ class Messages extends React.Component {
                     {!this.props.dialogs.dialogs.find(x => x.lastMessage) && <div className="data-empty">
                         <ChatBubbleIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                        <p>You dont have chats, lets create new</p>
+                        <p>{this.props.langProps.you_dont_have_chats}</p>
                     </div>}
 
                     <Tooltip title="Create dialog" className={`scroll-to-bottom ${this.state.showBtnAdd ? 'active' : ''}`} placement="top">

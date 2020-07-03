@@ -12,22 +12,26 @@ import {
     DIALOGS_SET_LOADING,
     DIALOGS_LOAD_MESSAGES,
     DIALOGS_UPDATE_ONLINE,
-    DIALOGS_SET_FORWARD
+    DIALOGS_SET_FORWARD,
+    DIALOGS_PRELOAD
 } from '../constants'
 
 const INITIAL_STATE = {
     isFetching: true,
     dialogs: [],
-    forwardMessages: []
+    forwardMessages: [],
+    canLoad: false
 }
 
 const dialogs = (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case DIALOGS_GET: {
-            return { ...state, dialogs: action.payload.dialogs, isFetching: false, noReadCount: action.payload.noReadCount }
+            return { ...state, dialogs: action.payload.dialogs, isFetching: false, noReadCount: action.payload.noReadCount, canLoad: action.payload.dialogs.length === 20 }
         }
         case DIALOGS_ADD:
             return { ...state, dialogs: [ action.payload, ...state.dialogs ]  }
+        case DIALOGS_PRELOAD:
+            return { ...state, dialogs: [ ...state.dialogs, ...action.payload ], canLoad: action.payload.length === 20 }
         case DIALOGS_LOAD:
             return { ...state, dialogs: state.dialogs.map(dialog => 
                 action.payload.dialogId === dialog._id ? 

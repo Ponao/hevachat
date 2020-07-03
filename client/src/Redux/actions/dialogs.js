@@ -11,10 +11,11 @@ import {
     DIALOGS_SET_LOADING,
     DIALOGS_LOAD_MESSAGES,
     DIALOGS_UPDATE_ONLINE,
-    DIALOGS_SET_FORWARD
+    DIALOGS_SET_FORWARD,
+    DIALOGS_PRELOAD
 } from '../constants'
 import store from '../store';
-import { randomInteger, setForceTitle } from '../../Controllers/FunctionsController';
+import { randomInteger } from '../../Controllers/FunctionsController';
 import SocketController from '../../Controllers/SocketController';
 import { toast } from 'react-toastify';
 import {urlApi} from '../../config'
@@ -50,6 +51,50 @@ export const dialogsGet = (apiToken) => (dispatch) => {
             payload: dialogs
         })
     });
+}
+
+export const dialogsLoad = (apiToken) => (dispatch) => {
+    if(store.getState().dialogs.canLoad) {
+        dispatch({
+            type: DIALOGS_PRELOAD,
+            payload: []
+        })
+
+        fetch(`${urlApi}/api/dialog/load`, {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiToken}`,
+            },
+            body: JSON.stringify({
+                lastDialogId: store.getState().dialogs.dialogs[store.getState().dialogs.dialogs.length-1]._id,
+                firstDialogId: store.getState().dialogs.dialogs[0]._id
+            })
+        })
+        .then((response) => response.json())
+        .then((dialogs) => {
+            for (let i = 0; i < dialogs.length; i++) {
+                let existDialog = store.getState().dialogs.dialogs.find(x => x._id === dialogs[i]._id)
+                
+                if(existDialog) {
+                    dialogs[i] = existDialog
+                } else {
+                    dialogs[i].user = dialogs[i].users.find(user => user._id !== store.getState().user._id)
+    
+                    if(!dialogs[i].user)
+                        dialogs[i].user = dialogs[i].users[0]
+    
+                    dialogs[i].typers = []
+                }
+            }
+            
+            dispatch({
+                type: DIALOGS_PRELOAD,
+                payload: dialogs
+            })
+        })
+    }
 }
 
 export const dialogGet = (userId, apiToken) => (dispatch) => {
@@ -200,6 +245,7 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages
@@ -315,6 +361,7 @@ export const editMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages
@@ -435,6 +482,7 @@ export const retrySendMessage = (message, apiToken) => (dispatch) => {
 
     message.recentMessages.map(m => {
         recentMessages.push(m._id)
+        return 1
     })
 
     message.recentMessages = recentMessages
@@ -480,6 +528,7 @@ export const deleteMessage = ({dialogId, otherId, deleteMessages}, apiToken) => 
     let messageIds = []
     deleteMessages.map(m => {
         messageIds.push(m._id)
+        return 1
     })
 
     let lastMessage

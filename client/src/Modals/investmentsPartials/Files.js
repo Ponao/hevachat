@@ -1,6 +1,5 @@
 // App
 import React from 'react'
-import Modal from 'react-modal';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 // Material
@@ -8,15 +7,10 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 // Redux
 import { connect } from 'react-redux'
-import * as usersActions from '../../Redux/actions/users'
-import { bindActionCreators } from 'redux'
 
-import { NavLink, withRouter } from 'react-router-dom';
-import UserItem from '../../Partials/User/UserItem';
+import { withRouter } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
-import { SLIDER_SET } from '../../Redux/constants';
-import Audio from '../../Partials/Chat/Audio';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
 

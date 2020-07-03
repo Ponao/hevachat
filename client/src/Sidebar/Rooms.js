@@ -2,11 +2,7 @@
 import React from 'react'
 import {PageSettings} from '../Pages/PageSettings'
 import RoomItem from '../Partials/Room/RoomItem'
-import SocketController from '../Controllers/SocketController'
 import { Scrollbars } from 'react-custom-scrollbars';
-
-// Modal
-import ModalCreateRoom from '../Modals/CreateRoom'
 
 // Redux
 import { connect } from 'react-redux'
@@ -15,10 +11,8 @@ import { bindActionCreators } from 'redux'
 
 // Material
 import Fab from '@material-ui/core/Fab';
-import Skeleton from '@material-ui/lab/Skeleton';
 import AddIcon from '@material-ui/icons/Add';
 import { withStyles, Tooltip, CircularProgress } from '@material-ui/core'
-import showLoading from '../Partials/Loading'
 import WarningIcon from '@material-ui/icons/Warning';
 import AppsIcon from '@material-ui/icons/Apps';
 import { withRouter } from 'react-router-dom';
@@ -63,6 +57,10 @@ class Rooms extends React.Component {
         } else {
             if(!this.state.showBtnAdd)
                 this.setState({showBtnAdd: true})
+        }
+
+        if((this.roomsBlock.getScrollHeight() - (this.roomsBlock.getClientHeight() + this.roomsBlock.getScrollTop())) === 0) {
+            this.props.roomsActions.roomsLoad(this.props.user.apiToken, this.props.user.roomLang)
         }
 
         this.setState({scrollTop: this.roomsBlock.getScrollTop()})
@@ -113,7 +111,7 @@ class Rooms extends React.Component {
                     {!this.props.rooms.isFetching && !this.props.rooms.isError && !this.props.rooms.rooms.length && <div className="data-empty">
                         <AppsIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                        <p>Create your first room in this language</p>
+                        <p>{this.props.langProps.create_your_first_room}</p>
                     </div>}
 
                     {!this.props.rooms.isFetching && this.props.rooms.isError && <div className="data-empty">

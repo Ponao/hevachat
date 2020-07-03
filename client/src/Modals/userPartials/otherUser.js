@@ -1,14 +1,14 @@
 // App
 import React from 'react'
-import Modal from 'react-modal';
 
 // Material
 import Fab from '@material-ui/core/Fab';
-import BookOutlinedIcon from '@material-ui/icons/BookOutlined';
 import { withStyles } from '@material-ui/core'
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@material-ui/icons/ChatBubbleOutlineOutlined';
+import MicOffIcon from '@material-ui/icons/MicOff';
 import CallIcon from '@material-ui/icons/Call';
+import MicIcon from '@material-ui/icons/Mic';
 
 // Redux
 import { connect } from 'react-redux'
@@ -18,9 +18,6 @@ import { bindActionCreators } from 'redux'
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined';
 import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
-import {urlApi} from '../../config'
-
-import SocketController from '../../Controllers/SocketController';
 import Avatar from '../../Partials/User/Avatar';
 import { NavLink, withRouter } from 'react-router-dom';
 import store from '../../Redux/store';
@@ -127,6 +124,28 @@ class OtherUser extends React.Component {
                             <DeleteOutlineOutlinedIcon style={{color: '#99AABB'}} />
                         </CustomFab>
                         <p>{this.props.langProps.remove}</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?mute=${this.props.user._id}`
+                            })
+                        }}>
+                            <MicOffIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Mute</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?unmute=${this.props.user._id}`
+                            })
+                        }}>
+                            <MicIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Unmute</p>
                     </div>}
                 </>
             </>
