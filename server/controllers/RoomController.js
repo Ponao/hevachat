@@ -11,8 +11,9 @@ const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const { validationResult } = require("express-validator");
 const Investment = require('../models/Investment');
+const Payment = require('../models/Payment');
 
-const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom} = require('./SocketController')
+const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom, banRoom} = require('./SocketController')
 const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom} = require('./WebRtcController')
 
 module.exports = {
@@ -34,6 +35,15 @@ module.exports = {
         let { id, socketId } = req.body;
 
         try {
+            let payment = await Payment.findOne({userId: user._id, expiriesAt: {'$gte': Date.now()}})
+
+            if(!payment) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `dont_have_payment`;
+                return res.status(401).json({ error: true, errors: [err] });
+            }
+
             if(!findBySocketId(socketId)) {
                 const err = {};
                 err.param = `all`;
@@ -51,6 +61,14 @@ module.exports = {
             }
             
             let room = await Room.findOne({_id: id}).populate('users').populate('dialog');
+
+            if(room === null) {
+                const err = {};
+                err.param = `all`;
+                err.msg = `room_delete_or_not_found`;
+                return res.status(401).json({ error: true, errors: [err] });
+            }
+
             let muted = await Limit.findOne({room: room._id, userId: user._id, type: 'mute', date: {$gte: new Date()}})
             
             if(muted) {
@@ -59,10 +77,13 @@ module.exports = {
                 muted = false
             }
 
-            if(room === null) {
+            let ban = await Limit.findOne({room: room._id, userId: user._id, type: 'banroom', date: {$gte: new Date()}})
+
+            if(ban) {
                 const err = {};
                 err.param = `all`;
-                err.msg = `room_delete_or_not_found`;
+                err.msg = `you_banned_in_this_room`;
+                err.ban = {numDate: ban.numDate, date: ban.date}
                 return res.status(401).json({ error: true, errors: [err] });
             }
 
@@ -305,6 +326,7 @@ module.exports = {
 
                 deleteRoom({roomId: id, lang: room.lang})
 
+                await Limit.deleteMany({room: {_id: id}})
                 await Notification.deleteMany({type: 'invite', room: {_id: room._id}})
             }
 
@@ -851,6 +873,51 @@ module.exports = {
 
                 unmuteUserRoom(roomId, userId)
                 unmuteRoom({roomId, userId})
+                return res.json({error: false});
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
+
+    ban: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId, time } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                await Limit.deleteOne({userId: userId, room: {_id: roomId}, type: 'banroom'})
+
+                let limit = new Limit()
+                limit.userId = userId
+                limit.room = await Room.findOne({_id: roomId})
+                limit.date = new Date(Date.now() + time*1000)
+                limit.numDate = time
+                limit.type = 'banroom'
+                await limit.save()
+
+                let ban  = {numDate: limit.numDate, date: limit.date}
+
+                banRoom({roomId, ban, userId})
+                return res.json({error: false});
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
+
+    unban: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                await Limit.deleteOne({userId: userId, room: {_id: roomId}, type: 'banroom'})
+
                 return res.json({error: false});
             } else {
                 return res.json({error: true});

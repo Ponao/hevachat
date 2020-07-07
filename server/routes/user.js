@@ -22,7 +22,10 @@ router.get('/get-requested', verifyToken, UserController.getRequested)
 router.get('/get-pending', verifyToken, UserController.getPending)
 router.post('/search', verifyToken, UserController.search)
 router.post('/get-mute', verifyToken, UserController.getMute)
+router.post('/get-roomban', verifyToken, UserController.getBanroom)
 router.post('/upload-avatar', verifyToken, UserController.uploadAvatar)
+router.post('/send-warning', verifyToken, UserController.sendWarning)
+
 router.post('/edit', [
     check('firstName')
     .notEmpty().withMessage('first_name_not_empty')

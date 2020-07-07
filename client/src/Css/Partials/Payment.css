@@ -1,0 +1,51 @@
+.payment-page {
+    background-color: #008FF7;
+    width: 100%;
+    height: max-content;
+    min-height: 100vh;
+    padding: 0 66px;
+}
+
+.payment-title {
+    color: #fff;
+    font-weight: bold;
+    font-size: 32px;
+    margin-top: 86px;
+}
+
+.payment-subtitle {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 14px;
+}
+
+.payment-tariff {
+    height: max-content;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    padding-bottom: 20px;
+}
+
+.payment-page .payment-tariff-container  {
+    padding: 0 15px;
+    
+    margin-bottom: 30px;
+}
+
+.payment-tariff-title {
+    font-size: 16px;
+    color: #556677;
+    text-align: center;
+    padding-top: 28px;
+    font-weight: 600;
+}
+
+.payment-tariff-price {
+    font-size: 32px;
+    color: #333333;
+    text-align: center;
+    padding-top: 0px;
+    font-weight: 800;
+}

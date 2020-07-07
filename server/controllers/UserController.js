@@ -12,7 +12,7 @@ const Friend = require('../models/Friends')
 const { validationResult } = require("express-validator");
 const Notification = require('../models/Notification');
 const mongoose = require("../database");
-const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification} = require('./SocketController')
+const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification, sendWarning} = require('./SocketController')
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 
@@ -187,20 +187,29 @@ module.exports = {
 
         try {
             if(user.role == 'moder' || user.role == 'admin') {
-                let limits = await Limit.find({userId: userId, type: 'mute'}).populate('room')
+                let limits = await Limit.find({userId: userId, type: 'mute', date: {$gte: new Date()}}).populate('room')
 
-                // let limit = new Limit()
-                // limit.userId = userId
-                // limit.roomId = roomId
-                // limit.date = new Date(Date.now() + time*1000)
-                // limit.numDate = time
-                // limit.type = 'mute'
-                // await limit.save()
+                if(!limits) {
+                    limits = []
+                }
 
-                // let muted  = {numDate: limit.numDate, date: limit.date}
+                return res.json(limits);
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
 
-                // muteUserRoom(roomId, userId)
-                // muteRoom({roomId, muted, userId})
+    getBanroom: async(req, res, next) => {
+        const { user } = res.locals;
+        const { userId, roomId } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                let limits = await Limit.find({userId: userId, type: 'banroom', date: {$gte: new Date()}}).populate('room')
+
                 if(!limits) {
                     limits = []
                 }
@@ -552,6 +561,23 @@ module.exports = {
             await user.save()
 
             res.json({ error: false }); 
+        } catch (e) {
+            return next(new Error(e));
+        }
+    },
+
+    sendWarning: async (req, res, next) => {
+        const { user } = res.locals;
+        const { warning, userId } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                sendWarning({userId, warning})
+
+                res.json({ error: false });
+            } else {
+                return res.json({error: true});
+            }
         } catch (e) {
             return next(new Error(e));
         }

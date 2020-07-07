@@ -7,6 +7,7 @@ import Languages from '../Sidebar/Languages'
 import Room from '../Pages/User/Room';
 import Main from '../Pages/User/Main';
 import Dialog from '../Pages/User/Dialog';
+import Payment from '../Pages/User/Payment';
 
 const routes = [
     {
@@ -50,6 +51,13 @@ const routes = [
         type: 'user',
         title: '',
         component: () => <Room />
+    },
+    {
+        path: '/payment',
+        exact: true,
+        type: 'user',
+        title: '',
+        component: () => <Payment />
     },
 ]
 

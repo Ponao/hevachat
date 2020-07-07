@@ -20,6 +20,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const historyApiFallback = require('connect-history-api-fallback');
 const {initSocket} = require('./controllers/SocketController')
+const adminPanel = require('./controllers/AdminController')
+const formidableMiddleware = require('express-formidable');
 
 // const errors = require('./middleware/errors');
 
@@ -30,12 +32,14 @@ const roomRoutes = require('./routes/room');
 const dialogRoutes = require('./routes/dialog');
 const notificationRoutes = require('./routes/notification');
 const callRoutes = require('./routes/call')
+const paymentRoutes = require('./routes/payment')
 
 // Use Express as our web server
 const app = express();
 
 app
   // Parse JSON
+  .use('/admin', formidableMiddleware(), adminPanel)
   .use(bodyParser.json())
   // Enable files upload
   .use(fileUpload({
@@ -51,10 +55,14 @@ app
   .use('/api/dialog', dialogRoutes)
   .use('/api/notification', notificationRoutes)
   .use('/api/call', callRoutes)
+  .use('/api/payment', paymentRoutes)
   // Serve static files
   .use('/media', express.static(path.join(__dirname, './uploads')))
+  // .use(formidableMiddleware({ extended: false }))
+  
   // Enable history API
   .use(historyApiFallback())
+  
   // Error middleware
 //   .use(errors);
 

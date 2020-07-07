@@ -4,11 +4,13 @@ import {
     USER_UPDATE_ROOM_LANG,
     USER_SET_AVATAR,
     USER_EDIT,
-    USER_SET_LANG
+    USER_SET_LANG,
+    USER_SET_WARNING
 } from '../constants'
 
 const INITIAL_STATE = {
-    isAuth: false
+    isAuth: false,
+    warning: false
 }
 
 const user = (state = INITIAL_STATE, action) => {
@@ -17,7 +19,7 @@ const user = (state = INITIAL_STATE, action) => {
             return { ...state, ...action.payload, isAuth: true }
         }
         case USER_LOGOUT:
-            return { isAuth: false }
+            return { isAuth: false, warning: false }
         case USER_UPDATE_ROOM_LANG:
             return { ...state, roomLang: action.payload }
         case USER_SET_AVATAR:
@@ -26,6 +28,8 @@ const user = (state = INITIAL_STATE, action) => {
             return { ...state, name: {first: action.payload.firstName, last: action.payload.lastName}, city: action.payload.city }
         case USER_SET_LANG:
             return { ...state, lang: action.payload }
+        case USER_SET_WARNING:
+            return { ...state, warning: action.payload }
         default: 
             return state
     }

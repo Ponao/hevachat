@@ -33,5 +33,7 @@ router.post('/load-messages', verifyToken, RoomController.loadMessage);
 router.post('/get-investments', verifyToken, RoomController.getInvestments);
 router.post('/mute', verifyToken, RoomController.mute)
 router.post('/unmute', verifyToken, RoomController.unmute)
+router.post('/ban', verifyToken, RoomController.ban)
+router.post('/unban', verifyToken, RoomController.unban)
 
 module.exports = router;

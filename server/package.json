@@ -8,6 +8,9 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
+    "admin-bro": "^2.6.0",
+    "admin-bro-expressjs": "^2.1.1",
+    "admin-bro-mongoose": "^0.5.2",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -21,6 +24,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.16.3",
     "express-fileupload": "^1.1.7-alpha.3",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.17.1",
     "express-validator": "^6.4.0",
     "gm": "^1.23.1",
     "image-thumbnail": "^1.0.9",

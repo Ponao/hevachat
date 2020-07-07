@@ -154,18 +154,6 @@ function initSocket(initIo) {
         })
 
         // Messages in users
-        socket.on('sendMessageUser', ({userId, message}) => {
-            socket.to(`${userId}`).emit('sendMessageUser', message)
-        })
-
-        socket.on('editMessageUser', ({userId, message}) => {
-            socket.to(`${userId}`).emit('editMessageRoom', message)
-        })
-
-        socket.on('deleteMessageUser', ({userId, messageId}) => {
-            socket.to(`${userId}`).emit('deleteMessageRoom', messageId)
-        })
-
         socket.on('typingDialog', ({otherId, userId}) => {
             if(userId == user._id)
                 socket.to(`user.${otherId}`).emit('typingDialog', userId)
@@ -302,6 +290,10 @@ function unmuteRoom({roomId, userId}) {
     io.to(`user.${userId}`).emit('unmuteRoom', roomId)
 }
 
+function banRoom({roomId, ban, userId}) {
+    io.to(`user.${userId}`).emit('banRoom', {roomId, ban})
+}
+
 // Chat dialog
 function sendMessageDialog({userId, socketId, otherId, message}) {
     if(userId != otherId) {
@@ -378,6 +370,11 @@ function stopUserCall({userId, otherId, socketId}) {
     }
 }
 
+// Users limit action
+function sendWarning({userId, warning}) {
+    io.to(`user.${userId}`).emit('sendWarning', warning)
+}
+
 module.exports = {
     getIO,
     initSocket, 
@@ -402,5 +399,7 @@ module.exports = {
     sendUserCall,
     sendUserAcceptCall,
     muteRoom,
-    unmuteRoom
+    unmuteRoom,
+    banRoom,
+    sendWarning
 }

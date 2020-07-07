@@ -9,6 +9,9 @@ import ChatBubbleOutlineOutlinedIcon from '@material-ui/icons/ChatBubbleOutlineO
 import MicOffIcon from '@material-ui/icons/MicOff';
 import CallIcon from '@material-ui/icons/Call';
 import MicIcon from '@material-ui/icons/Mic';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import WarningIcon from '@material-ui/icons/Warning';
 
 // Redux
 import { connect } from 'react-redux'
@@ -146,6 +149,39 @@ class OtherUser extends React.Component {
                             <MicIcon style={{color: '#99AABB'}} />
                         </CustomFab>
                         <p>Unmute</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?banroom=${this.props.user._id}`
+                            })
+                        }}>
+                            <LockOutlinedIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Ban room</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?unbanroom=${this.props.user._id}`
+                            })
+                        }}>
+                            <LockOpenIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Unban room</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?sendwarning=${this.props.user._id}`
+                            })
+                        }}>
+                            <WarningIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Send warning</p>
                     </div>}
                 </>
             </>

@@ -7,8 +7,6 @@
 const mongoose = require("../database");
 const Schema = mongoose.Schema;
 
-// The number of rounds to use when hashing a password with bcrypt
-
 const RoomSchema = new Schema({
   lang: { type: String },
   title: { type: String },

@@ -20,6 +20,10 @@ import Profile from './Profile';
 import Language from './Language';
 import Mute from './Mute';
 import Unmute from './Unmute';
+import Banroom from './Banroom';
+import Unbanroom from './Unbanroom';
+import SendWaning from './SendWaning';
+import Warning from './Warning';
 
 class MainModal extends React.Component {
     state = {
@@ -28,6 +32,9 @@ class MainModal extends React.Component {
         modal: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).modal,
         mute: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).mute,
         unmute: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).unmute,
+        banroom: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).banroom,
+        unbanroom: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).unbanroom,
+        sendwarning: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).sendwarning,
     }
 
     componentDidMount() {
@@ -38,6 +45,9 @@ class MainModal extends React.Component {
                 modal: qs.parse(location.search, { ignoreQueryPrefix: true }).modal,
                 mute: qs.parse(location.search, { ignoreQueryPrefix: true }).mute,
                 unmute: qs.parse(location.search, { ignoreQueryPrefix: true }).unmute,
+                banroom: qs.parse(location.search, { ignoreQueryPrefix: true }).banroom,
+                unbanroom: qs.parse(location.search, { ignoreQueryPrefix: true }).unbanroom,
+                sendwarning: qs.parse(location.search, { ignoreQueryPrefix: true }).sendwarning,
             })
         })
     }
@@ -62,6 +72,8 @@ class MainModal extends React.Component {
                 })
             }} />}
 
+            {!!this.props.user.warning && <Warning isOpen={!!this.props.user.warning} />}
+
             {this.state.mute && this.props.user.role !== 'user' && <Mute userId={this.state.mute} close={() => {
                 this.props.history.push({
                     search: ""
@@ -69,6 +81,24 @@ class MainModal extends React.Component {
             }} />}
 
             {this.state.unmute && this.props.user.role !== 'user' && <Unmute userId={this.state.unmute} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.banroom && this.props.user.role !== 'user' && <Banroom userId={this.state.banroom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.unbanroom && this.props.user.role !== 'user' && <Unbanroom userId={this.state.unbanroom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.sendwarning && this.props.user.role !== 'user' && <SendWaning userId={this.state.sendwarning} close={() => {
                 this.props.history.push({
                     search: ""
                 })

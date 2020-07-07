@@ -37,7 +37,10 @@ import {
     CALL_SET_USER,
     CALL_SET_STATUS,
     CALL_SET_MEDIA,
-    ROOMS_SET_MUTED
+    ROOMS_SET_MUTED,
+    ROOMS_JOIN_ERROR,
+    ROOMS_LEAVE_ROOM,
+    USER_SET_WARNING
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -630,6 +633,26 @@ export default {
                     clearTimeout(unmuteTimer)
                 }
             }
+        })
+
+        socket.on('banRoom', ({roomId, ban}) => {
+            if(store.getState().rooms.activeRoom && store.getState().rooms.activeRoom._id === roomId) {
+                WebRtcController.leaveRoom({roomId, lang: store.getState().rooms.activeRoom.lang})
+                store.dispatch({
+                    type: ROOMS_LEAVE_ROOM
+                })
+                store.dispatch({
+                    type: ROOMS_JOIN_ERROR,
+                    payload: {msg: 'you_banned_in_this_room', ban: ban}
+                })
+            }
+        })
+
+        socket.on('sendWarning', warning => {
+            store.dispatch({
+                type: USER_SET_WARNING,
+                payload: warning
+            })
         })
     },
     getSocketId: () => {

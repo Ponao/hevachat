@@ -38,7 +38,6 @@ export const accept = (apiToken) => (dispatch) => {
         type: CALL_SET_STATUS,
         payload: 'active'
     })
-    WebRtcController.call(store.getState().call.user._id)
 
     fetch(`${urlApi}/api/call/accept`, {
         method: "post",
@@ -52,9 +51,16 @@ export const accept = (apiToken) => (dispatch) => {
             socketId: SocketController.getSocketId()
         })
     })
-    // .then((response) => response.json())
+    .then((response) => response.json())
     .then((call) => {
-        // console.log(call)
+        if(call.error) {
+            dispatch({
+                type: CALL_SET_STATUS,
+                payload: call.error
+            })
+        } else {
+            WebRtcController.call(store.getState().call.user._id)
+        }
     })
 }
 

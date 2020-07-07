@@ -11,7 +11,7 @@ import { connect } from 'react-redux'
 import * as callActions from '../Redux/actions/call'
 import { bindActionCreators } from 'redux'
 
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import Avatar from '../Partials/User/Avatar';
 import Fab from '@material-ui/core/Fab';
 import CallIcon from '@material-ui/icons/Call';
@@ -238,14 +238,19 @@ class CreateDialog extends React.Component {
                 </div>}
 
                 {this.props.call.status === 'busy' && <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20, color: '#999999', fontSize: 14}}>
-                    The line is busy... <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>Close</a>
+                    The user is busy... <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>Close</a>
                 </div>}
 
                 {this.props.call.status === 'canceled' && <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20, color: '#999999', fontSize: 14}}>
                     {this.props.call.user.name.first} canceled your call <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>Close</a>
                 </div>}
             </>}
+            {this.props.call.status === 'dont_have_payment' && <>
+                {this.props.callActions.clear()}
+                <Redirect to="/payment" />
+            </>}
             {this.props.call.status === 'exist' && <>
+                
                 <ErrorOutlineIcon style={{color: '#FF3333', fontSize: 60}} />
                 <h2 className="modal-title" style={{width: '100%'}}>Error</h2>
                 <p className="modal-text" style={{width: '100%', textAlign: 'center'}}>have_active_call</p>

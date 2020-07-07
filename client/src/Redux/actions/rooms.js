@@ -109,61 +109,64 @@ export const joinRoom = ({id, apiToken}) => (dispatch) => {
             })
         })
         .then(response => response.json())
-        .then(({room, muted}) => {
-            if(room.error) {
+        .then((data) => {
+            if(data.error) {
                 setForceTitle('Error')
 
                 dispatch({
                     type: ROOMS_JOIN_ERROR,
-                    payload: room.errors[0]
+                    payload: data.errors[0]
                 })
                 
                 return
-            }
+            } else {
+                let room = data.room
+                let muted = data.muted
 
-            room.dialog.messages = room.dialog.messages.reverse()
+                room.dialog.messages = room.dialog.messages.reverse()
 
-            room.users.map(x => {
-                x.speaking = false
-                return 1
-            })
-
-            setForceTitle(room.title)
-
-            dispatch({
-                type: ROOMS_JOIN_ROOM,
-                payload: {room, canLoad: room.dialog.messages.length === 50, muted}
-            })
-
-            if(unmuteTimer) {
-                clearTimeout(unmuteTimer)
-            }
-
-            if(muted && (new Date(muted.date).getTime() - new Date().getTime()) <= 86400000) {
-                unmuteTimer = setTimeout(() => {
-                    if(store.getState().rooms.activeRoom && 
-                    store.getState().rooms.activeRoom._id === room._id && 
-                    !!store.getState().rooms.activeRoom.muted && 
-                    store.getState().rooms.activeRoom.muted.date === muted.date) {
-                        store.dispatch({
-                            type: ROOMS_SET_MUTED,
-                            payload: false
-                        })
-                    }
-                    // console.log(unmuteTimer)
-                }, (new Date(muted.date).getTime() - new Date().getTime()) );
-            }
-            
-            SocketController.joinRoom({roomId: room._id, lang: room.lang})
-
-            try {
-                WebRtcController.connectRoom(room._id)
-            } catch (err) {
-                SocketController.leaveRoom({roomId: room._id, lang: room.lang})
-                dispatch({
-                    type: ROOMS_JOIN_ERROR,
-                    payload: {param: 'all', msg: 'something_goes_wrong'}
+                room.users.map(x => {
+                    x.speaking = false
+                    return 1
                 })
+
+                setForceTitle(room.title)
+
+                dispatch({
+                    type: ROOMS_JOIN_ROOM,
+                    payload: {room, canLoad: room.dialog.messages.length === 50, muted}
+                })
+
+                if(unmuteTimer) {
+                    clearTimeout(unmuteTimer)
+                }
+
+                if(muted && (new Date(muted.date).getTime() - new Date().getTime()) <= 86400000) {
+                    unmuteTimer = setTimeout(() => {
+                        if(store.getState().rooms.activeRoom && 
+                        store.getState().rooms.activeRoom._id === room._id && 
+                        !!store.getState().rooms.activeRoom.muted && 
+                        store.getState().rooms.activeRoom.muted.date === muted.date) {
+                            store.dispatch({
+                                type: ROOMS_SET_MUTED,
+                                payload: false
+                            })
+                        }
+                        // console.log(unmuteTimer)
+                    }, (new Date(muted.date).getTime() - new Date().getTime()) );
+                }
+                
+                SocketController.joinRoom({roomId: room._id, lang: room.lang})
+
+                try {
+                    WebRtcController.connectRoom(room._id)
+                } catch (err) {
+                    SocketController.leaveRoom({roomId: room._id, lang: room.lang})
+                    dispatch({
+                        type: ROOMS_JOIN_ERROR,
+                        payload: {param: 'all', msg: 'something_goes_wrong'}
+                    })
+                }
             }
         })
         .catch((err) => {
