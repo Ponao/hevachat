@@ -403,24 +403,34 @@ module.exports = {
                         break
 
                     if(req.files['images'+i].size / 1000 <= 10000) {
-                        req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), function(err) {
-                            if (err)
-                            return res.status(500).send(err);
-                        });
+                        let mv = (path) => {
+                            return new Promise((resolve, reject) => {
+                                req.files['images'+i].mv(path, (err) => {
+                                    if (err)
+                                        reject(err);
+                                    
+                                    resolve()
+                                })
+                            })
+                        }
+                        await mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
+                        let dimensions = sizeOf('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
 
                         let investment = new Investment()
 
                         investment.dialogId = dialogId
                         investment.type = 'image'
                         investment.data = {
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop()
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
+                            dimensions
                         }
                         
                         await investment.save()
                         
                         message.images.push({
                             path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['images'+i].name.split('.').pop(),
-                            name: req.files['images'+i].name
+                            name: req.files['images'+i].name,
+                            dimensions
                         })
                         nowCount++
                     } else {
