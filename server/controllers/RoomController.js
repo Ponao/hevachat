@@ -193,7 +193,7 @@ module.exports = {
 
         try {
             let messages = await Message
-                .find({dialogId, isDelete: false, _id: { $lte: lastMessageId }})
+                .find({dialogId, isDelete: false, _id: { $lt: lastMessageId }})
                 .populate([
                     {
                         path: 'user',
