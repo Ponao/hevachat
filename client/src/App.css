@@ -1130,12 +1130,17 @@
 }
 
 .dialog-header .user-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     display: flex;
     font-weight: 600;
     font-size: 16px;
     color: #008FF7;
     margin: 0 0 0 14px;
     line-height: 22px;
+    
+    width: calc(100% - 14px);
 }
 
 .dialog-header .last-message {
@@ -1144,6 +1149,9 @@
     color: #667788;
     margin: 0 0 0 14px;
     line-height: 16px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .user-profile-name {
@@ -1189,6 +1197,7 @@
 
 .dialog-header .user-info {
     cursor: pointer;
+    padding-right: 14px;
 }
 
 .contacts-tabs {

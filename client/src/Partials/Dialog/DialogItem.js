@@ -55,7 +55,7 @@ class DialogItem extends React.Component {
                             
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length === 1 && 
-                                <><span  className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.images[0].name}</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>Photo</span></>
                             }
 
                             {!this.props.lastMessage.text && 
@@ -66,7 +66,7 @@ class DialogItem extends React.Component {
                             {!this.props.lastMessage.text && 
                             !this.props.lastMessage.images.length && 
                             this.props.lastMessage.sounds.length === 1 &&
-                                <><span  className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.sounds[0].name}</span></>
+                                <><span  className="content" style={{color: '#008FF7'}}>Sound</span></>
                             }
 
                             {!this.props.lastMessage.text && 
@@ -79,7 +79,7 @@ class DialogItem extends React.Component {
                             !this.props.lastMessage.images.length && 
                             !this.props.lastMessage.sounds.length &&
                             this.props.lastMessage.files.length === 1 &&
-                                <><span className="content" style={{color: '#008FF7'}}>{this.props.lastMessage.files[0].name}</span></>
+                                <><span className="content" style={{color: '#008FF7'}}>File</span></>
                             }
 
                             {!this.props.lastMessage.text && 

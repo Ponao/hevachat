@@ -193,19 +193,16 @@ export const sendMessage = (message, apiToken) => (dispatch) => {
 
     for (let i = 0; i < message.images.length; i++) {
         formData.append('images'+i, message.images[i].file)
-        message.images[i].file = false
         images.push(message.images[i])
     }
 
     for (let i = 0; i < message.files.length; i++) {
         formData.append('files'+i, message.files[i].file)
-        message.files[i].file = false
         files.push(message.files[i])
     }
 
     for (let i = 0; i < message.sounds.length; i++) {
         formData.append('sounds'+i, message.sounds[i].file)
-        message.sounds[i].file = false
         sounds.push(message.sounds[i])
     }
 
@@ -434,6 +431,23 @@ export const deleteLocalMessage = (_id) => (dispatch) => {
 export const retrySendMessage = (message, apiToken) => (dispatch) => {
     let formData = new FormData()
     let images = []
+    let files = []
+    let sounds = []
+
+    for (let i = 0; i < message.images.length; i++) {
+        formData.append('images'+i, message.images[i].file)
+        images.push(message.images[i])
+    }
+
+    for (let i = 0; i < message.files.length; i++) {
+        formData.append('files'+i, message.files[i].file)
+        files.push(message.files[i])
+    }
+
+    for (let i = 0; i < message.sounds.length; i++) {
+        formData.append('sounds'+i, message.sounds[i].file)
+        sounds.push(message.sounds[i])
+    }
 
     let localMessage = {
         _id: message._id,
@@ -458,12 +472,6 @@ export const retrySendMessage = (message, apiToken) => (dispatch) => {
         type: ROOMS_ADD_MESSAGE,
         payload: localMessage
     })
-
-    for (let i = 0; i < message.images.length; i++) {
-        formData.append('images'+i, message.images[i].file)
-
-        images.push(message.images[i].path)
-    }
 
     let recentMessages = []
 

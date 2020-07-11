@@ -100,7 +100,11 @@ const rooms = (state = INITIAL_STATE, action) => {
         case ROOMS_SUCCESS_MESSAGE: 
             return { ...state, activeRoom: { ...state.activeRoom, dialog: { ...state.activeRoom.dialog, messages: state.activeRoom.dialog.messages.map(message => 
                 action.payload._id === message._id ? 
-                { ...message, isLoading: false, _id: action.payload._newId } :
+                { ...message, isLoading: false, _id: action.payload._newId,
+                    files: message.files.map(item => {return { ...item, file: false}}),
+                    sounds: message.sounds.map(item => {return { ...item, file: false}}),
+                    images: message.images.map(item => {return { ...item, file: false}})
+                } :
                 message
             ) } } }
         case ROOMS_ERROR_MESSAGE: 

@@ -45,12 +45,15 @@ import {
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
 
-let socket = null
+let socket = false
 let activeLang = false
 let unmuteTimer = false
 
 export default { 
     init: (apiToken) => {
+        if(socket) 
+            return
+
         socket = io(urlApi, {transports: ['websocket', 'polling', 'flashsocket']})
         socket.on('connect', () => {
             socket.emit('auth', apiToken)

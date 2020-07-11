@@ -2,6 +2,7 @@
 import React from 'react'
 import {PageSettings} from '../PageSettings'
 import { Scrollbars } from 'react-custom-scrollbars';
+import qs from 'qs'
 
 // Redux
 import { connect } from 'react-redux'
@@ -28,6 +29,7 @@ import ActionMenu from '../../Partials/ActionMenu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
+import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
 
 const fabStyles = theme => ({
     root: {
@@ -47,7 +49,7 @@ const fabStylesCustom = theme => ({
         backgroundColor: '#fff',
         color: '#008FF7',
         zIndex: 2,
-        width: 36,
+        minWidth: 36,
         height: 36,
         boxShadow: 'none!important',
         marginLeft: 'auto',
@@ -95,6 +97,10 @@ class MediaStream extends React.PureComponent {
 class Room extends React.Component {
     static contextType = PageSettings;
 
+    state = {
+        act: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).act,
+    }
+
     componentDidMount() {
         this.context.toggleHeader(false)
 
@@ -105,6 +111,11 @@ class Room extends React.Component {
             }
         }, 100);
         
+        this.props.history.listen((location) => {
+            this.setState({
+                act: qs.parse(location.search, { ignoreQueryPrefix: true }).act,
+            })
+        })
     }
 
     componentWillUnmount() {
@@ -119,10 +130,16 @@ class Room extends React.Component {
         return this.props.rooms.activeRoom && (
             <>  
                 {this.props.rooms.activeRoom.remoteStream && <MediaStream stream={this.props.rooms.activeRoom.remoteStream} />}
-                <div className="col-xl-3 col-lg-6 col-md-6">
+                <div className={`col-xl-3 col-lg-6 col-md-6 theme-first-block ${this.state.act === 'chat' ? 'active' : 'hide'}`}>
                     <div className="theme-header">
                         <IconButton className="back-btn" onClick={() => {
-                            this.props.history.push('/')
+                            if(this.state.act === 'chat') {
+                                this.props.history.push({
+                                    search: ``
+                                })
+                            } else {
+                                this.props.history.push('/')
+                            }                           
                         }}>
                             <ArrowBackIcon fontSize="small" style={{color: '#008FF7'}} />
                         </IconButton>
@@ -191,10 +208,16 @@ class Room extends React.Component {
                 </div>
                 
 
-                <div className="col-xl-9 col-lg-6 col-md-6 theme-screen">
+                <div className={`col-xl-9 col-lg-6 col-md-6 theme-screen ${this.state.act === 'chat' ? 'hide' : 'active'}`}>
                     {this.props.rooms.activeRoom && <Members users={this.props.rooms.activeRoom.users} />}
 
                     <div className="media-options">
+                        <CustomFab className={`media-option mobile-option`} onClick={() => {this.props.history.push({
+                            search: `?act=chat`
+                        })}}>
+                            {!!this.props.rooms.activeRoom.dialog.messages.filter(x => !x.isRead && x.user._id !== this.props.user._id).length && <span style={{right: 0}} className="unread-messages-count">{this.props.rooms.activeRoom.dialog.messages.filter(x => !x.isRead && x.user._id !== this.props.user._id).length}</span>}
+                            <ChatBubbleOutlineIcon style={{color: this.props.media.musicOn ? '#008FF7' : '#fff'}} />
+                        </CustomFab>
                         {!!this.props.rooms.activeRoom.muted && <Tooltip title={`Blocked to ${new Date(this.props.rooms.activeRoom.muted.date).toLocaleString()}`} placement="top"><CustomFab className={`media-option reject`}>
                             <MicOffIcon style={{color: '#fff'}} />
                         </CustomFab></Tooltip>}

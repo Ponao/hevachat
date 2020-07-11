@@ -64,6 +64,30 @@
     display: flex;
     flex-wrap: wrap;
     align-content: center;
+    overflow: hidden;
+    padding-right: 14px;
+}
+
+.mobile-option {
+    display: none!important;
+}
+
+@media screen and (max-width: 768px) {
+    .theme-screen.active {
+        display: block;
+    }
+    .mobile-option {
+        display: block!important;
+    }
+    .theme-screen.hide {
+        display: none;
+    }
+    .theme-first-block.hide {
+        display: none;
+    }
+    .theme-first-block.active {
+        display: block;
+    }
 }
 
 .theme-title {
@@ -75,6 +99,9 @@
     cursor: pointer;
     font-weight: 600;
     width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .theme-online-counter {

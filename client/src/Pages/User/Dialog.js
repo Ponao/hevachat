@@ -112,7 +112,7 @@ class Dialog extends React.PureComponent {
                     name={dialog.user.name.first.charAt(0) + dialog.user.name.last.charAt(0)} 
                     avatar={dialog.user.avatar ? dialog.user.avatar : false}
                     /></div>
-                    <div className="user-info" onClick={() => {
+                    <div className="user-info col" onClick={() => {
                         this.props.history.push({
                             search: `?user=${dialog.user._id}`
                         })
