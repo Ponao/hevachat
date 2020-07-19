@@ -64,9 +64,11 @@ function initSocket(initIo) {
 
                     let room = await Room.findById(activeRoomId).populate('users')
                     
-                    room.users = room.users.filter(x => String(x._id) != String(user._id))
+                    if(room) {
+                        room.users = room.users.filter(x => String(x._id) != String(user._id))
 
-                    await room.save()
+                        await room.save()
+                    }
                 }
 
                 stopCall(socket.id, user._id, stopUserCall, io)
