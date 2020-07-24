@@ -19,7 +19,7 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 
 import MicIcon from '@material-ui/icons/Mic';
 import Fab from '@material-ui/core/Fab';
-import { withStyles, Tooltip } from '@material-ui/core'
+import { withStyles, Tooltip, CircularProgress } from '@material-ui/core'
 import WebRtcController from '../../Controllers/WebRtcController'
 import SocketController from '../../Controllers/SocketController'
 import MusicOffIcon from '@material-ui/icons/MusicOff';
@@ -124,6 +124,17 @@ class Room extends React.Component {
     }
 
     render() {
+        if(!this.props.rooms.activeRoom) {
+            return <CircularProgress style={{
+                color: '#008FF7',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                margin: 'auto',
+                top: 'calc(50% - 20px)'
+            }} />
+        }
+
         if(this.props.rooms.activeRoom && this.props.rooms.activeRoom.error) {
             return <RoomJoinError isOpen={true} />
         }

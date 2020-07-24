@@ -16,6 +16,7 @@ import {urlApi} from '../config'
 import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../languages';
+import { CircularProgress } from '@material-ui/core';
 
 const customStylesModalCreate = {
     overlay: {
@@ -33,6 +34,7 @@ const customStylesModalCreate = {
         right                 : 'auto',
         bottom                : 'auto',
         minWidth              : '300px',
+        minHeight              : '245px',
         marginRight           : '-50%',
         transform             : 'translate(-50%, -50%)',
         borderRadius          : '10px',
@@ -61,11 +63,12 @@ class CreateRoom extends React.Component {
         title: this.props.rooms.activeRoom.title,
         isPrivate: this.props.rooms.activeRoom.isPrivate,
         error: false,
+        isFetching: false,
         errors: []
     }
 
     onSubmit(e) {
-        this.setState({error: false, errors: []})
+        this.setState({error: false, errors: [], isFetching: true})
         e.preventDefault()
 
         fetch(`${urlApi}/api/room/edit`, {
@@ -84,7 +87,7 @@ class CreateRoom extends React.Component {
         .then((response) => response.json())
         .then((room) => {
             if(room.error) {
-                this.setState({error: true, errors: room.errors})
+                this.setState({error: true, errors: room.errors, isFetching: false})
             } else {
                 this.props.close()
             }
@@ -92,6 +95,24 @@ class CreateRoom extends React.Component {
     }
     
     render() {
+        if(this.state.isFetching) {
+            return <Modal
+                isOpen={this.props.isOpen}
+                onRequestClose={() => {this.props.close()}}
+                style={customStylesModalCreate}
+                contentLabel="Edit room"
+            >
+                <CircularProgress style={{
+                    color: '#008FF7',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    margin: 'auto',
+                    top: 'calc(50% - 20px)'
+                }} />
+            </Modal>
+        }
+
         return <Modal
             isOpen={this.props.isOpen}
             onRequestClose={() => {this.props.close()}}

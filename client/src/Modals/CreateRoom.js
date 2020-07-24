@@ -20,6 +20,7 @@ import { withLang } from 'react-multi-language';
 import languages from '../languages';
 import store from '../Redux/store';
 import { ROOMS_SET_FORCE } from '../Redux/constants';
+import { CircularProgress } from '@material-ui/core';
 
 const customStylesModalCreate = {
     overlay: {
@@ -60,6 +61,7 @@ const customStylesModalInvite = {
         right                 : 'auto',
         bottom                : 'auto',
         minWidth              : '300px',
+        minHeight             : '300px',
         marginRight           : '-50%',
         transform             : 'translate(-50%, -50%)',
         borderRadius          : '10px',
@@ -96,11 +98,12 @@ class CreateRoom extends React.Component {
         step: 'create',
         selectUsers: [],
         error: false,
-        errors: []
+        errors: [],
+        isFetching: false
     }
 
     onSubmit(e) {
-        this.setState({error: false, errors: []})
+        this.setState({error: false, errors: [], isFetching: true})
         e.preventDefault()
 
         fetch(`${urlApi}/api/room/create`, {
@@ -120,7 +123,7 @@ class CreateRoom extends React.Component {
         .then((response) => response.json())
         .then((room) => {
             if(room.error) {
-                this.setState({error: true, errors: room.errors, step: 'create'})
+                this.setState({error: true, errors: room.errors, step: 'create', isFetching: false})
             } else {
                 this.props.roomsActions.roomsAdd(room)
                 SocketController.createRoom({room, lang: this.props.user.roomLang})
@@ -141,6 +144,24 @@ class CreateRoom extends React.Component {
     }
     
     render() {
+        if(this.state.isFetching) {
+            return <Modal
+                isOpen={this.props.isOpen}
+                onRequestClose={() => {this.props.close()}}
+                style={customStylesModalInvite}
+                contentLabel="Create room"
+            >
+                <CircularProgress style={{
+                    color: '#008FF7',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    margin: 'auto',
+                    top: 'calc(50% - 20px)'
+                }} />
+            </Modal>
+        }
+
         return <Modal
             isOpen={this.props.isOpen}
             onRequestClose={() => {this.props.close()}}
@@ -175,8 +196,9 @@ class CreateRoom extends React.Component {
                         style={{color: '#667788'}}
                         label={this.props.langProps.private_room}
                     />
-
-                    <button className="button-blue" onClick={() => {this.setState({step: 'invite'})}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.next}</button>
+                    
+                    {!this.state.title.length && <button className="button-gray" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>}
+                    {!!this.state.title.length && <button className="button-blue" onClick={() => {this.setState({step: 'invite'})}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.next}</button>}
                 </>}
 
                 {this.state.step === 'invite' && <>
