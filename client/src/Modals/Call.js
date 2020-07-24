@@ -193,11 +193,13 @@ class CreateDialog extends React.Component {
                 {this.props.call.status === 'incoming' && <h2 style={{width: '100%'}} className="modal-title">{this.props.langProps.incoming_call}</h2>}
 
                 {this.props.call.media === 'audio' && <>
-                    <Avatar 
-                        style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.call.user.color})`}} 
-                        name={this.props.call.user.name.first.charAt(0)+this.props.call.user.name.last.charAt(0)}
-                        avatar={this.props.call.user.avatar ? this.props.call.user.avatar : false}
-                    />
+                    <div className={this.props.call.status !== 'busy' && this.props.call.status !== 'canceled' && this.props.call.status !== 'active' ? 'pulse-avatar' : ''}>
+                        <Avatar 
+                            style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.call.user.color})`, zIndex: 3}} 
+                            name={this.props.call.user.name.first.charAt(0)+this.props.call.user.name.last.charAt(0)}
+                            avatar={this.props.call.user.avatar ? this.props.call.user.avatar : false}
+                        />
+                    </div>
 
                     <p className="user-profile-name">{this.props.call.user.name.first} {this.props.call.user.name.last}</p>
                     <p className="user-profile-city">{this.props.call.user.city ? this.props.call.user.city : this.props.langProps.not_indicated}</p>
@@ -238,11 +240,11 @@ class CreateDialog extends React.Component {
                 </div>}
 
                 {this.props.call.status === 'busy' && <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20, color: '#999999', fontSize: 14}}>
-                    The user is busy... <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>Close</a>
+                    {this.props.langProps.user_busy} <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>{this.props.langProps.close}</a>
                 </div>}
-
+                
                 {this.props.call.status === 'canceled' && <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20, color: '#999999', fontSize: 14}}>
-                    {this.props.call.user.name.first} canceled your call <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>Close</a>
+                    {this.props.call.user.name.first} {this.props.langProps.cancel_your_call} <br></br><a style={{color: '#008FF7', cursor: 'pointer'}} onClick={() => {this.props.callActions.clear()}}>{this.props.langProps.close}</a>
                 </div>}
             </>}
             {this.props.call.status === 'dont_have_payment' && <>
@@ -252,8 +254,8 @@ class CreateDialog extends React.Component {
             {this.props.call.status === 'exist' && <>
                 
                 <ErrorOutlineIcon style={{color: '#FF3333', fontSize: 60}} />
-                <h2 className="modal-title" style={{width: '100%'}}>Error</h2>
-                <p className="modal-text" style={{width: '100%', textAlign: 'center'}}>have_active_call</p>
+                <h2 className="modal-title" style={{width: '100%'}}>{this.props.langProps.error}</h2>
+                <p className="modal-text" style={{width: '100%', textAlign: 'center'}}>{this.props.langProps.have_active_call}</p>
             </>}
         </Modal>
     }

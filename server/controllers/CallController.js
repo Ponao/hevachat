@@ -4,7 +4,7 @@
  */
 'use strict';
 
-const { addUserCall, stopCall, checkBusy, checkIncominmgCall, acceptCall } = require("./WebRtcController");
+const { addUserCall, stopCall, checkBusy, checkIncominmgCall, acceptCall, getUserExistById } = require("./WebRtcController");
 const { sendUserCall, stopUserCall, getIO, sendUserAcceptCall } = require("./SocketController");
 const Dialog = require('../models/Dialog');
 const Message = require('../models/Message');
@@ -23,7 +23,7 @@ module.exports = {
                 return res.json({error: 'dont_have_payment'});
             }
 
-            if(checkBusy(user._id) || user._id == id) {
+            if(checkBusy(user._id) || user._id == id || getUserExistById(user._id)) {
                 return res.json({error: 'exist'});
             }
 
@@ -82,7 +82,11 @@ module.exports = {
                 stopCall(socketId, user._id, stopUserCall, io, true)
                 return res.json({error: 'dont_have_payment'});
             }
-            
+
+            if(getUserExistById(user._id)){
+                // stopCall(socketId, user._id, stopUserCall, io, true)
+                return res.json({error: 'exist'});
+            }
             acceptCall(user._id, userId, socketId)
             sendUserAcceptCall({userId: user._id, otherId: userId, socketId})
             return res.json({error: false});

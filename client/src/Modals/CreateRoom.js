@@ -18,6 +18,8 @@ import Friends from './contactsPartials/Friends';
 import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../languages';
+import store from '../Redux/store';
+import { ROOMS_SET_FORCE } from '../Redux/constants';
 
 const customStylesModalCreate = {
     overlay: {
@@ -122,7 +124,18 @@ class CreateRoom extends React.Component {
             } else {
                 this.props.roomsActions.roomsAdd(room)
                 SocketController.createRoom({room, lang: this.props.user.roomLang})
-                this.props.history.push(`/rooms/${room._id}`)
+
+                if(this.props.call.user) {
+                    this.props.history.push({
+                        search: ""
+                    })
+                    store.dispatch({
+                        type: ROOMS_SET_FORCE,
+                        payload: room._id
+                    })
+                } else {
+                    this.props.history.push(`/rooms/${room._id}`)
+                }
             }
         });
     }
@@ -184,7 +197,8 @@ class CreateRoom extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.user
+        user: state.user,
+        call: state.call
     }
 }
 

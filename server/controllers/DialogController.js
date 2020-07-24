@@ -736,7 +736,7 @@ module.exports = {
 
             const dialogId = String(dialog._id)
 
-            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'}).limit(20)
+            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'})
 
             if(investments) {
                 return res.json(investments);

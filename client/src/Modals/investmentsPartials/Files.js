@@ -13,6 +13,8 @@ import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
 import InsertDriveFileOutlinedIcon from '@material-ui/icons/InsertDriveFileOutlined';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class Images extends React.Component {
     state = {
@@ -95,7 +97,7 @@ class Images extends React.Component {
             {(!this.state.files.length && !this.state.isFetching) && <div className="data-empty">
                 <FileCopyIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                <p>Here will placed files from this dialog</p>
+                <p>{this.props.langProps.empty_inv_files}</p>
             </div>}
         </Scrollbars>
     }
@@ -108,4 +110,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(Images))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(Images)))

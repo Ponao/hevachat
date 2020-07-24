@@ -84,6 +84,7 @@ class OtherUser extends React.Component {
 
                     {this.props.call.status === 'none' && <div className="user-btn">
                         <NavLink style={{textDecoration: 'none'}} onClick={(e) => {
+                            e.preventDefault()
                             this.props.callActions.call(this.props.user, this.props.myUser.apiToken)
                         }} className="dialog-link" to={`/chats/${this.props.user._id}`}>
                             <CustomFab color="primary" size="small" aria-label="add" onClick={() => {}}>

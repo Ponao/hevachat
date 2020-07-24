@@ -2,14 +2,16 @@ import {
     CALL_SET_USER,
     CALL_SET_STATUS,
     CALL_SET_REMOTE_STREAM,
-    CALL_SET_MEDIA
+    CALL_SET_MEDIA,
+    CALL_SET_FORCE
 } from '../constants'
 
 const INITIAL_STATE = {
     user: false,
     status: 'none', // none, outcoming, incoming, busy, active, canceled
     remoteStream: false,
-    media: 'audio'
+    media: 'audio',
+    force: {user: false, status: false}
 }
 
 const call = (state = INITIAL_STATE, action) => {
@@ -22,6 +24,8 @@ const call = (state = INITIAL_STATE, action) => {
             return { ...state, remoteStream: action.payload }
         case CALL_SET_MEDIA:
             return { ...state, media: action.payload }
+        case CALL_SET_FORCE:
+            return { ...state, force: {user: action.payload.user, status: action.payload.status} }
         default:    
             return state
     }

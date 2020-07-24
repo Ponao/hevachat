@@ -367,6 +367,8 @@
     display: flex;
     flex-wrap: wrap;
     padding-left: 6px;
+    flex: 1 1;
+    overflow: hidden;
 }
 
 .message-file-name {
@@ -1408,3 +1410,73 @@
     color: #008FF7;
     cursor: default;
 }
+
+.pulse-avatar {
+    position: relative;
+    width: 120px;
+    padding: 0 20px;
+}
+
+.pulse-avatar::before {
+    border-radius: 100px;
+    content: '';
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    background: rgba(60, 147, 223, 0.38);
+    z-index: 2;
+    animation: pulsebefore 1.5s infinite ease-in-out;
+}
+
+.pulse-avatar::after {
+    border-radius: 100px;
+    content: '';
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    background: rgba(60, 147, 223, 0.38);
+    z-index: 1;
+    animation: pulseafter 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseafter {
+    from {
+        width: 100px;
+        height: 100px;
+    }
+    50% {
+        width: 80px;
+        height: 80px;
+    }
+    to {
+        width: 100px;
+        height: 100px;
+    }
+}
+@keyframes pulsebefore {
+    from {
+        width: 80px;
+        height: 80px;
+    }
+    50% {
+        width: 115px;
+        height: 115px;
+    }
+    to {
+        width: 80px;
+        height: 80px;
+    }
+}
+

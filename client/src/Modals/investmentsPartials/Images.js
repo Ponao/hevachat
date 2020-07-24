@@ -12,6 +12,8 @@ import { withRouter } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
 import { SLIDER_SET } from '../../Redux/constants';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class Images extends React.Component {
     state = {
@@ -98,7 +100,7 @@ class Images extends React.Component {
             {(!this.state.images.length && !this.state.isFetching) && <div className="data-empty">
                 <PhotoLibraryIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                <p>Here will placed images from this dialog</p>
+                <p>{this.props.langProps.empty_inv_images}</p>
             </div>}
         </Scrollbars>
     }
@@ -111,4 +113,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(Images))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(Images)))

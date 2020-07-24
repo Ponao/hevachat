@@ -24,6 +24,9 @@ import Banroom from './Banroom';
 import Unbanroom from './Unbanroom';
 import SendWaning from './SendWaning';
 import Warning from './Warning';
+import ForceAcceptCall from './ForceAcceptCall';
+import ForcePlaceCall from './ForcePlaceCall';
+import ForceJoinRoom from './ForceJoinRoom';
 
 class MainModal extends React.Component {
     state = {
@@ -134,13 +137,13 @@ class MainModal extends React.Component {
                 })
             }} />
 
-            {this.state.act === 'editRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId) && <EditRoom isOpen={this.state.act === 'editRoom' && this.props.rooms.activeRoom} close={() => {
+            {this.state.act === 'editRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId  || this.props.user.role === 'admin' || this.props.user.role === 'moder') && <EditRoom isOpen={this.state.act === 'editRoom' && this.props.rooms.activeRoom} close={() => {
                 this.props.history.push({
                     search: ""
                 })
             }} />}
 
-            {this.state.act === 'deleteRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId) && <DeleteRoom isOpen={this.state.act === 'deleteRoom' && this.props.rooms.activeRoom} close={() => {
+            {this.state.act === 'deleteRoom' && this.props.rooms.activeRoom && (this.props.user._id === this.props.rooms.activeRoom.ownerId || this.props.user.role === 'admin' || this.props.user.role === 'moder') && <DeleteRoom isOpen={this.state.act === 'deleteRoom' && this.props.rooms.activeRoom} close={() => {
                 this.props.history.push({
                     search: ""
                 })
@@ -174,7 +177,12 @@ class MainModal extends React.Component {
                 }}
             />}
 
-            {this.props.call.user && <Call isOpen={true} />}
+            {!!this.props.rooms.force && <ForceJoinRoom isOpen={true} />}
+
+            {this.props.call.user && this.props.call.force.status === 'force-accept' && <ForceAcceptCall isOpen={true} />}
+            {this.props.call.user && this.props.call.force.status === 'force-call' && <ForcePlaceCall isOpen={true} />}
+
+            {this.props.call.user && !this.props.call.force.status && <Call isOpen={true} />}
         </>
     }
 }

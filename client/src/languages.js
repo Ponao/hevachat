@@ -98,7 +98,21 @@ export default {
         write_your_first_message: 'Напишите свое первое сообщение для',
         typing: 'печатает',
         attachment_messages: 'Прикрепленные сообщения',
-        messages: 'Сообщения'
+        messages: 'Сообщения',
+        have_max_rooms: 'Создано максимальное кол-во комнат',
+        room_exist: 'Комната с таким именем существует',
+        have_active_call: 'Имеется активный звонок',
+        error: 'Ошибка',
+        force_accept_text: 'Если вы примите личный звонок, то ваш звонок в комнате завершится.',
+        force_join_text: 'Если вы перейдете в комнату, текущий личный звонок завершится.',
+        force_place_text: 'Если вы совершите личный звонок, то ваш звонок в комнате завершится.',
+        delete_room_text: 'После удаления вы и присутсвующие в комнате останутся в ней, но больше никто не сможет зайти.',
+        close: 'Закрыть',
+        user_busy: 'Пользователь занят...',
+        cancel_your_call: 'отклонил ваш звонок',
+        empty_inv_files: 'Здесь будут находиться файды из этого диалога',
+        empty_inv_sounds: 'Здесь будет находиться аудио из этого диалога',
+        empty_inv_images: 'Здесь будут находиться изображения из этого диалога'
     },
     en: {
         settings: 'Settings',
@@ -199,6 +213,20 @@ export default {
         write_your_first_message: 'Write your first message to',
         typing: 'typing',
         attachment_messages: 'Attachment messages',
-        messages: 'Messages'
+        messages: 'Messages',
+        have_max_rooms: 'Create max limit rooms',
+        room_exist: 'A room with that name exists',
+        have_active_call: 'Have active call',
+        error: 'Error',
+        force_accept_text: 'If you accept a personal call, your room call will end.',
+        force_join_text: 'If you move to a room, the current personal call ends.',
+        force_place_text: 'If you make a personal call, then your call in the room will end.',
+        delete_room_text: 'After deleting, you and those present in the room will remain in it, but no one else will be able to enter.',
+        close: 'Close',
+        user_busy: 'The user is busy...',
+        cancel_your_call: 'canceled your call',
+        empty_inv_files: 'Here will placed files from this dialog',
+        empty_inv_sounds: 'Here will placed sounds from this dialog',
+        empty_inv_images: 'Here will placed images from this dialog'
     }
 }

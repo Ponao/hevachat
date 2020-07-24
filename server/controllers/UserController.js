@@ -172,7 +172,7 @@ module.exports = {
             if(searchFirst || searchLast)
                 users = await User.find(
                     {'$or': search}
-                ).limit(20)
+                )
 
             if(users)
                 return res.json(users);
@@ -233,7 +233,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 3}, limit: 15, sort: {updatedAt: 'DESC'}}
+                options: {where: {status: 3}, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)
@@ -253,7 +253,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 2}, limit: 15, sort: {updatedAt: 'DESC'}}
+                options: {where: {status: 2}, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)
@@ -273,7 +273,7 @@ module.exports = {
                     {path: 'recipient', options: {select: ['-friends']}}, 
                     {path: 'requester', options: {select: ['-friends']}}
                 ],
-                options: {where: {status: 1}, limit: 15, sort: {updatedAt: 'DESC'}}
+                options: {where: {status: 1}, sort: {updatedAt: 'DESC'}}
             })
 
             if(friends)

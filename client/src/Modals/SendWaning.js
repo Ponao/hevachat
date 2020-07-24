@@ -10,18 +10,13 @@ import * as usersActions from '../Redux/actions/users'
 import * as roomsActions from '../Redux/actions/rooms'
 import { bindActionCreators } from 'redux'
 import { withCookies } from 'react-cookie'
-import { Scrollbars } from 'react-custom-scrollbars';
-import { CircularProgress, Button, Radio, withStyles } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import { withRouter } from 'react-router-dom';
-import { urlApi, timeStamps } from '../config';
+import { urlApi } from '../config';
 import languages from '../languages';
 import { withLang } from 'react-multi-language';
-import Avatar from '../Partials/User/Avatar';
 import { toast } from 'react-toastify';
 
-let waitSearch = false
 
 const customStylesModal = {
     overlay: {
@@ -52,45 +47,7 @@ const customStylesModal = {
     }
 };
 
-const radioStyles = theme => ({
-    root: {
-        color: '#CCD1D6',
-        display: 'flex',
-        '&$checked': {
-            color: '#008FF7',
-            border: 'none'
-        },
-        '&:hover': {
-            backgroundColor: 'transparent',
-        }
-    },
-    checked: {},
-})
 
-const CustomRadio = withStyles(radioStyles)(Radio);
-
-class RoomItem extends React.Component {
-    render() {
-        return <>
-            <Button className="room-item" title={`Room ${this.props.room.title}`} onClick={() => {
-                this.props.selectRoom(this.props.room._id)
-            }}>
-                <Avatar style={{minWidth: 40, maxWidth: 40, height: 40, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.room.color})`}} name={this.props.room.title.charAt(0)} />
-                <div style={{
-                    flexGrow: 1,
-                    minWidth: 0,
-                    maxWidth: '100%',
-                    paddingRight: 10
-                }}>
-                    <p>{this.props.room.isPrivate && <LockOutlinedIcon />}<span>{this.props.room.title}</span></p>
-                </div>
-                <CustomRadio
-                    checked={this.props.selectRoomId === this.props.room._id}
-                />
-            </Button>
-        </>
-    }
-}
 
 class Settings extends React.Component {
     state = {

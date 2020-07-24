@@ -17,6 +17,8 @@ import { Button } from '@material-ui/core';
 import { LastMessageDate } from '../../Controllers/TimeController';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
+import store from '../../Redux/store';
+import { ROOMS_SET_FORCE } from '../../Redux/constants';
 
 class NotificationItem extends React.Component {
     state = {
@@ -29,8 +31,16 @@ class NotificationItem extends React.Component {
                 if(!this.props.notification.isRead)
                     this.props.notificationsActions.notificationRead(this.props.notification._id, this.props.user.apiToken)
 
-                if(this.props.notification.type === 'invite')
-                    this.props.history.push(`/rooms/${this.props.notification.room._id}`)
+                if(this.props.notification.type === 'invite') {
+                    if(this.props.call.user) {
+                        store.dispatch({
+                            type: ROOMS_SET_FORCE,
+                            payload: this.props.notification.room._id
+                        })
+                    } else {
+                        this.props.history.push(`/rooms/${this.props.notification.room._id}`)
+                    }
+                }
                 if(this.props.notification.type === 'accept' || this.props.notification.type === 'request')
                     this.props.history.push({
                         search: `?user=${this.props.notification.user._id}`
@@ -70,6 +80,7 @@ class NotificationItem extends React.Component {
 
 const mapStateToProps = state => {
     return {
+        call: state.call,
         user: state.user,
     }
 }

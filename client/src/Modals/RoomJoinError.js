@@ -6,6 +6,8 @@ import Modal from 'react-modal';
 import { connect } from 'react-redux'
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { withRouter, Redirect } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../languages';
 
 const customStylesModal = {
     overlay: {
@@ -39,12 +41,12 @@ class RoomJoinError extends React.Component {
         >  
             {this.props.rooms.activeRoom.error.msg === 'dont_have_payment' && <Redirect to="/payment" />}
             <ErrorOutlineIcon style={{color: '#FF3333', fontSize: 60}} />
-            <h2 className="modal-title">Error</h2>
-            <p className="modal-text" style={{marginBottom: !!this.props.rooms.activeRoom.error.ban ? 0 : ''}}>{this.props.rooms.activeRoom.error.msg}</p>
+            <h2 className="modal-title">{this.props.langProps.error}</h2>
+            <p className="modal-text" style={{marginBottom: !!this.props.rooms.activeRoom.error.ban ? 0 : ''}}>{this.props.langProps[this.props.rooms.activeRoom.error.msg]}</p>
             {!!this.props.rooms.activeRoom.error.ban && <p className="modal-text">to <span style={{color: '#008FF7'}}>{new Date(this.props.rooms.activeRoom.error.ban.date).toLocaleString()}</span></p>}
             <button className="button-blue" type="submit" style={{width: 'max-content'}} onClick={() => {
                 this.props.history.push('/')
-            }}>Back</button>
+            }}>{this.props.langProps.back}</button>
         </Modal>
     }
 }
@@ -55,4 +57,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(RoomJoinError))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(RoomJoinError)))

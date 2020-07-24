@@ -27,6 +27,7 @@ import { connect } from 'react-redux'
 import ActionMenu from '../ActionMenu'
 import { randomInteger } from '../../Controllers/FunctionsController'
 import * as usersActions from '../../Redux/actions/users'
+import * as callActions from '../../Redux/actions/call'
 import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom';
 import store from '../../Redux/store';
@@ -162,7 +163,12 @@ class Message extends React.PureComponent {
                         </h3>
                     }
 
-                    {this.props.message.text && <p className="message-text">
+                    {this.props.message.text && <p className="message-text" onClick={(e) => {
+                        if(this.props.message.type === 'call' && this.props.message.user._id !== this.props.user._id) {
+                            e.stopPropagation()
+                            this.props.callActions.call(this.props.message.user, this.props.user.apiToken)
+                        }
+                    }}>
                         <Linkify componentDecorator={componentDecorator}>
                             {this.props.message.type === 'message' && <>
                                 {this.props.message.text.replace(/&nbsp;/g, '')
@@ -321,7 +327,8 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
     return {
-        usersActions: bindActionCreators(usersActions, dispatch)
+        usersActions: bindActionCreators(usersActions, dispatch),
+        callActions: bindActionCreators(callActions, dispatch),
     }
 }
 

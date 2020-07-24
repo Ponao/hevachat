@@ -23,9 +23,9 @@ class ToolbarMessage extends React.Component {
                     <ReplyIcon style={{color: '#99AABB'}} />
                 </Button>
 
-                <Button className="btn-forward" onClick={() => {this.props.addAttachmentForwardMessage()}}>
+                {!this.props.recentMessages.find(message => message.type === 'call') && <Button className="btn-forward" onClick={() => {this.props.addAttachmentForwardMessage()}}>
                     <ReplyIcon style={{color: '#99AABB', transform: 'scaleX(-1)'}} />
-                </Button>
+                </Button>}
 
                 <div className="col"></div>
 

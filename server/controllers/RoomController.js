@@ -15,7 +15,7 @@ const Payment = require('../models/Payment');
 const sizeOf = require('image-size');
 
 const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom, banRoom} = require('./SocketController')
-const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom} = require('./WebRtcController')
+const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} = require('./WebRtcController')
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -99,7 +99,7 @@ module.exports = {
                 }
             }
 
-            if(getUserExistById(user._id)) {
+            if(getUserExistById(user._id) || checkBusy(user._id)) {
                 const err = {};
                 err.param = `all`;
                 err.msg = `have_active_call`;
@@ -246,6 +246,15 @@ module.exports = {
                 return res.status(409).json({ error: true, errors: [err] });
             }
 
+            const countRooms = await Room.find({ownerId: user._id}).countDocuments()
+
+            if(countRooms >= 5) {
+                const err = {};
+                err.param = `title`;
+                err.msg = `have_max_rooms`;
+                return res.status(409).json({ error: true, errors: [err] });
+            }
+
             const dialog = new Dialog()
             await dialog.save()
             
@@ -322,7 +331,7 @@ module.exports = {
         try {
             const room = await Room.findById(id)
 
-            if(room && user._id == room.ownerId) {
+            if(room && (user._id == room.ownerId  || user.role == 'admin' || user.role == 'moder')) {
                 await Room.deleteOne({_id: id})
 
                 deleteRoom({roomId: id, lang: room.lang})
@@ -358,7 +367,7 @@ module.exports = {
                 return res.status(409).json({ error: true, errors: [err] });
             }
 
-            if(user._id != room.ownerId) {
+            if(user._id != room.ownerId && (user.role != 'admin' && user.role != 'moder')) {
                 const err = {};
                 err.param = `title`;
                 err.msg = `dont_have_permissions`;
@@ -845,7 +854,7 @@ module.exports = {
 
             const dialogId = String(room.dialog._id)
 
-            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'}).limit(20)
+            let investments = await Investment.find({dialogId, type}).sort({createdAt: 'DESC'})
 
             if(investments) {
                 return res.json(investments);

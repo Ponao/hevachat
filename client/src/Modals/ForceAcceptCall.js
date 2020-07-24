@@ -4,11 +4,14 @@ import Modal from 'react-modal';
 
 // Redux
 import { connect } from 'react-redux'
-import {urlApi} from '../config'
 
 import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../languages';
+import store from '../Redux/store';
+import { CALL_SET_FORCE } from '../Redux/constants';
+import * as callActions from '../Redux/actions/call'
+import { bindActionCreators } from 'redux';
 
 const customStylesModalCreate = {
     overlay: {
@@ -38,35 +41,38 @@ const customStylesModalCreate = {
 
 class DeleteRoom extends React.Component {
     onSubmit() {
-        fetch(`${urlApi}/api/room/delete`, {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.props.user.apiToken}`,
-            },
-            body: JSON.stringify({
-                id: this.props.rooms.activeRoom._id
-            })
+        this.props.history.push(`/chats/${this.props.call.force.user._id}`)
+        
+        store.dispatch({
+            type: CALL_SET_FORCE,
+            payload: {user: false, status: false}
         })
-        .then(() => {
-            this.props.close()
-        });
+
+        setTimeout(() => {
+            this.props.callActions.accept(this.props.user.apiToken)
+        }, 250)
+    }
+
+    close() {
+        store.dispatch({
+            type: CALL_SET_FORCE,
+            payload: {user: false, status: false}
+        })
     }
     
     render() {
         return <Modal
             isOpen={this.props.isOpen}
-            onRequestClose={() => {this.props.close()}}
+            onRequestClose={() => {this.close()}}
             style={customStylesModalCreate}
             contentLabel="Delete room"
         >
             <h2 className="modal-title" style={{width: '100%'}}>{this.props.langProps.you_sure}</h2>
             
-            <p>{this.props.langProps.delete_room_text}</p>
+            <p>{this.props.langProps.force_accept_text}</p>
 
-            <button className="button-blue" onClick={() => {this.props.close()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>
-            <button className="button-gray" onClick={() => {this.onSubmit()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.delete}</button>
+            <button className="button-blue" onClick={() => {this.close()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.back}</button>
+            <button className="button-gray" onClick={() => {this.onSubmit()}} style={{width: 'max-content', marginTop: 5}}>{this.props.langProps.accept}</button>
         </Modal>
     }
 }
@@ -74,8 +80,14 @@ class DeleteRoom extends React.Component {
 const mapStateToProps = state => {
     return {
         user: state.user,
-        rooms: state.rooms
+        call: state.call
     }
 }
 
-export default withLang(languages)(connect(mapStateToProps)(withRouter(DeleteRoom)))
+function mapDispatchToProps(dispatch) {
+    return {
+        callActions: bindActionCreators(callActions, dispatch)
+    }
+}
+
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(DeleteRoom)))

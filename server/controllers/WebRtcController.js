@@ -87,16 +87,21 @@ function getKurentoClient(callback) {
         return callback(null, kurentoClient);
     }
 
-    kurento(wsKurentoUri, function(error, _kurentoClient) {
-        if (error) {
-            console.log("Could not find media server at address " + wsKurentoUri);
-            return callback("Could not find media server at address" + wsKurentoUri
-                    + ". Exiting with error " + error);
-        }
-
-        kurentoClient = _kurentoClient;
-        callback(null, kurentoClient);
-    });
+    try {
+        kurento(wsKurentoUri, function(error, _kurentoClient) {
+            if (error) {
+                console.log("Could not find media server at address " + wsKurentoUri);
+                return callback("Could not find media server at address" + wsKurentoUri
+                        + ". Exiting with error " + error);
+            }
+            console.log('New kurento')
+            kurentoClient = _kurentoClient;
+            callback(null, kurentoClient);
+        });
+    } catch (error) {
+        
+    }
+    
 }
 
 function roomOnIceCandidate(roomId, userId, _candidate) {
@@ -131,16 +136,19 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
                     if(error) {
                         return console.log(error)
                     }
-                    Rooms[roomId].MediaPipeline = pipeline
+                    if(!!Rooms[roomId]) {
+                        Rooms[roomId].MediaPipeline = pipeline
 
-                    Rooms[roomId].MediaPipeline.create('Composite',  function( error, composite ) {
-                        if (error) {
-                            return callback(error);
-                        }
-                        Rooms[roomId].composite = composite;
-                    });
+                        Rooms[roomId].MediaPipeline.create('Composite',  function( error, composite ) {
+                            if (error) {
+                                return callback(error);
+                            }
+                            if(!!Rooms[roomId])
+                                Rooms[roomId].composite = composite;
+                        });
 
-                    connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+                        connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
+                    }
                 })
             })
         } catch {}
@@ -244,7 +252,7 @@ const stop = async (roomId, userId) => {
 
 	clearCandidatesQueue(userId);
 
-	if (Rooms[roomId].users.length < 1) {
+	if (Object.entries(Rooms[roomId].users).length < 1) {
         if(Rooms[roomId].MediaPipeline)
             Rooms[roomId].MediaPipeline.release();
         
@@ -252,6 +260,17 @@ const stop = async (roomId, userId) => {
             Rooms[roomId].composite.release();
         delete Rooms[roomId]
     }
+
+    // if(Object.entries(Rooms).length < 1) {
+    //     console.log('Close kurento')
+    //     try {
+    //         kurentoClient.close()
+    //         kurentoClient = null
+    //     } catch (error) {
+            
+    //     }
+        
+    // }
 }
 
 function stopRoomBySocketId(socketId) {
@@ -266,7 +285,7 @@ function stopRoomBySocketId(socketId) {
 
                 delete Rooms[room._id].users[user._id]
 
-                if (Rooms[room._id].users.length < 1) {
+                if (Object.entries(Rooms[room._id].users).length < 1) {
                     if(Rooms[room._id].MediaPipeline)
                         Rooms[room._id].MediaPipeline.release();
 
@@ -275,6 +294,16 @@ function stopRoomBySocketId(socketId) {
 
                     delete Rooms[room._id]
                 }
+
+                // if(Object.entries(Rooms).length < 1) {
+                //     console.log('Close kurento')
+                //     try {
+                //         kurentoClient.close()
+                //         kurentoClient = null
+                //     } catch (error) {
+                        
+                //     }
+                // }
 
                 return
             }

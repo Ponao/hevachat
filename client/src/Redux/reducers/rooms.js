@@ -27,7 +27,8 @@ import {
     ROOMS_EDIT_IN_ROOM,
     ROOMS_DELETE_ROOM,
     ROOMS_PRELOAD,
-    ROOMS_SET_MUTED
+    ROOMS_SET_MUTED,
+    ROOMS_SET_FORCE
 } from '../constants'
 
 const INITIAL_STATE = {
@@ -36,7 +37,8 @@ const INITIAL_STATE = {
     activeRoom: false,
     isError: false,
     rooms: [],
-    canLoad: false
+    canLoad: false,
+    force: false
 }
 
 const rooms = (state = INITIAL_STATE, action) => {
@@ -72,6 +74,8 @@ const rooms = (state = INITIAL_STATE, action) => {
                     return user._id !== action.payload
                 })
             ] } }
+        case ROOMS_SET_FORCE:
+            return { ...state, force: action.payload }
         case ROOMS_USER_JOIN_IN_ROOM:
             return { ...state, activeRoom: { ...state.activeRoom, users: [ ...state.activeRoom.users, action.payload ] } }
         case ROOMS_EDIT_IN_ROOM:

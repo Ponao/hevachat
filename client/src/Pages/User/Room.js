@@ -71,7 +71,7 @@ const Members = withRouter((props) => {
         autoHide
     >
         {props.users.map((user, index) => 
-            <div key={index} style={{cursor: 'pointer'}} className="member" onClick={() => {
+            <div key={index} style={{cursor: 'pointer'}} className="member col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3" onClick={() => {
                 props.history.push({
                     search: `?user=${user._id}`
                 })
@@ -119,7 +119,8 @@ class Room extends React.Component {
     }
 
     componentWillUnmount() {
-        this.props.roomsActions.leaveRoom(this.props.rooms.activeRoom._id, this.props.rooms.activeRoom.lang)
+        if(!!this.props.rooms.activeRoom)
+            this.props.roomsActions.leaveRoom(this.props.rooms.activeRoom._id, this.props.rooms.activeRoom.lang)
     }
 
     render() {
@@ -153,7 +154,7 @@ class Room extends React.Component {
                             <MoreVertIcon style={{color: '#008FF7'}} />
                         </CustomFab2>
                         <ActionMenu event="click" bottom={true} right={true} actions={
-                        this.props.rooms.activeRoom.ownerId === this.props.user._id ? [
+                        this.props.rooms.activeRoom.ownerId === this.props.user._id || this.props.user.role === 'admin' || this.props.user.role === 'moder' ? [
                             {text: this.props.langProps.invite_friends, action: () => {
                                 this.props.history.push({
                                     search: '?act=invite'

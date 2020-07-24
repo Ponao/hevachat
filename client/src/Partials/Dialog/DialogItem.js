@@ -51,7 +51,7 @@ class DialogItem extends React.Component {
                         <p className="user-name"><span>{`${this.props.user.name.first} ${this.props.user.name.last}`}</span></p>
                         {!this.props.typing && <p className="last-message">
                             {this.props.lastMessage.user._id === this.props.myUser._id && <span style={{color: '#999999'}}>{this.props.langProps.you}:&nbsp;</span>}
-                            {this.props.lastMessage.text && <span className="content">{this.props.lastMessage.type === 'call' ? this.props.langProps[this.props.lastMessage.text] : this.props.lastMessage.text}</span>}
+                            {this.props.lastMessage.text && <span className="content" style={{color: this.props.lastMessage.type === 'call' ? '#008FF7' : null}}>{this.props.lastMessage.type === 'call' ? this.props.langProps[this.props.lastMessage.text] : this.props.lastMessage.text}</span>}
                             
                             {!this.props.lastMessage.text && 
                             this.props.lastMessage.images.length === 1 && 

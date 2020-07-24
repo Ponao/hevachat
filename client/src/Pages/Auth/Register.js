@@ -14,6 +14,7 @@ import * as userActions from '../../Redux/actions/user'
 import { bindActionCreators } from 'redux'
 import {urlApi} from '../../config'
 import SocketController from '../../Controllers/SocketController'
+import { CircularProgress } from '@material-ui/core'
 
 class Register extends React.Component {
     state = {
@@ -30,7 +31,7 @@ class Register extends React.Component {
         e.preventDefault()
 
         if(this.state.email && this.state.password) {
-            this.setState({isFetching: true})
+            this.setState({isFetching: true, error: false, errors: []})
 
             fetch(`${urlApi}/auth/register`, {
                 method: "post",
@@ -64,6 +65,16 @@ class Register extends React.Component {
     }
 
     render() {
+        if(this.state.isFetching)
+            return <CircularProgress style={{
+                color: '#008FF7',
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                margin: 'auto',
+                top: 'calc(50% - 20px)'
+            }} />
+
         return (
             <div className="login-page">
                 <h1 className="logo">
@@ -87,7 +98,7 @@ class Register extends React.Component {
                         {this.state.errors.find(value => value.param === 'email').msg} 
                     </span>}
 
-                    <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Пароль" />
+                    <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Password" />
                     {this.state.errors.find(value => value.param === 'password') && <span className="input-error-label">
                         {this.state.errors.find(value => value.param === 'password').msg} 
                     </span>}
@@ -96,7 +107,7 @@ class Register extends React.Component {
                         {this.state.errors.find(value => value.param === 'all').msg} 
                     </span>}
 
-                    <button type="submit" className="button-gray">Зарегистрироваться</button>
+                    <button type="submit" className="button-gray">Sign up</button>
 
                     <p className="nav-auth">Already have account? <Link to="/login">Log in</Link></p>
                 </form>

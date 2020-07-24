@@ -173,6 +173,9 @@ export default {
         })
     },
     leaveRoom({roomId, lang}) {
+        if(!!store.getState().call.user)
+            return 
+            
         if(WebRtcPeerConnection) {
             WebRtcPeerConnection.close()
             WebRtcPeerConnection = false

@@ -12,6 +12,8 @@ import { withRouter } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
 import { urlApi } from '../../config';
 import Audio from '../../Partials/Chat/Audio';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class Images extends React.Component {
     state = {
@@ -89,7 +91,7 @@ class Images extends React.Component {
             {(!this.state.sounds.length && !this.state.isFetching) && <div className="data-empty">
                 <AudiotrackIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
 
-                <p>Here will placed sounds from this dialog</p>
+                <p>{this.props.langProps.empty_inv_sounds}</p>
             </div>}
         </Scrollbars>
     }
@@ -102,4 +104,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(Images))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(Images)))

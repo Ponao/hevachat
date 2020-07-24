@@ -39,6 +39,7 @@ export const ROOMS_EDIT_IN_ROOM = 'ROOMS_EDIT_IN_ROOM'
 export const ROOMS_DELETE_ROOM = 'ROOMS_DELETE_ROOM'
 export const ROOMS_PRELOAD = 'ROOMS_PRELOAD'
 export const ROOMS_SET_MUTED = 'ROOMS_SET_MUTED'
+export const ROOMS_SET_FORCE = 'ROOMS_SET_FORCE'
 
 // Dialogs
 export const DIALOGS_GET = 'DIALOGS_GET'
@@ -90,6 +91,7 @@ export const CALL_SET_USER = 'CALL_SET_USER'
 export const CALL_SET_STATUS = 'CALL_SET_STATUS'
 export const CALL_SET_REMOTE_STREAM = 'CALL_SET_REMOTE_STREAM'
 export const CALL_SET_MEDIA = 'CALL_SET_MEDIA'
+export const CALL_SET_FORCE = 'CALL_SET_FORCE'
 
 // Slider
 export const SLIDER_SET = 'SLIDER_SET'
