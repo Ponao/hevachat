@@ -41,12 +41,12 @@ const customStylesModalCreate = {
 
 class DeleteRoom extends React.Component {
     onSubmit() {
-        this.props.history.push(`/chats/${this.props.call.force.user._id}`)
-        
         store.dispatch({
             type: CALL_SET_FORCE,
             payload: {user: false, status: false}
         })
+        
+        this.props.history.push(`/chats/${this.props.call.force.user._id}`)
 
         setTimeout(() => {
             this.props.callActions.accept(this.props.user.apiToken)

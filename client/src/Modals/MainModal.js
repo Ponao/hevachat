@@ -180,7 +180,7 @@ class MainModal extends React.Component {
             {!!this.props.rooms.force && <ForceJoinRoom isOpen={true} />}
 
             {this.props.call.user && this.props.call.force.status === 'force-accept' && <ForceAcceptCall isOpen={true} />}
-            {this.props.call.user && this.props.call.force.status === 'force-call' && <ForcePlaceCall isOpen={true} />}
+            {this.props.call.force.status === 'force-call' && <ForcePlaceCall isOpen={true} />}
 
             {this.props.call.user && !this.props.call.force.status && <Call isOpen={true} />}
         </>

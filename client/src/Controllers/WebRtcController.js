@@ -133,19 +133,23 @@ function onCallIceCandidate(e) {
 export default { 
     // Global functions
     toggleMicrophone() {
-        localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled
-        store.dispatch({
-            type: MEDIA_TOGGLE_MICROPHONE,
-            payload: localStream.getAudioTracks()[0].enabled
-        })
+        if(localStream) {
+            localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled
+            store.dispatch({
+                type: MEDIA_TOGGLE_MICROPHONE,
+                payload: localStream.getAudioTracks()[0].enabled
+            })
+        }
     },
     toggleMusic() {
-        remoteStream.getAudioTracks()[0].enabled = !remoteStream.getAudioTracks()[0].enabled
+        if(remoteStream) {
+            remoteStream.getAudioTracks()[0].enabled = !remoteStream.getAudioTracks()[0].enabled
 
-        store.dispatch({
-            type: MEDIA_TOGGLE_MUSIC,
-            payload: remoteStream.getAudioTracks()[0].enabled
-        })
+            store.dispatch({
+                type: MEDIA_TOGGLE_MUSIC,
+                payload: remoteStream.getAudioTracks()[0].enabled
+            })
+        }
     },
 
     // Rooms conference
@@ -173,7 +177,7 @@ export default {
         })
     },
     leaveRoom({roomId, lang}) {
-        if(!!store.getState().call.user)
+        if(!!store.getState().call.status === 'active')
             return 
             
         if(WebRtcPeerConnection) {
