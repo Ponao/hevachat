@@ -15,6 +15,7 @@ const mongoose = require("../database");
 const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification, sendWarning} = require('./SocketController')
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
+const { sendPushNotification } = require('./PushNotificationsController');
 
 module.exports = {
     // Get user data
