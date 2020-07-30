@@ -15,7 +15,9 @@ const Payment = require('../models/Payment');
 const sizeOf = require('image-size');
 
 const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom, banRoom} = require('./SocketController')
-const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} = require('./WebRtcController')
+const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} = require('./WebRtcController');
+const { sendPushNotification } = require('./PushNotificationsController');
+const User = require('../models/User');
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -280,6 +282,30 @@ module.exports = {
                     notification.type = 'invite'
                     notification.room = room
 
+                    let otherUser = await User.findOne({_id: id}).select('+pushToken')
+                    if(otherUser && otherUser.pushToken) {
+                        let data = { 
+                            text: room.title,
+                            push_ids: [otherUser.pushToken.id],
+                            icon: 'invite_icon',
+                            color: '008FF7',
+                            header_text: `${user.name.first} ${user.name.last}`,
+                            avatar: user.avatar ? user.avatar.min : '',
+                            group_id: `invite${user._id}`,
+                            channel_id: 'b5453baa-e480-4e17-b916-d5c20e82be43',
+                            group_name: 'invite',
+                            additional: {
+                                userId: user._id,
+                                type: 'invite'
+                            },
+                            os: otherUser.pushToken.os
+                        };
+                
+                        sendPushNotification(data).then(async (id) => {
+                            
+                        })
+                    }
+
                     sendNotification({userId: id, notification})
 
                     await notification.save()
@@ -309,6 +335,30 @@ module.exports = {
                         notification.userId = userId
                         notification.type = 'invite'
                         notification.room = room
+
+                        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+                        if(otherUser && otherUser.pushToken) {
+                            let data = { 
+                                text: room.title,
+                                push_ids: [otherUser.pushToken.id],
+                                icon: 'invite_icon',
+                                color: '008FF7',
+                                header_text: `${user.name.first} ${user.name.last}`,
+                                avatar: user.avatar ? user.avatar.min : '',
+                                group_id: `invite${user._id}`,
+                                channel_id: 'b5453baa-e480-4e17-b916-d5c20e82be43',
+                                group_name: 'invite',
+                                additional: {
+                                    userId: user._id,
+                                    type: 'invite'
+                                },
+                                os: otherUser.pushToken.os
+                            };
+                    
+                            sendPushNotification(data).then(async (id) => {
+                                
+                            })
+                        }
 
                         sendNotification({userId, notification})
 

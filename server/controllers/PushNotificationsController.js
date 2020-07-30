@@ -28,7 +28,6 @@ function sendPushNotification(data) {
     return new Promise((resolve) => {
         let message = {}
         if(data.os === 'android') {
-            console.log(androidAppId)
             message = {
                 app_id: androidAppId,
                 android_accent_color: data.color,
@@ -53,14 +52,12 @@ function sendPushNotification(data) {
                 contents: {"en": data.text},
                 headings: {"en": data.header_text},
                 data: data.additional,
-                send_after: new Date(Date.now()+1000+(3*60*60*1000)).toISOString(),
+                send_after: new Date(Date.now()+2500).toISOString(),
             }
         }
 
         let req = https.request(optionsSend, function(res) {  
             res.on('data', function(data) {
-                // console.log("Response:");
-                console.log(JSON.parse(data));
                 resolve(JSON.parse(data).id)
             });
         });

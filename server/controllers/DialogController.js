@@ -334,7 +334,6 @@ module.exports = {
 
             await dialog.save()
 
-            console.log(otherUser.pushToken)
             if(otherUser.pushToken) {
                 let data = { 
                     text,
@@ -347,7 +346,7 @@ module.exports = {
                     channel_id: '5949773e-fddd-4b91-b3c9-3e4a9f9526b8',
                     group_name: 'message',
                     additional: {
-                        userId: otherUser._id,
+                        userId: user._id,
                         type: 'message'
                     },
                     os: otherUser.pushToken.os
