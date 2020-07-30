@@ -28,6 +28,7 @@ function sendPushNotification(data) {
     return new Promise((resolve) => {
         let message = {}
         if(data.os === 'android') {
+            console.log(androidAppId)
             message = {
                 app_id: androidAppId,
                 android_accent_color: data.color,
