@@ -306,6 +306,30 @@ module.exports = {
             { $push: { friends: docB._id }}
         )
 
+        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+        if(otherUser && otherUser.pushToken) {
+            let data = { 
+                text: 'Test',
+                push_ids: [otherUser.pushToken.id],
+                icon: 'friend_icon',
+                color: '008FF7',
+                header_text: `${user.name.first} ${user.name.last}`,
+                avatar: user.avatar ? user.avatar.min : '',
+                group_id: `request${user._id}`,
+                channel_id: 'd8fcc2a5-a5b8-443a-9faf-01e1ebd3b955',
+                group_name: 'request',
+                additional: {
+                    userId: userId,
+                    type: 'request'
+                },
+                os: otherUser.pushToken.os
+            };
+    
+            sendPushNotification(data).then(async (id) => {
+                
+            })
+        }
+
         let notification = new Notification()
 
         notification.user = user
@@ -339,6 +363,30 @@ module.exports = {
         notification.user = user
         notification.userId = userId
         notification.type = 'accept'
+
+        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+        if(otherUser && otherUser.pushToken) {
+            let data = { 
+                text: 'Test',
+                push_ids: [otherUser.pushToken.id],
+                icon: 'friend_icon',
+                color: '008FF7',
+                header_text: `${user.name.first} ${user.name.last}`,
+                avatar: user.avatar ? user.avatar.min : '',
+                group_id: `accept${user._id}`,
+                channel_id: 'd8fcc2a5-a5b8-443a-9faf-01e1ebd3b955',
+                group_name: 'accept',
+                additional: {
+                    userId: userId,
+                    type: 'accept'
+                },
+                os: otherUser.pushToken.os
+            };
+    
+            sendPushNotification(data).then(async (id) => {
+                
+            })
+        }
 
         sendNotification({userId, notification})
 
