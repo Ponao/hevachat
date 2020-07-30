@@ -59,7 +59,7 @@ function sendPushNotification(data) {
         let req = https.request(optionsSend, function(res) {  
             res.on('data', function(data) {
                 // console.log("Response:");
-                // console.log(JSON.parse(data));
+                console.log(JSON.parse(data));
                 resolve(JSON.parse(data).id)
             });
         });
