@@ -334,11 +334,11 @@ module.exports = {
 
             await dialog.save()
 
-
+            console.log(otherUser.pushToken)
             if(otherUser.pushToken) {
                 let data = { 
                     text,
-                    push_ids: [otherUser.pushToken],
+                    push_ids: [otherUser.pushToken.id],
                     icon: 'message_icon',
                     color: '008FF7',
                     header_text: `${user.name.first} ${user.name.last}`,
