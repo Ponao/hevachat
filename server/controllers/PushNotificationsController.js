@@ -39,7 +39,7 @@ function sendPushNotification(data) {
                 small_icon: data.icon,
                 large_icon: data.avatar,
                 data: data.additional,
-                send_after: new Date(Date.now()+1000).toISOString(),
+                send_after: new Date(Date.now()+2500).toISOString(),
                 thread_id: data.group_id,
                 android_group: data.group_name,
                 collapse_id: data.group_id,
