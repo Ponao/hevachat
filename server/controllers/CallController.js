@@ -6,10 +6,9 @@
 
 const { addUserCall, stopCall, checkBusy, checkIncominmgCall, acceptCall, getUserExistById } = require("./WebRtcController");
 const { sendUserCall, stopUserCall, getIO, sendUserAcceptCall } = require("./SocketController");
-const Dialog = require('../models/Dialog');
-const Message = require('../models/Message');
 const User = require('../models/User');
 const Payment = require('../models/Payment');
+const { sendPushNotification } = require("./PushNotificationsController");
 
 module.exports = {
     call: async (req, res, next) => {
@@ -34,6 +33,30 @@ module.exports = {
             addUserCall(user._id, id, socketId)
 
             sendUserCall({userId: user._id, otherId: id, socketId})
+
+            let otherUser = await User.findOne({_id: id}).select('+pushToken')
+            if(otherUser && otherUser.pushToken) {
+                let data = { 
+                    text: 'Incoming call',
+                    push_ids: [otherUser.pushToken.id],
+                    icon: 'phone_icon',
+                    color: '008FF7',
+                    header_text: `${user.name.first} ${user.name.last}`,
+                    avatar: user.avatar ? user.avatar.min : '',
+                    group_id: `call${user._id}`,
+                    channel_id: 'd8fcc2a5-a5b8-443a-9faf-01e1ebd3b955',
+                    group_name: 'call',
+                    additional: {
+                        userId: user._id,
+                        type: 'call'
+                    },
+                    os: otherUser.pushToken.os
+                };
+        
+                sendPushNotification(data).then(async (id) => {
+                    
+                })
+            }
 
             return res.json({error: false});
         } catch (e) {

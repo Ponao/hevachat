@@ -320,7 +320,7 @@ module.exports = {
                 channel_id: 'd8fcc2a5-a5b8-443a-9faf-01e1ebd3b955',
                 group_name: 'request',
                 additional: {
-                    userId: userId,
+                    userId: user._id,
                     type: 'request'
                 },
                 os: otherUser.pushToken.os
@@ -378,7 +378,7 @@ module.exports = {
                 channel_id: 'd8fcc2a5-a5b8-443a-9faf-01e1ebd3b955',
                 group_name: 'accept',
                 additional: {
-                    userId: userId,
+                    userId: user._id,
                     type: 'accept'
                 },
                 os: otherUser.pushToken.os
