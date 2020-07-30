@@ -349,7 +349,7 @@ module.exports = {
                                 channel_id: 'b5453baa-e480-4e17-b916-d5c20e82be43',
                                 group_name: 'invite',
                                 additional: {
-                                    userId: user._id,
+                                    roomId: room._id,
                                     type: 'invite'
                                 },
                                 os: otherUser.pushToken.os
