@@ -18,6 +18,7 @@ const UserSchema = new Schema({
   email: { type: String,  },// false
   avatar: { type: Object, select: true },
   password: { type: String, select: false }, // false
+  pushId: { type: String, select: false }, // false
   roomLang: { type: String, default: 'eng', },// false
   online: { type: Boolean, default: true },
   onlineAt: { type: Date, default: Date.now },
@@ -27,6 +28,7 @@ const UserSchema = new Schema({
   role: { type: String, default: 'user',  },// false
   lang: { type: String, default: 'en',  },// false
   color: { type: String },
+  pushToken: { type: Schema.Types.Mixed, select: false },
   buff: Buffer
 });
 

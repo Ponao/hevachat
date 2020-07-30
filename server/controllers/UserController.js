@@ -581,6 +581,22 @@ module.exports = {
         } catch (e) {
             return next(new Error(e));
         }
+    },
+
+    addPushId: async (req, res, next) => {
+        const { user } = res.locals;
+        const { id, os } = req.body;
+
+        if(id) {
+            user.pushToken = {
+                os,
+                id
+            }
+        } else {
+            user.pushToken = false
+        }
+
+        await user.save()
     }
 }
 

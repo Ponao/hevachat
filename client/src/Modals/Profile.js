@@ -68,7 +68,8 @@ class Settings extends React.Component {
             },
             body: JSON.stringify({
                 firstName: this.state.firstName,
-                lastName: this.state.lastName
+                lastName: this.state.lastName,
+                city: this.state.city
             })
         })
         .then((response) => response.json())

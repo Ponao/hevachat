@@ -11,7 +11,8 @@ const User = require('../models/User');
 const sizeOf = require('image-size');
 const { promisify } = require('util')
 
-const {sendMessageDialog, readMessageDialog, editMessageDialog, deleteMessageDialog} = require('./SocketController')
+const {sendMessageDialog, readMessageDialog, editMessageDialog, deleteMessageDialog} = require('./SocketController');
+const { sendPushNotification, removePushNotification } = require('./PushNotificationsController');
 // const readdir = util.promisify(fs.readdir);
 module.exports = {
     getAll: async (req, res, next) => {
@@ -142,11 +143,12 @@ module.exports = {
     sendMessage: async (req, res, next) => {
         const { user } = res.locals;
         let { userId, text, socketId, recentMessages } = req.body;
-        
+
         try {
             let query = userId == user._id ? {'$eq': [user._id]} : {'$all': [user._id, userId]}
             let dialog = await Dialog.findOne({'users': query}).populate('lastMessage')
             const dialogId = String(dialog._id)
+            let otherUser = await User.findOne({_id: userId}).select('+pushToken')
 
             if(!/\S/.test(text) && !recentMessages.length && !req.files) {
                 let err = {};
@@ -299,7 +301,7 @@ module.exports = {
             message.dialogId = dialogId
             message.images = images
             message.sounds = sounds
-            message.files = files
+            message.files = files            
             
             message.recentMessages = await Message.find({_id: {"$in": recentMessages}}).populate([
                 {
@@ -332,7 +334,33 @@ module.exports = {
 
             await dialog.save()
 
-            sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
+
+            if(otherUser.pushToken) {
+                let data = { 
+                    text,
+                    push_ids: [otherUser.pushToken],
+                    icon: 'message_icon',
+                    color: '008FF7',
+                    header_text: `${user.name.first} ${user.name.last}`,
+                    avatar: user.avatar ? user.avatar.min : '',
+                    group_id: `dialog${user._id}`,
+                    channel_id: '5949773e-fddd-4b91-b3c9-3e4a9f9526b8',
+                    group_name: 'message',
+                    additional: {
+                        userId: otherUser._id,
+                        type: 'message'
+                    },
+                    os: otherUser.pushToken.os
+                };
+        
+                sendPushNotification(data).then(async (id) => {
+                    message.pushId = id
+                    sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
+                    await message.save()
+                })
+            } else {
+                sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
+            }
 
             return res.json(message);
         } catch (e) {
@@ -698,13 +726,18 @@ module.exports = {
 
         try {
             let query = {'$all': [user._id, otherId]}
-            let dialog = await Dialog.findOne({'users': query})
+            let dialog = await Dialog.findOne({'users': query}).populate('lastMessage')
             const dialogId = String(dialog._id)
+            let messages = await Message.find({dialogId, 'user': { "$ne": user._id }, isRead: false })
             let result = await Message.updateMany({dialogId, 'user': { "$ne": user._id } }, {"$set":{"isRead": true}})
-
-            // let dialog = await Dialog.findById(dialogId)
-
+            
             dialog.noRead = 0
+            
+            if(messages) {
+                messages.map(x => {
+                    removePushNotification(x.pushId)
+                })
+            }
 
             await dialog.save()
             
