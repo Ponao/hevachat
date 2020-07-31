@@ -4,30 +4,54 @@ const https = require('https');
 const androidAppId = process.env.ONESIGNAL_ANDROID_APP_ID
 const iosAppId = process.env.ONESIGNAL_IOS_APP_ID
 
-const headers = {
-    "Content-Type": "application/json; charset=utf-8",
-    "Authorization": "Basic " + process.env.ONESIGNAL_API_KEY
-};
-
-const optionsSend = {
+const optionsSendAndroid = {
     host: "onesignal.com",
     port: 443,
     path: "/api/v1/notifications",
     method: "POST",
-    headers: headers
+    headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "Basic " + process.env.ONESIGNAL_ANDROID_API_KEY
+    }
 };
-const optionsDelete = {
+const optionsDeleteAndroid = {
     host: "onesignal.com",
     port: 443,
     path: "/api/v1/notifications",
     method: "DELETE",
-    headers: headers
+    headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "Basic " + process.env.ONESIGNAL_ANDROID_API_KEY
+    }
+};
+
+const optionsSendIos = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "Basic " + process.env.ONESIGNAL_IOS_API_KEY
+    }
+};
+const optionsDeleteIos = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "DELETE",
+    headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": "Basic " + process.env.ONESIGNAL_IOS_API_KEY
+    }
 };
 
 function sendPushNotification(data) {
     return new Promise((resolve) => {
         let message = {}
+        let options = {}
         if(data.os === 'android') {
+            options = optionsSendAndroid
             message = {
                 app_id: androidAppId,
                 android_accent_color: data.color,
@@ -46,6 +70,7 @@ function sendPushNotification(data) {
                 priority: 10,
             }
         } else {
+            options = optionsSendIos
             message = {
                 app_id: iosAppId,
                 include_player_ids: data.push_ids,
@@ -56,7 +81,7 @@ function sendPushNotification(data) {
             }
         }
 
-        let req = https.request(optionsSend, function(res) {  
+        let req = https.request(options, function(res) {  
             res.on('data', function(data) {
                 resolve(JSON.parse(data).id)
             });
@@ -73,7 +98,7 @@ function sendPushNotification(data) {
 };
 
 function removePushNotification(id) {
-    let removeNotification = {...optionsDelete}
+    let removeNotification = {...optionsDeleteAndroid}
     removeNotification.path += `/${id}?app_id=65b74473-51f1-424a-8b11-829a9e203271`
     let req = https.request(removeNotification, function(res) {  
         res.on('data', function(data) {

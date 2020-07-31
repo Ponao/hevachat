@@ -9,6 +9,7 @@ const { sendUserCall, stopUserCall, getIO, sendUserAcceptCall } = require("./Soc
 const User = require('../models/User');
 const Payment = require('../models/Payment');
 const { sendPushNotification } = require("./PushNotificationsController");
+const languages = require("../languages");
 
 module.exports = {
     call: async (req, res, next) => {
@@ -34,10 +35,10 @@ module.exports = {
 
             sendUserCall({userId: user._id, otherId: id, socketId})
 
-            let otherUser = await User.findOne({_id: id}).select('+pushToken')
+            let otherUser = await User.findOne({_id: id}).select('+pushToken').select('+lang')
             if(otherUser && otherUser.pushToken) {
                 let data = { 
-                    text: 'Incoming call',
+                    text: languages[otherUser.lang].incoming_call,
                     push_ids: [otherUser.pushToken.id],
                     icon: 'phone_icon',
                     color: '008FF7',

@@ -16,6 +16,7 @@ const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, 
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 const { sendPushNotification } = require('./PushNotificationsController');
+const languages = require('../languages');
 
 module.exports = {
     // Get user data
@@ -307,10 +308,10 @@ module.exports = {
             { $push: { friends: docB._id }}
         )
 
-        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+        let otherUser = await User.findOne({_id: userId}).select('+pushToken').select('+lang')
         if(otherUser && otherUser.pushToken) {
             let data = { 
-                text: 'Test',
+                text: languages[otherUser.lang].send_you_friend_request,
                 push_ids: [otherUser.pushToken.id],
                 icon: 'friend_icon',
                 color: '008FF7',
@@ -365,10 +366,10 @@ module.exports = {
         notification.userId = userId
         notification.type = 'accept'
 
-        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+        let otherUser = await User.findOne({_id: userId}).select('+pushToken').select('+lang')
         if(otherUser && otherUser.pushToken) {
             let data = { 
-                text: 'Test',
+                text: languages[otherUser.lang].accept_your_friend_request,
                 push_ids: [otherUser.pushToken.id],
                 icon: 'friend_icon',
                 color: '008FF7',

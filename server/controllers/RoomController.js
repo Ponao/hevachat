@@ -18,6 +18,7 @@ const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, fin
 const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} = require('./WebRtcController');
 const { sendPushNotification } = require('./PushNotificationsController');
 const User = require('../models/User');
+const languages = require('../languages');
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -282,10 +283,10 @@ module.exports = {
                     notification.type = 'invite'
                     notification.room = room
 
-                    let otherUser = await User.findOne({_id: id}).select('+pushToken')
+                    let otherUser = await User.findOne({_id: id}).select('+pushToken').select('+lang')
                     if(otherUser && otherUser.pushToken) {
                         let data = { 
-                            text: room.title,
+                            text: languages[otherUser.lang].invited_you_to_the_room + ' ' + room.title,
                             push_ids: [otherUser.pushToken.id],
                             icon: 'invite_icon',
                             color: '008FF7',
@@ -336,10 +337,10 @@ module.exports = {
                         notification.type = 'invite'
                         notification.room = room
 
-                        let otherUser = await User.findOne({_id: userId}).select('+pushToken')
+                        let otherUser = await User.findOne({_id: userId}).select('+pushToken').select('+lang')
                         if(otherUser && otherUser.pushToken) {
                             let data = { 
-                                text: room.title,
+                                text: languages[otherUser.lang].invited_you_to_the_room + ' ' + room.title,
                                 push_ids: [otherUser.pushToken.id],
                                 icon: 'invite_icon',
                                 color: '008FF7',
