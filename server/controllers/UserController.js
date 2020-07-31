@@ -647,6 +647,8 @@ module.exports = {
         }
 
         await user.save()
+
+        return res.json({error: false});
     }
 }
 
