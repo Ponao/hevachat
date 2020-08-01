@@ -17,7 +17,8 @@ class ActionMenu extends React.Component {
         let element = document.getElementById(this.props.from)
         if(element) {
             let find = false
-            if(e.path.find(x => x.id === this.props.from)) {
+            let path = e.path || (e.composedPath && e.composedPath());
+            if(path.find(x => x.id === this.props.from)) {
                 e.stopPropagation()
                 find = true
             }
