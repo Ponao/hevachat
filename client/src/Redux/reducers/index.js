@@ -8,6 +8,7 @@ import users from './users'
 import notifications from './notifications'
 import call from './call'
 import slider from './slider'
+import ban from './ban'
 
 export default combineReducers({
     user,
@@ -17,5 +18,6 @@ export default combineReducers({
     users,
     notifications,
     call,
-    slider
+    slider,
+    ban
 })

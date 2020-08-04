@@ -12,6 +12,7 @@ import MicIcon from '@material-ui/icons/Mic';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import WarningIcon from '@material-ui/icons/Warning';
+import BlockIcon from '@material-ui/icons/Block';
 
 // Redux
 import { connect } from 'react-redux'
@@ -49,17 +50,19 @@ const CustomFab = withStyles(fabStyles)(Fab);
 class OtherUser extends React.Component {
     render() {
         return <>
-                <span style={{cursor: 'pointer'}} onClick={() => {
-                    this.props.history.push({
-                        search: `?modal=slider`
-                    })
-                    store.dispatch({
-                        type: SLIDER_SET,
-                        payload: {
-                            images: [{path: this.props.user.avatar.original}],
-                            index: 0
-                        }
-                    })
+                <span style={{cursor: 'pointer', borderRadius: 50}} onClick={() => {
+                    if(this.props.user.avatar) {
+                        this.props.history.push({
+                            search: `?modal=slider`
+                        })
+                        store.dispatch({
+                            type: SLIDER_SET,
+                            payload: {
+                                images: [{path: this.props.user.avatar.original}],
+                                index: 0
+                            }
+                        })
+                    }
                 }}><Avatar 
                     style={{width: 80, height: 80, fontSize: 28, lineHeight: '28px', fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} 
                     name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)} 
@@ -183,6 +186,17 @@ class OtherUser extends React.Component {
                             <WarningIcon style={{color: '#99AABB'}} />
                         </CustomFab>
                         <p>Send warning</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.props.history.push({
+                                search: `?ban=${this.props.user._id}`
+                            })
+                        }}>
+                            <BlockIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Ban</p>
                     </div>}
                 </>
             </>

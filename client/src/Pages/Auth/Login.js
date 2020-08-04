@@ -15,6 +15,8 @@ import { bindActionCreators } from 'redux'
 import SocketController from '../../Controllers/SocketController'
 import {urlApi} from '../../config'
 import { CircularProgress } from '@material-ui/core'
+import store from '../../Redux/store'
+import { BAN_SET } from '../../Redux/constants'
 
 class Login extends React.Component {
     state = {
@@ -47,12 +49,18 @@ class Login extends React.Component {
                 if(data.error) {
                     this.setState({error: true, errors: data.errors})
                 } else {
+                    if(data.ban) {
+                        store.dispatch({
+                            type: BAN_SET,
+                            payload: {numDate: data.numDate, date: data.date}
+                        })
+                    } else {
+                        this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token)
+
+                        SocketController.init(data.token)
+                    }
                     const { cookies } = this.props
                     cookies.set('apiToken', data.token, { path: '/' })
-
-                    this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token)
-
-                    SocketController.init(data.token)
                 }
 
                 this.setState({isFetching: false})

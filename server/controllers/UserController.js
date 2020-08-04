@@ -649,7 +649,33 @@ module.exports = {
         await user.save()
 
         return res.json({error: false});
-    }
+    },
+
+    ban: async (req, res, next) => {
+        const { user } = res.locals;
+        const { userId, time } = req.body;
+
+        try {
+            if(user.role == 'moder' || user.role == 'admin') {
+                await Limit.deleteOne({userId: userId, type: 'ban'})
+
+                let limit = new Limit()
+                limit.userId = userId
+                limit.date = new Date(Date.now() + time*1000)
+                limit.numDate = time
+                limit.type = 'ban'
+                await limit.save()
+
+                let ban  = {numDate: limit.numDate, date: limit.date}
+
+                return res.json({error: false});
+            } else {
+                return res.json({error: true});
+            }
+        } catch(e) {
+            return next(new Error(e));
+        }
+    },
 }
 
 function randomString(length) {

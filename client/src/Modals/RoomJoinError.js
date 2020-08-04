@@ -43,7 +43,7 @@ class RoomJoinError extends React.Component {
             <ErrorOutlineIcon style={{color: '#FF3333', fontSize: 60}} />
             <h2 className="modal-title">{this.props.langProps.error}</h2>
             <p className="modal-text" style={{marginBottom: !!this.props.rooms.activeRoom.error.ban ? 0 : ''}}>{this.props.langProps[this.props.rooms.activeRoom.error.msg]}</p>
-            {!!this.props.rooms.activeRoom.error.ban && <p className="modal-text">to <span style={{color: '#008FF7'}}>{new Date(this.props.rooms.activeRoom.error.ban.date).toLocaleString()}</span></p>}
+            {!!this.props.rooms.activeRoom.error.ban && <p className="modal-text">{this.props.langProps.to} <span style={{color: '#008FF7'}}>{new Date(this.props.rooms.activeRoom.error.ban.date).toLocaleString()}</span></p>}
             <button className="button-blue" type="submit" style={{width: 'max-content'}} onClick={() => {
                 this.props.history.push('/')
             }}>{this.props.langProps.back}</button>

@@ -38,6 +38,8 @@ const adminBro = new AdminBro({
                 password: { isVisible: { list: false, filter: false, show: false, edit: false } },
                 avatar: { isVisible: { list: false, filter: false, show: false, edit: false } },
                 roomLang: { isVisible: { list: false, filter: false, show: false, edit: false } },
+                pushId: { isVisible: { list: false, filter: false, show: false, edit: false } },
+                pushToken: { isVisible: { list: false, filter: false, show: false, edit: false } },
                 role: { isVisible: { list: true, filter: true, show: true, edit: true }, availableValues: [
                   {
                     value: 'user',

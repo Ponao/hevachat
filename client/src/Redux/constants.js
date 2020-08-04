@@ -95,3 +95,6 @@ export const CALL_SET_FORCE = 'CALL_SET_FORCE'
 
 // Slider
 export const SLIDER_SET = 'SLIDER_SET'
+
+// Ban
+export const BAN_SET = 'BAN_SET'

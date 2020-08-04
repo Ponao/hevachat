@@ -41,7 +41,7 @@ module.exports = {
         try {
             let payment = await Payment.findOne({userId: user._id, expiriesAt: {'$gte': Date.now()}})
 
-            if(!payment) {
+            if(!payment && user.role !== 'admin' && user.role !== 'moder') {
                 const err = {};
                 err.param = `all`;
                 err.msg = `dont_have_payment`;

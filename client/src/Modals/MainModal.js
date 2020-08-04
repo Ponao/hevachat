@@ -27,6 +27,7 @@ import Warning from './Warning';
 import ForceAcceptCall from './ForceAcceptCall';
 import ForcePlaceCall from './ForcePlaceCall';
 import ForceJoinRoom from './ForceJoinRoom';
+import Ban from './Ban';
 
 class MainModal extends React.Component {
     state = {
@@ -38,6 +39,7 @@ class MainModal extends React.Component {
         banroom: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).banroom,
         unbanroom: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).unbanroom,
         sendwarning: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).sendwarning,
+        ban: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).ban,
     }
 
     componentDidMount() {
@@ -51,6 +53,7 @@ class MainModal extends React.Component {
                 banroom: qs.parse(location.search, { ignoreQueryPrefix: true }).banroom,
                 unbanroom: qs.parse(location.search, { ignoreQueryPrefix: true }).unbanroom,
                 sendwarning: qs.parse(location.search, { ignoreQueryPrefix: true }).sendwarning,
+                ban: qs.parse(location.search, { ignoreQueryPrefix: true }).ban,
             })
         })
     }
@@ -90,6 +93,12 @@ class MainModal extends React.Component {
             }} />}
 
             {this.state.banroom && this.props.user.role !== 'user' && <Banroom userId={this.state.banroom} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.ban && this.props.user.role !== 'user' && <Ban userId={this.state.ban} close={() => {
                 this.props.history.push({
                     search: ""
                 })

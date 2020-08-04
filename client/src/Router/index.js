@@ -17,6 +17,9 @@ import NoMatch from '../Pages/NoMatch'
 import { setTitle } from "../Controllers/FunctionsController";
 import {urlApi} from '../config'
 import MainModal from "../Modals/MainModal";
+import store from "../Redux/store";
+import { BAN_SET } from "../Redux/constants";
+import Ban from "../Pages/User/Ban";
 class AppRouter extends React.Component {
   state = {
     isRender: false
@@ -42,9 +45,16 @@ class AppRouter extends React.Component {
         },
       })
         .then((response) => response.json())
-        .then(({user, dialogs, noReadCount, noReadNotifications}) => {
-          SocketController.init(apiToken)
-          this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken);
+        .then(({user, dialogs, noReadCount, noReadNotifications, ban, numDate, date}) => {
+          if(ban) {
+            store.dispatch({
+              type: BAN_SET,
+              payload: {numDate, date}
+            })
+          } else {
+            SocketController.init(apiToken)
+            this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken);
+          }
           this.setState({isRender: true})
         })
         .catch(() => {
@@ -79,7 +89,13 @@ class AppRouter extends React.Component {
                       >
                           <route.component />
                       </this.PrivateRoute>
-              
+                  case 'ban':
+                    return this.props.ban.ban ? <Ban /> : <Redirect
+                    to={{
+                      pathname: "/",
+                    }}
+                  /> 
+
                   default:
                       return false
               }            
@@ -99,7 +115,11 @@ class AppRouter extends React.Component {
       <Route
         {...rest}
         render={() =>
-          this.props.user.isAuth ? (
+          this.props.user.isAuth ? this.props.ban.ban ? <Redirect
+          to={{
+            pathname: "/ban",
+          }}
+        /> : (
             (<>
               {children}
               <MainModal />
@@ -121,9 +141,13 @@ class AppRouter extends React.Component {
       <Route
         {...rest}
         render={() =>
-          !this.props.user.isAuth ? (
+          !this.props.user.isAuth ?  this.props.ban.ban ? <Redirect
+          to={{
+            pathname: "/ban",
+          }}
+        /> : (
             children
-          ) : (
+          )  : (
             <Redirect
               to={{
                 pathname: "/",
@@ -139,6 +163,7 @@ class AppRouter extends React.Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
+    ban: state.ban
   };
 };
 

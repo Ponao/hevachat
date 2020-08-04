@@ -26,6 +26,7 @@ router.post('/get-roomban', verifyToken, UserController.getBanroom)
 router.post('/upload-avatar', verifyToken, UserController.uploadAvatar)
 router.post('/send-warning', verifyToken, UserController.sendWarning)
 router.post('/add_push_id', verifyToken, UserController.addPushId)
+router.post('/ban', verifyToken, UserController.ban)
 
 router.post('/edit', [
     check('firstName')

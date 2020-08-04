@@ -6,11 +6,12 @@
 
 const jwt = require('jsonwebtoken')
 const User = require('../models/User');
+const Limit = require('../models/Limit');
 
 module.exports = async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("Access-Control-Allow-Methods", "*");
-res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
+    res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
     // Check if an `Authorization` header was included
     const header = req.headers.authorization
     const {apiToken} = req.body
@@ -50,5 +51,12 @@ res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
 
     // Success: include decoded data in the request
     res.locals.user = await User.findById(user.data.userId).select('+email').select('+lang').select('+role').select('+roomLang').select("-friends")
+
+    let ban = await Limit.findOne({userId: user.data.userId, type: 'ban', date: {$gte: new Date()}})
+            
+    if(ban) {
+        return res.json({numDate: ban.numDate, date: ban.date, ban: true})
+    }
+
     return next()
 }

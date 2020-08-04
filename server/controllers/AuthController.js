@@ -10,6 +10,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Dialog = require('../models/Dialog');
 const Notification = require('../models/Notification');
+const Limit = require("../models/Limit");
 
 module.exports = {
   // Register method
@@ -122,6 +123,12 @@ module.exports = {
           // Success: generate and respond with the JWT
           let token = generateToken(user.id);
 
+          let ban = await Limit.findOne({userId: user._id, type: 'ban', date: {$gte: new Date()}})
+            
+          if(ban) {
+              return res.json({numDate: ban.numDate, date: ban.date, ban: true, token})
+          }
+
           const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
             {
                 path: 'users',
@@ -137,29 +144,29 @@ module.exports = {
 
         let noReadCount = 0
 
-    const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
-      {
-          path: 'users',
-          select: ['_id']
-      },
-      {
-        path: 'lastMessage',
-        populate: {
-            path: 'user'
-        }
-    },
-  ]);
+        const noReadDialogs = await Dialog.find({noRead: {'$ne': 0}, 'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}}).populate([
+          {
+              path: 'users',
+              select: ['_id']
+          },
+          {
+            path: 'lastMessage',
+            populate: {
+                path: 'user'
+            }
+        },
+      ]);
 
-    if(noReadDialogs) {
-      noReadDialogs.map(x => {
-        if(String(x.lastMessage.user._id) != String(user._id)) {
-          noReadCount++
-        } 
-      })
-    }
-    let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
-            
-    const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
+        if(noReadDialogs) {
+          noReadDialogs.map(x => {
+            if(String(x.lastMessage.user._id) != String(user._id)) {
+              noReadCount++
+            } 
+          })
+        }
+        let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
+                
+        const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
           
           return res.json({ token, user, dialogs, noReadCount, noReadNotifications });
         }

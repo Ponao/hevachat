@@ -112,7 +112,9 @@ export default {
         cancel_your_call: 'отклонил ваш звонок',
         empty_inv_files: 'Здесь будут находиться файды из этого диалога',
         empty_inv_sounds: 'Здесь будет находиться аудио из этого диалога',
-        empty_inv_images: 'Здесь будут находиться изображения из этого диалога'
+        empty_inv_images: 'Здесь будут находиться изображения из этого диалога',
+        you_banned_in_this_room: 'Вы заблокированны в этой комнате',
+        to: 'до'
     },
     en: {
         settings: 'Settings',
@@ -227,6 +229,8 @@ export default {
         cancel_your_call: 'canceled your call',
         empty_inv_files: 'Here will placed files from this dialog',
         empty_inv_sounds: 'Here will placed sounds from this dialog',
-        empty_inv_images: 'Here will placed images from this dialog'
+        empty_inv_images: 'Here will placed images from this dialog',
+        you_banned_in_this_room: 'You blocked in this room',
+        to: 'to'
     }
 }

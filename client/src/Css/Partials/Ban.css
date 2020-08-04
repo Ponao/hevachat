@@ -1,0 +1,20 @@
+.ban-page {
+    background-color: #fff;
+    width: 100%;
+    height: 100vh;
+    padding: 0 66px;
+}
+
+.ban-title {
+    color: #008FF7;
+    font-weight: bold;
+    font-size: 32px;
+    margin-top: 86px;
+}
+
+.ban-subtitle {
+    color: #667788;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 14px;
+}

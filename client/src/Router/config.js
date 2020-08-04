@@ -8,6 +8,7 @@ import Room from '../Pages/User/Room';
 import Main from '../Pages/User/Main';
 import Dialog from '../Pages/User/Dialog';
 import Payment from '../Pages/User/Payment';
+import Ban from '../Pages/User/Ban';
 
 const routes = [
     {
@@ -58,6 +59,13 @@ const routes = [
         type: 'user',
         title: '',
         component: () => <Payment />
+    },
+    {
+        path: '/ban',
+        exact: true,
+        type: 'ban',
+        title: '',
+        component: () => <Ban />
     },
 ]
 
