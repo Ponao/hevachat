@@ -15,6 +15,8 @@ import { bindActionCreators } from 'redux'
 import {urlApi} from '../../config'
 import SocketController from '../../Controllers/SocketController'
 import { CircularProgress } from '@material-ui/core'
+import { withLang } from 'react-multi-language'
+import languages from '../../languages'
 
 class Register extends React.Component {
     state = {
@@ -85,26 +87,26 @@ class Register extends React.Component {
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
                     <input value={this.state.firstName} onChange={(e) => {this.setState({firstName: e.target.value})}} className="input-field" type="text" name="firstName" placeholder="First name" />
                     {this.state.errors.find(value => value.param === 'firstName') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'firstName').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'firstName').msg]} 
                     </span>}
 
                     <input value={this.state.lastName} onChange={(e) => {this.setState({lastName: e.target.value})}} className="input-field" type="text" name="lastName" placeholder="Last name" />
                     {this.state.errors.find(value => value.param === 'lastName') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'lastName').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'lastName').msg]} 
                     </span>}
 
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
                     {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'email').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'email').msg]} 
                     </span>}
 
                     <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Password" />
                     {this.state.errors.find(value => value.param === 'password') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'password').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'password').msg]} 
                     </span>}
 
                     {this.state.errors.find(value => value.param === 'all') && <span style={{marginTop: 30}} className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'all').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'all').msg]} 
                     </span>}
 
                     <button type="submit" className="button-gray">Sign up</button>
@@ -128,4 +130,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withCookies(Register))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withCookies(Register)))

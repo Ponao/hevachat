@@ -150,15 +150,23 @@ export function OnlineDate(timeR) {
             day_diff === 0 && 
             (
                 (diff < 60 && languages[lang].just_now)
-                || (diff < 120 && '1 minute ago')
-                || (diff < 3600 && Math.floor(diff / 60) + 'minutes ago')
-                || (diff < 7200 && '1 hour ago')
-                || (diff < 86400 && Math.floor(diff / 3600) + 'hours ago')
+                || (diff < 120 && '1 ' + languages[lang].minute_1 + ' ' + languages[lang].ago)
+                || (diff < 3600 && Math.floor(diff / 60) + ' ' + declension(Math.ceil(diff / 60), [languages[lang].minute_1, languages[lang].minute_2, languages[lang].minute_5]) + ' ' + languages[lang].ago)
+                || (diff < 7200 && '1 ' + languages[lang].hour_1 + ' ' + languages[lang].ago)
+                || (diff < 86400 && Math.floor(diff / 3600) + ' ' + declension(Math.ceil(diff / 3600), [languages[lang].hour_1, languages[lang].hour_2, languages[lang].hour_5]) + ' ' + languages[lang].ago)
             )
         )
-        || (day_diff === 1 && languages[lang].yerstaday + languages[lang].in + hours + ':' +  minutes)
-        || (day_diff < 7 && day_diff + 'days ago' + languages[lang].in + hours + ':' +  minutes)
-        || (day_diff < 31 && Math.ceil(day_diff / 7) + 'weeks ago' + languages[lang].in + hours + ':' +  minutes)
+        || (day_diff === 1 && languages[lang].yerstaday + ' ' + languages[lang].in + ' ' + hours + ':' +  minutes)
+        || (day_diff < 7 && day_diff + ' ' + declension(Math.ceil(day_diff), [languages[lang].day_1, languages[lang].day_2, languages[lang].day_5]) + ' ' + languages[lang].ago + ' ' + languages[lang].in + ' ' + hours + ':' +  minutes)
+        || (day_diff < 31 && Math.ceil(day_diff / 7) + ' ' + declension(Math.ceil(day_diff / 7), [languages[lang].week_1, languages[lang].week_2, languages[lang].week_5]) + ' ' + languages[lang].ago + ' ' + languages[lang].in + ' ' + hours + ':' +  minutes)
     );
     return r;
+}
+
+function declension(n, text_forms) {  
+    n = Math.abs(n) % 100; var n1 = n % 10;
+    if (n > 10 && n < 20) { return text_forms[2]; }
+    if (n1 > 1 && n1 < 5) { return text_forms[1]; }
+    if (n1 == 1) { return text_forms[0]; }
+    return text_forms[2];
 }

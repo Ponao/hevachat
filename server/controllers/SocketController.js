@@ -377,6 +377,10 @@ function sendWarning({userId, warning}) {
     io.to(`user.${userId}`).emit('sendWarning', warning)
 }
 
+function sendBan({userId}) {
+    io.to(`user.${userId}`).emit('ban')
+}
+
 module.exports = {
     getIO,
     initSocket, 
@@ -403,5 +407,6 @@ module.exports = {
     muteRoom,
     unmuteRoom,
     banRoom,
-    sendWarning
+    sendWarning,
+    sendBan
 }

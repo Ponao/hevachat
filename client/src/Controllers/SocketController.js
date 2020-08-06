@@ -657,6 +657,10 @@ export default {
                 payload: warning
             })
         })
+
+        socket.on('ban', async () => {
+            window.location.reload()
+        })
     },
     getSocketId: () => {
         return socket.id

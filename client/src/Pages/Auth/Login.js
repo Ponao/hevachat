@@ -17,6 +17,8 @@ import {urlApi} from '../../config'
 import { CircularProgress } from '@material-ui/core'
 import store from '../../Redux/store'
 import { BAN_SET } from '../../Redux/constants'
+import { withLang } from 'react-multi-language'
+import languages from '../../languages'
 
 class Login extends React.Component {
     state = {
@@ -89,16 +91,16 @@ class Login extends React.Component {
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
                     {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'email').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'email').msg]} 
                     </span>}
 
                     <input value={this.state.password} onChange={(e) => {this.setState({password: e.target.value})}} className="input-field" type="password" name="password" placeholder="Password" />
                     {this.state.errors.find(value => value.param === 'password') && <span className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'password').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'password').msg]} 
                     </span>}
 
                     {this.state.errors.find(value => value.param === 'all') && <span style={{marginTop: 30}} className="input-error-label">
-                        {this.state.errors.find(value => value.param === 'all').msg} 
+                        {this.props.langProps[this.state.errors.find(value => value.param === 'all').msg]} 
                     </span>}
 
                     <button type="submit" className="button-gray">Log in</button>
@@ -122,4 +124,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withCookies(Login))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withCookies(Login)))

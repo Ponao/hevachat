@@ -13,6 +13,8 @@ import { bindActionCreators } from 'redux'
 import { withRouter } from 'react-router-dom';
 import UserItem from '../../Partials/User/UserItem';
 import { CircularProgress } from '@material-ui/core';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
 
 class Contacts extends React.Component {
     componentDidMount() {
@@ -50,8 +52,8 @@ class Contacts extends React.Component {
             })}
             {(!this.props.users.pending.users.length && !this.props.users.pending.isFetching) && <div className="data-empty">
                 <GroupIcon style={{color: '#B8C3CF', fontSize: 54, margin: '0 auto', display: 'block'}} />
-
-                <p>Outgoing requests will be displayed here</p>
+                
+                <p>{this.props.langProps.outgoing_request_empty}</p>
             </div>}
         </Scrollbars>
     }
@@ -70,4 +72,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts))
+export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Contacts)))

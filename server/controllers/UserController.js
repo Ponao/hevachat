@@ -12,7 +12,7 @@ const Friend = require('../models/Friends')
 const { validationResult } = require("express-validator");
 const Notification = require('../models/Notification');
 const mongoose = require("../database");
-const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification, sendWarning} = require('./SocketController')
+const {sendRequestFriend, sendAcceptFriend, sendRemoveFriend, sendNotification, removeNotification, sendWarning, sendBan} = require('./SocketController')
 const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 const { sendPushNotification } = require('./PushNotificationsController');
@@ -667,7 +667,7 @@ module.exports = {
                 await limit.save()
 
                 let ban  = {numDate: limit.numDate, date: limit.date}
-
+                sendBan({userId})
                 return res.json({error: false});
             } else {
                 return res.json({error: true});
