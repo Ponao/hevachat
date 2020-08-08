@@ -45,5 +45,9 @@ router.post('/reset', [
   check('passwordConfirm')
   .custom((value, { req }) => value === req.body.password).withMessage('Подтверждение должно совпадать с паролем'),  
 ], AuthController.reset);
+router.get('/login_vk', AuthController.loginVk);
+router.get('/auth_vk', AuthController.authVk);
+router.get('/login_fb', AuthController.loginFb);
+router.get('/auth_fb', AuthController.authFb);
 
 module.exports = router;

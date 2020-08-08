@@ -89,6 +89,7 @@ class Login extends React.Component {
                 </h1>
 
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
+                    <a href={`${urlApi}/auth/login_vk?uuid=${randomInteger(0, 9999999)}`}>123</a>
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
                     {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
                         {this.props.langProps[this.state.errors.find(value => value.param === 'email').msg]} 
@@ -122,6 +123,11 @@ function mapDispatchToProps(dispatch) {
     return {
         userActions: bindActionCreators(userActions, dispatch),
     }
+}
+
+function randomInteger(min, max) {
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
 }
 
 export default withLang(languages)(connect(mapStateToProps, mapDispatchToProps)(withCookies(Login)))

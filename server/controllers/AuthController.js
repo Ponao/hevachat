@@ -11,6 +11,12 @@ const User = require("../models/User");
 const Dialog = require('../models/Dialog');
 const Notification = require('../models/Notification');
 const Limit = require("../models/Limit");
+const https = require('https');
+const { resolve } = require("path");
+const VK_APP_ID = process.env.VK_APP_ID;
+const VK_APP_KEY = process.env.VK_APP_KEY;
+const VK_VERSION_API = process.env.VK_VERSION_API;
+const VK_REDIRECT_URI = process.env.VK_REDIRECT_URI;
 
 module.exports = {
   // Register method
@@ -180,6 +186,23 @@ module.exports = {
     err.msg = `email_or_password_wrong`;
     return res.status(401).json({ error: true, errors: [err] });
   },
+  loginVk: async (req, res, next) => {    
+    res.writeHead(301, { "Location": `http://oauth.vk.com/authorize?client_id=${VK_APP_ID}&redirect_uri=${VK_REDIRECT_URI}&response_type=code&scope=photos,offline` });
+    res.end()
+  },
+  authVk: async (req, res, next) => {
+    const { code } = req.query;
+
+    let token = await getTokenFromVkUser(code)
+
+    return res.json({token})
+  },
+  loginFb: async (req, res, next) => {
+
+  },
+  authFb: async (req, res, next) => {
+
+  },
   forgot: async (req, res, next) => {
     // This route expects the body parameters:
     //  - email: username's email
@@ -270,4 +293,118 @@ function generateToken(userId) {
 function randomInteger(min, max) {
   let rand = min + Math.random() * (max + 1 - min);
   return Math.floor(rand);
+}
+
+function getTokenFromVkUser(code) {
+  return new Promise((resolve) => {
+    let params = {
+      client_id: VK_APP_ID,
+      client_secret: VK_APP_KEY,
+      code: code,
+      redirect_uri: VK_REDIRECT_URI
+    }
+
+    let searchParameters = new URLSearchParams();
+
+    Object.keys(params).forEach(function(parameterName) {
+        searchParameters.append(parameterName, params[parameterName]);
+    });
+
+    let optionsRequest = {
+        host: `oauth.vk.com`,
+        port: 443,
+        path: `/access_token?${searchParameters}`,
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+        }
+    };
+
+    let req1 = https.request(optionsRequest, function(res) {  
+        res.on('data', function(data) {
+            data = JSON.parse(data)
+            if(data.access_token) {
+              let params = {
+                  v: VK_VERSION_API,
+                  access_token: data.access_token,
+                  user_ids: data.user_id,
+                  fields: 'photo_big,bdate'
+              }
+          
+              let searchParameters = new URLSearchParams();
+          
+              Object.keys(params).forEach(function(parameterName) {
+                  searchParameters.append(parameterName, params[parameterName]);
+              });
+
+              let optionsRequest = {
+                host: `api.vk.com`,
+                port: 443,
+                path: `/method/users.get?${searchParameters}`,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                }
+              };
+
+              let req2 = https.request(optionsRequest, async (res) => {  
+                res.on('data', async (data) => {
+                  data = JSON.parse(data).response
+                  
+                  if(data && data[0] && data[0].id) {
+                    let user = await User.findOne({email: data[0].id}).select('+email');
+                    if(user) {
+                      let token = generateToken(user.id);
+                      resolve(token)
+                    } else {
+                      const newUser = new User();
+
+                      newUser.name = {
+                        first: data[0].first_name,
+                        last: data[0].last_name
+                      }
+                      newUser.email = data[0].id
+                      newUser.password = await bcrypt.hash(String(data[0].id), 12)
+
+                      let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
+
+                      newUser.color = colors[randomInteger(0,7)]
+
+                      newUser.avatar = {
+                        original: data[0].photo_big, 
+                        min: data[0].photo_big
+                      }
+
+                      await newUser.save()
+
+                      let token = generateToken(newUser.id);
+                      resolve(token)
+                    }
+                  } else {
+                    resolve(false)
+                  }
+                })
+              })
+
+              req2.on('error', function(e) {
+                  console.log("ERROR:");
+                  console.log(e);
+                  resolve(false)
+              });
+              
+              req2.end();
+            } else {
+              resolve(false)
+            }
+        });
+    });
+
+    req1.on('error', function(e) {
+        console.log("ERROR:");
+        console.log(e);
+        resolve(false)
+    });
+
+    req1.end();
+  })
 }

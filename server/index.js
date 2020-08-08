@@ -20,7 +20,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const historyApiFallback = require('connect-history-api-fallback');
 const {initSocket} = require('./controllers/SocketController')
-const adminPanel = require('./controllers/AdminController')
+// const adminPanel = require('./controllers/AdminController')
 const formidableMiddleware = require('express-formidable');
 
 // const errors = require('./middleware/errors');
@@ -35,11 +35,13 @@ const callRoutes = require('./routes/call')
 const paymentRoutes = require('./routes/payment')
 
 // Use Express as our web server
+
+
 const app = express();
 
 app
   // Parse JSON
-  .use('/admin', formidableMiddleware(), adminPanel)
+  // .use('/admin', formidableMiddleware(), adminPanel)
   .use(bodyParser.json())
   // Enable files upload
   .use(fileUpload({
