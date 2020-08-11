@@ -47,6 +47,7 @@ router.post('/reset', [
 ], AuthController.reset);
 router.get('/login_vk', AuthController.loginVk);
 router.get('/auth_vk', AuthController.authVk);
+router.post('/auth_vk_app', AuthController.authVkApp);
 router.get('/login_fb', AuthController.loginFb);
 router.get('/auth_fb', AuthController.authFb);
 

@@ -1,4 +1,3 @@
-// 9b7f5159-2043-48f4-9370-82bd8740d617
 const https = require('https');
 
 const androidAppId = process.env.ONESIGNAL_ANDROID_APP_ID

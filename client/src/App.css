@@ -1480,3 +1480,31 @@
     }
 }
 
+
+.social-auth {
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    text-decoration: none!important;
+    background: #EDF0F3;
+    width: 260px;
+    height: 40px;
+    border-radius: 50px;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 40px;
+    color: #008FF7;
+    transition: all 0.2s;
+}
+.social-auth svg {
+    transition: all 0.2s;
+}
+.social-auth:hover {
+    background: #008FF7;
+    color: #fff;
+}
+.social-auth:hover svg {
+    color: #fff!important;
+}

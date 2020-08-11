@@ -9,6 +9,7 @@ import Main from '../Pages/User/Main';
 import Dialog from '../Pages/User/Dialog';
 import Payment from '../Pages/User/Payment';
 import Ban from '../Pages/User/Ban';
+import AuthVk from '../Pages/Auth/AuthVk';
 
 const routes = [
     {
@@ -24,6 +25,13 @@ const routes = [
         type: 'auth',
         title: 'Регистрация',
         component: () => <Register />
+    },
+    {
+        path: '/auth_vk',
+        exact: true,
+        type: 'auth',
+        title: 'Loading...',
+        component: () => <AuthVk />
     },
     {
         path: '/',

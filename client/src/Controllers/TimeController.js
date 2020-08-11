@@ -129,12 +129,14 @@ export function OnlineDate(timeR) {
         hours = "0" + hours;
     }
 
-    var diff = (((new Date()).getTime() - time.getTime()) / 1000),
-        day_diff = new Date().getDay() - time.getDay();
-     var   month_diff = (new Date().getMonth()+1) - (time.getMonth()+1)
     var year = time.getFullYear(),
         month = time.getMonth()+1,
         day = time.getDate();
+        console.log(day)
+
+    var diff = (((new Date()).getTime() - time.getTime()) / 1000),
+        day_diff = new Date().getDate() - time.getDate();
+    var month_diff = (new Date().getMonth()+1) - (time.getMonth()+1)
 
     if (isNaN(day_diff) || day_diff < 0 || month_diff >= 1 )
         return (

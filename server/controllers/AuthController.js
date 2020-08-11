@@ -17,6 +17,7 @@ const VK_APP_ID = process.env.VK_APP_ID;
 const VK_APP_KEY = process.env.VK_APP_KEY;
 const VK_VERSION_API = process.env.VK_VERSION_API;
 const VK_REDIRECT_URI = process.env.VK_REDIRECT_URI;
+const VK_CLIENT_REDIRECT_URI = process.env.VK_CLIENT_REDIRECT_URI;
 
 module.exports = {
   // Register method
@@ -192,10 +193,30 @@ module.exports = {
   },
   authVk: async (req, res, next) => {
     const { code } = req.query;
+    
+    try {
+      let token = await getTokenFromVkUser(code)
 
-    let token = await getTokenFromVkUser(code)
+      if(token)
+        res.writeHead(301, { "Location": `${VK_CLIENT_REDIRECT_URI}?token=${token}&uuid=${randomInteger(0, 1000000)}` });
+      else 
+        res.writeHead(301, { "Location": `${VK_CLIENT_REDIRECT_URI}` });
 
-    return res.json({token})
+      res.end()
+    } catch (e) {
+      return next(new Error(e));
+    }
+  },
+  authVkApp: async (req, res, next) => {
+    const { access_token } = req.body;
+
+    try {
+      let token = await getVkUserFromToken(access_token)
+
+      return res.json({token})
+    } catch (e) {
+      return next(new Error(e));
+    }
   },
   loginFb: async (req, res, next) => {
 
@@ -324,75 +345,9 @@ function getTokenFromVkUser(code) {
         res.on('data', function(data) {
             data = JSON.parse(data)
             if(data.access_token) {
-              let params = {
-                  v: VK_VERSION_API,
-                  access_token: data.access_token,
-                  user_ids: data.user_id,
-                  fields: 'photo_big,bdate'
-              }
-          
-              let searchParameters = new URLSearchParams();
-          
-              Object.keys(params).forEach(function(parameterName) {
-                  searchParameters.append(parameterName, params[parameterName]);
-              });
-
-              let optionsRequest = {
-                host: `api.vk.com`,
-                port: 443,
-                path: `/method/users.get?${searchParameters}`,
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json; charset=utf-8",
-                }
-              };
-
-              let req2 = https.request(optionsRequest, async (res) => {  
-                res.on('data', async (data) => {
-                  data = JSON.parse(data).response
-                  
-                  if(data && data[0] && data[0].id) {
-                    let user = await User.findOne({email: data[0].id}).select('+email');
-                    if(user) {
-                      let token = generateToken(user.id);
-                      resolve(token)
-                    } else {
-                      const newUser = new User();
-
-                      newUser.name = {
-                        first: data[0].first_name,
-                        last: data[0].last_name
-                      }
-                      newUser.email = data[0].id
-                      newUser.password = await bcrypt.hash(String(data[0].id), 12)
-
-                      let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
-
-                      newUser.color = colors[randomInteger(0,7)]
-
-                      newUser.avatar = {
-                        original: data[0].photo_big, 
-                        min: data[0].photo_big
-                      }
-
-                      await newUser.save()
-
-                      let token = generateToken(newUser.id);
-                      resolve(token)
-                    }
-                  } else {
-                    resolve(false)
-                  }
-                })
+              getVkUserFromToken(data).then(token => {
+                resolve(token)
               })
-
-              req2.on('error', function(e) {
-                  console.log("ERROR:");
-                  console.log(e);
-                  resolve(false)
-              });
-              
-              req2.end();
             } else {
               resolve(false)
             }
@@ -406,5 +361,79 @@ function getTokenFromVkUser(code) {
     });
 
     req1.end();
+  })
+}
+
+function getVkUserFromToken(data) {
+  return new Promise((resolve) => {
+    let params = {
+      v: VK_VERSION_API,
+      access_token: data.access_token,
+      user_ids: data.user_id,
+      fields: 'photo_big,bdate'
+    }
+
+    let searchParameters = new URLSearchParams();
+
+    Object.keys(params).forEach(function(parameterName) {
+        searchParameters.append(parameterName, params[parameterName]);
+    });
+
+    let optionsRequest = {
+      host: `api.vk.com`,
+      port: 443,
+      path: `/method/users.get?${searchParameters}`,
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json; charset=utf-8",
+      }
+    };
+
+    let req2 = https.request(optionsRequest, async (res) => {  
+      res.on('data', async (data) => {
+        data = JSON.parse(data).response
+        
+        if(data && data[0] && data[0].id) {
+          let user = await User.findOne({email: data[0].id}).select('+email');
+          if(user) {
+            let token = generateToken(user.id);
+            resolve(token)
+          } else {
+            const newUser = new User();
+
+            newUser.name = {
+              first: data[0].first_name,
+              last: data[0].last_name
+            }
+            newUser.email = data[0].id
+            newUser.password = await bcrypt.hash(String(data[0].id), 12)
+
+            let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
+
+            newUser.color = colors[randomInteger(0,7)]
+
+            newUser.avatar = {
+              original: data[0].photo_big, 
+              min: data[0].photo_big
+            }
+
+            await newUser.save()
+
+            let token = generateToken(newUser.id);
+            resolve(token)
+          }
+        } else {
+          resolve(false)
+        }
+      })
+    })
+
+    req2.on('error', function(e) {
+        console.log("ERROR:");
+        console.log(e);
+        resolve(false)
+    });
+
+    req2.end();
   })
 }
