@@ -208,10 +208,10 @@ module.exports = {
     }
   },
   authVkApp: async (req, res, next) => {
-    const { access_token } = req.body;
+    const { data } = req.body;
 
     try {
-      let token = await getVkUserFromToken(access_token)
+      let token = await getVkUserFromToken(data)
 
       return res.json({token})
     } catch (e) {
