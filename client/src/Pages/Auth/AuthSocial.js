@@ -5,7 +5,7 @@ import { CircularProgress } from '@material-ui/core'
 import qs from 'qs'
 import { withRouter } from 'react-router-dom'
 
-class AuthVk extends React.Component {
+class AuthSocial extends React.Component {
     state = {
         token: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).token,
     }
@@ -15,6 +15,8 @@ class AuthVk extends React.Component {
             const { cookies } = this.props
             cookies.set('apiToken', this.state.token, { path: '/' })
 
+            window.location.replace('/')
+        } else {
             window.location.replace('/')
         }
     }
@@ -32,4 +34,4 @@ class AuthVk extends React.Component {
 }
 
 
-export default withCookies(withRouter(AuthVk))
+export default withCookies(withRouter(AuthSocial))

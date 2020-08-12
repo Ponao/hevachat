@@ -13,11 +13,18 @@ const Notification = require('../models/Notification');
 const Limit = require("../models/Limit");
 const https = require('https');
 const { resolve } = require("path");
+
+// VK
 const VK_APP_ID = process.env.VK_APP_ID;
 const VK_APP_KEY = process.env.VK_APP_KEY;
 const VK_VERSION_API = process.env.VK_VERSION_API;
 const VK_REDIRECT_URI = process.env.VK_REDIRECT_URI;
-const VK_CLIENT_REDIRECT_URI = process.env.VK_CLIENT_REDIRECT_URI;
+
+// FaceBook
+const FB_APP_ID = process.env.FB_APP_ID;
+const FB_APP_KEY = process.env.FB_APP_KEY;
+const FB_VERSION_API = process.env.FB_VERSION_API;
+const FB_REDIRECT_URI = process.env.FB_REDIRECT_URI;
 
 module.exports = {
   // Register method
@@ -198,9 +205,9 @@ module.exports = {
       let token = await getTokenFromVkUser(code)
 
       if(token)
-        res.writeHead(301, { "Location": `${VK_CLIENT_REDIRECT_URI}?token=${token}&uuid=${randomInteger(0, 1000000)}` });
+        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/auth_social?token=${token}&uuid=${randomInteger(0, 1000000)}` });
       else 
-        res.writeHead(301, { "Location": `${VK_CLIENT_REDIRECT_URI}` });
+        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}` });
 
       res.end()
     } catch (e) {
@@ -219,10 +226,24 @@ module.exports = {
     }
   },
   loginFb: async (req, res, next) => {
-
+    res.writeHead(301, { "Location": `https://www.facebook.com/v4.0/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${FB_REDIRECT_URI}&response_type=code&auth_type=rerequest` });
+    res.end()
   },
   authFb: async (req, res, next) => {
+    const { code } = req.query;
+    
+    try {
+      let token = await getTokenFromFBUser(code)
 
+      if(token)
+        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/auth_social?token=${token}&uuid=${randomInteger(0, 1000000)}` });
+      else 
+        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}` });
+
+      res.end()
+    } catch (e) {
+      return next(new Error(e));
+    }
   },
   forgot: async (req, res, next) => {
     // This route expects the body parameters:
@@ -415,6 +436,126 @@ function getVkUserFromToken(data) {
             newUser.avatar = {
               original: data[0].photo_big, 
               min: data[0].photo_big
+            }
+
+            await newUser.save()
+
+            let token = generateToken(newUser.id);
+            resolve(token)
+          }
+        } else {
+          resolve(false)
+        }
+      })
+    })
+
+    req2.on('error', function(e) {
+        console.log("ERROR:");
+        console.log(e);
+        resolve(false)
+    });
+
+    req2.end();
+  })
+}
+
+function getTokenFromFBUser(code) {
+  return new Promise((resolve) => {
+    let params = {
+      client_id: FB_APP_ID,
+      client_secret: FB_APP_KEY,
+      code: code,
+      redirect_uri: FB_REDIRECT_URI
+    }
+
+    let searchParameters = new URLSearchParams();
+
+    Object.keys(params).forEach(function(parameterName) {
+        searchParameters.append(parameterName, params[parameterName]);
+    });
+
+    let optionsRequest = {
+        host: `graph.facebook.com`,
+        port: 443,
+        path: `/${FB_VERSION_API}/oauth/access_token?${searchParameters}`,
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+        }
+    };
+
+    let req1 = https.request(optionsRequest, function(res) {  
+        res.on('data', function(data) {
+            data = JSON.parse(data)
+            if(data.access_token) {
+              getFBUserFromToken(data).then(token => {
+                resolve(token)
+              })
+            } else {
+              resolve(false)
+            }
+        });
+    });
+
+    req1.on('error', function(e) {
+        console.log("ERROR:");
+        console.log(e);
+        resolve(false)
+    });
+
+    req1.end();
+  })
+}
+
+function getFBUserFromToken(data) {
+  return new Promise((resolve) => {
+    let params = {
+      access_token: data.access_token,
+      fields: 'id,first_name,last_name'
+    }
+
+    let searchParameters = new URLSearchParams();
+
+    Object.keys(params).forEach(function(parameterName) {
+        searchParameters.append(parameterName, params[parameterName]);
+    });
+
+    let optionsRequest = {
+      host: `graph.facebook.com`,
+      port: 443,
+      path: `/me?${searchParameters}`,
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json; charset=utf-8",
+      }
+    };
+
+    let req2 = https.request(optionsRequest, async (res) => {  
+      res.on('data', async (data) => {
+        data = JSON.parse(data)
+        
+        if(data && data && data.id) {
+          let user = await User.findOne({email: data.id}).select('+email');
+          if(user) {
+            let token = generateToken(user.id);
+            resolve(token)
+          } else {
+            const newUser = new User();
+
+            newUser.name = {
+              first: data.first_name,
+              last: data.last_name
+            }
+            newUser.email = data.id
+            newUser.password = await bcrypt.hash(String(data.id), 12)
+
+            let colors = ["26, 188, 156",'46, 204, 113','52, 152, 219','155, 89, 182','233, 30, 99','241, 196, 15','230, 126, 34','231, 76, 60']
+
+            newUser.color = colors[randomInteger(0,7)]
+
+            newUser.avatar = {
+              original: `https://graph.facebook.com/${data.id}/picture?type=large`, 
+              min: `https://graph.facebook.com/${data.id}/picture?type=large`
             }
 
             await newUser.save()

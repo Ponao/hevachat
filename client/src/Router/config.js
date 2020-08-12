@@ -9,7 +9,7 @@ import Main from '../Pages/User/Main';
 import Dialog from '../Pages/User/Dialog';
 import Payment from '../Pages/User/Payment';
 import Ban from '../Pages/User/Ban';
-import AuthVk from '../Pages/Auth/AuthVk';
+import AuthSocial from '../Pages/Auth/AuthSocial';
 
 const routes = [
     {
@@ -27,11 +27,11 @@ const routes = [
         component: () => <Register />
     },
     {
-        path: '/auth_vk',
+        path: '/auth_social',
         exact: true,
         type: 'auth',
         title: 'Loading...',
-        component: () => <AuthVk />
+        component: () => <AuthSocial />
     },
     {
         path: '/',

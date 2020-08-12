@@ -60,7 +60,7 @@ class Login extends React.Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: this.state.email,
+                    email: this.state.email.toLowerCase().replace(/\s+/g, ''),
                     password: this.state.password
                 })
             })
@@ -110,11 +110,11 @@ class Login extends React.Component {
                     <a className="social-auth" href={`${urlApi}/auth/login_vk?uuid=${randomInteger(0, 9999999)}`}>
                         <Vkontakte style={{width: 24, height: 24, marginLeft: 20, marginRight: 15, color: '#5181b8'}} />
                         Вход через VK
-                        </a>
-                    <a className="social-auth" href={`${urlApi}/auth/login_vk?uuid=${randomInteger(0, 9999999)}`}>
+                    </a>
+                    <a className="social-auth" href={`${urlApi}/auth/login_fb?uuid=${randomInteger(0, 9999999)}`}>
                         <Facebook style={{marginLeft: 20, marginRight: 15, color: '#4267b2'}} />
                         Вход через FaceBook
-                        </a>
+                    </a>
 
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
                     {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">

@@ -44,7 +44,7 @@ class Register extends React.Component {
                 body: JSON.stringify({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
-                    email: this.state.email,
+                    email: this.state.email.toLowerCase().replace(/\s+/g, ''),
                     password: this.state.password
                 })
             })
