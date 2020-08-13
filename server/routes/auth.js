@@ -50,5 +50,6 @@ router.get('/auth_vk', AuthController.authVk);
 router.post('/auth_vk_app', AuthController.authVkApp);
 router.get('/login_fb', AuthController.loginFb);
 router.get('/auth_fb', AuthController.authFb);
+router.post('/auth_fb_app', AuthController.authFbApp);
 
 module.exports = router;

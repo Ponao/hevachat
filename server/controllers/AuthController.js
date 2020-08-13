@@ -245,6 +245,17 @@ module.exports = {
       return next(new Error(e));
     }
   },
+  authFbApp: async (req, res, next) => {
+    const { access_token } = req.body;
+
+    try {
+      let token = await getFBUserFromToken({access_token: token})
+
+      return res.json({token})
+    } catch (e) {
+      return next(new Error(e));
+    }
+  },
   forgot: async (req, res, next) => {
     // This route expects the body parameters:
     //  - email: username's email
