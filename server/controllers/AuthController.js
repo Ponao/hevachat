@@ -249,7 +249,7 @@ module.exports = {
     const { access_token } = req.body;
 
     try {
-      let token = await getFBUserFromToken({access_token: token})
+      let token = await getFBUserFromToken({access_token})
 
       return res.json({token})
     } catch (e) {
