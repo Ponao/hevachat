@@ -32,7 +32,7 @@ class UserSidebar extends React.Component {
                         }}><Avatar avatar={this.props.user.avatar ? this.props.user.avatar : false} style={{width: 32, height: 32, fontSize: 14, fontWeight: 600, backgroundColor: `rgb(${this.props.user.color})`}} name={this.props.user.name.first.charAt(0) + this.props.user.name.last.charAt(0)} /></li>
                         <li style={{position: 'relative'}} className={`${this.state.activeTab === 'messages' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'messages'})}}>
                             <ChatBubbleOutlineIcon style={{color: '#CCD1D6'}} />
-                            {!!this.props.dialogs.noReadCount && <span 
+                            {this.props.dialogs.noReadCount > 0 && <span 
                                 className="unread-messages-count"
                                 style={{
                                     top: 11,
@@ -45,7 +45,7 @@ class UserSidebar extends React.Component {
                         <li className={`${this.state.activeTab === 'rooms' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'rooms'})}}><AppsIcon style={{color: '#CCD1D6'}} /></li>
                         <li style={{position: 'relative'}} className={`${this.state.activeTab === 'notifications' ? 'active' : ''}`} onClick={() => {this.setState({activeTab: 'notifications'})}}>
                             <NotificationsNoneIcon style={{color: '#CCD1D6'}} />
-                            {!!this.props.notifications.noRead && <span 
+                            {this.props.notifications.noRead > 0 && <span 
                                 className="unread-messages-count"
                                 style={{
                                     top: 11,

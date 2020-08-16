@@ -45,9 +45,17 @@ import {
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
 
+const CTX = new (window.AudioContext || window.webkitAudioContext)()
+
 let socket = false
 let activeLang = false
 let unmuteTimer = false
+
+let newMessageSound = new Audio(`${urlApi}/sounds/NewMessage.mp3`)
+
+setInterval(() => {
+    CTX.resume().then(() => {})
+}, 3000)
 
 export default { 
     init: (apiToken) => {
@@ -273,6 +281,15 @@ export default {
                     })
                 });
             }
+
+            if(message.user._id !== store.getState().user._id) {
+                newMessageSound.currentTime = 0
+                let promise = newMessageSound.play()
+
+                if (promise !== undefined) {
+                    promise.then(_ => {}).catch(error => {console.log(error)})
+                }
+            }
         })
 
         socket.on('sendNotification', notification => {
@@ -286,6 +303,13 @@ export default {
                     type: NOTIFICATIONS_SET_NO_READ,
                     payload: store.getState().notifications.noRead+1
                 })
+
+            newMessageSound.currentTime = 0
+            let promise = newMessageSound.play()
+
+            if (promise !== undefined) {
+                promise.then(_ => {}).catch(error => {console.log(error)})
+            }
         })
 
         socket.on('readNotification', id => {
@@ -335,7 +359,6 @@ export default {
         })
 
         socket.on('deleteMessageDialog', ({messageIds, dialogId, lastMessage, noRead, noReadCount}) => {
-            console.log(noReadCount)
             store.dispatch({
                 type: DIALOGS_DELETE_MESSAGE,
                 payload: {dialogId, messageIds, lastMessage, noRead, noReadCount}

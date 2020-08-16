@@ -132,7 +132,6 @@ export function OnlineDate(timeR) {
     var year = time.getFullYear(),
         month = time.getMonth()+1,
         day = time.getDate();
-        console.log(day)
 
     var diff = (((new Date()).getTime() - time.getTime()) / 1000),
         day_diff = new Date().getDate() - time.getDate();

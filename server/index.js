@@ -60,6 +60,7 @@ app
   .use('/api/payment', paymentRoutes)
   // Serve static files
   .use('/media', express.static(path.join(__dirname, './uploads')))
+  .use('/sounds', express.static(path.join(__dirname, './sounds')))
   // .use(formidableMiddleware({ extended: false }))
   
   // Enable history API
