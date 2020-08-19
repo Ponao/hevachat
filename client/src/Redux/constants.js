@@ -98,3 +98,7 @@ export const SLIDER_SET = 'SLIDER_SET'
 
 // Ban
 export const BAN_SET = 'BAN_SET'
+
+// Toasts
+export const TOASTS_ADD = 'TOASTS_ADD'
+export const TOASTS_REMOVE = 'TOASTS_REMOVE'

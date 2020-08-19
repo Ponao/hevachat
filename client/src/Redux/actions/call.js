@@ -3,6 +3,7 @@ import { urlApi } from "../../config"
 import SocketController from "../../Controllers/SocketController"
 import WebRtcController from "../../Controllers/WebRtcController"
 import store from "../store"
+import { playBeep, stopBeep, stopRington } from "../../Controllers/SoundController"
 
 export const call = (user, apiToken) => (dispatch) => {
     if(store.getState().rooms.activeRoom) {
@@ -15,6 +16,8 @@ export const call = (user, apiToken) => (dispatch) => {
             type: CALL_SET_USER,
             payload: {user, status: 'outcoming'}
         })
+
+        playBeep()
 
         fetch(`${urlApi}/api/call/call`, {
             method: "post",
@@ -31,6 +34,7 @@ export const call = (user, apiToken) => (dispatch) => {
         .then((response) => response.json())
         .then((call) => {
             if(call.error) {
+                stopBeep()
                 dispatch({
                     type: CALL_SET_STATUS,
                     payload: call.error
@@ -85,6 +89,7 @@ export const accept = (apiToken) => (dispatch) => {
                     })
                 })
             } else {
+                stopRington()
                 WebRtcController.call(store.getState().call.user._id)
             }
         })
@@ -92,6 +97,8 @@ export const accept = (apiToken) => (dispatch) => {
 }
 
 export const stop = (user, apiToken) => (dispatch) => {
+    stopBeep()
+    stopRington()
     WebRtcController.stopCall()
 
     dispatch({

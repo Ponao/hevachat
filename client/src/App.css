@@ -1508,3 +1508,50 @@
 .social-auth:hover svg {
     color: #fff!important;
 }
+
+.bell-toasts {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    max-height: 321px;
+    overflow: hidden;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-top: 15px;
+}
+
+.bell-toast {
+    background-color: #fff;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    width: 240px;
+    height: 87px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+}
+
+.bell-toast .name {
+    display: flex;
+    font-weight: 600;
+    font-size: 16px;
+    color: #008FF7;
+    margin: 0 15px;
+}
+
+.bell-toast .text {
+    font-weight: 500;
+    font-size: 14px;
+    color: #667788;
+    margin: 0 15px;
+}
+.bell-toast .bell-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}

@@ -40,22 +40,17 @@ import {
     ROOMS_SET_MUTED,
     ROOMS_JOIN_ERROR,
     ROOMS_LEAVE_ROOM,
-    USER_SET_WARNING
+    USER_SET_WARNING,
+    TOASTS_ADD,
+    TOASTS_REMOVE
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
-
-const CTX = new (window.AudioContext || window.webkitAudioContext)()
+import {playNewMessage, stopBeep, playRington, stopRington} from './SoundController'
 
 let socket = false
 let activeLang = false
 let unmuteTimer = false
-
-let newMessageSound = new Audio(`${urlApi}/sounds/NewMessage.mp3`)
-
-setInterval(() => {
-    CTX.resume().then(() => {})
-}, 3000)
 
 export default { 
     init: (apiToken) => {
@@ -282,34 +277,48 @@ export default {
                 });
             }
 
-            if(message.user._id !== store.getState().user._id) {
-                newMessageSound.currentTime = 0
-                let promise = newMessageSound.play()
+            if(message.user._id !== store.getState().user._id && `/chats/${message.user._id}` !== window.location.pathname) {
+                playNewMessage()
 
-                if (promise !== undefined) {
-                    promise.then(_ => {}).catch(error => {console.log(error)})
-                }
+                store.dispatch({
+                    type: TOASTS_ADD,
+                    payload: {toast: message, toastType: 'message'}
+                })
+
+                setTimeout(() => {
+                    store.dispatch({
+                        type: TOASTS_REMOVE,
+                        payload: message._id
+                    })
+                }, 5000)
             }
         })
 
         socket.on('sendNotification', notification => {
-            if(store.getState().notifications.getted)
+            if(store.getState().notifications.getted) {
                 store.dispatch({
                     type: NOTIFICATIONS_ADD,
                     payload: notification
                 })
-            else 
+            } else 
                 store.dispatch({
                     type: NOTIFICATIONS_SET_NO_READ,
                     payload: store.getState().notifications.noRead+1
                 })
+            
+            store.dispatch({
+                type: TOASTS_ADD,
+                payload: {toast: notification, toastType: 'notification'}
+            })
 
-            newMessageSound.currentTime = 0
-            let promise = newMessageSound.play()
+            setTimeout(() => {
+                store.dispatch({
+                    type: TOASTS_REMOVE,
+                    payload: notification._id
+                })
+            }, 5000)
 
-            if (promise !== undefined) {
-                promise.then(_ => {}).catch(error => {console.log(error)})
-            }
+            playNewMessage()
         })
 
         socket.on('readNotification', id => {
@@ -332,6 +341,11 @@ export default {
 
             store.dispatch({
                 type: NOTIFICATIONS_REMOVE,
+                payload: id
+            })
+
+            store.dispatch({
+                type: TOASTS_REMOVE,
                 payload: id
             })
         })
@@ -552,6 +566,7 @@ export default {
             })
             .then((response) => response.json())
             .then(({user, friendStatus}) => {
+                playRington()
                 store.dispatch({
                     type: CALL_SET_USER,
                     payload: {user, status: 'incoming'}
@@ -566,6 +581,7 @@ export default {
                     payload: 'active'
                 })
                 WebRtcController.call(userId, true)
+                stopBeep()
             }
         })
 
@@ -577,6 +593,8 @@ export default {
 
         socket.on('stopUserCall', userId => {
             if(store.getState().call.user && store.getState().call.user._id === userId) {
+                stopBeep()
+                stopRington()
                 if(store.getState().call.status === 'outcoming')
                     store.dispatch({
                         type: CALL_SET_STATUS,
