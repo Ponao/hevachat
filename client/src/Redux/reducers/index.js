@@ -10,6 +10,7 @@ import call from './call'
 import slider from './slider'
 import ban from './ban'
 import toasts from './toasts'
+import app from './app'
 
 export default combineReducers({
     user,
@@ -21,5 +22,6 @@ export default combineReducers({
     call,
     slider,
     ban,
-    toasts
+    toasts,
+    app
 })

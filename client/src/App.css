@@ -1555,3 +1555,19 @@
     top: 10px;
     right: 10px;
 }
+.app-status-connecting {
+    background-color: #008FF7;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.app-status-connecting span {
+    color: #fff;
+    display: flex;
+    font-size: 14px;
+    line-height: 14px;
+}

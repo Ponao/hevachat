@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Your cam</h1>
+    <video id="stream"></video>
+    <button id="start" onclick="startStreaming()">Start</button>
+    <button id="stop" onclick="stopStreaming()" style="display: none;">Stop</button>
+    
+    <h1>Your snap</h1>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="canvasImg">
+    <button id="snap" onclick="takeSnap()" style="display: none;">Snap</button>
+
+    <style>
+        * {
+            outline: none!important;
+        }
+        #stream, #canvasImg {
+            border: 2px #0088f7 solid;
+            width: 300px;
+            height: 200px;
+            margin: 0 auto;
+            display: block;
+            background-color: #0088f7;
+        }
+        #start, #stop, #snap {
+            display: block;
+            margin: 20px auto;
+            background-color: brown;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        h1 {
+            text-align: center;
+            color: crimson;
+        }
+    </style>
+
+    <script src="./accessVideo.js"></script>
+</body>
+</html>

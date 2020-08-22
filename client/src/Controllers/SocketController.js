@@ -42,15 +42,27 @@ import {
     ROOMS_LEAVE_ROOM,
     USER_SET_WARNING,
     TOASTS_ADD,
-    TOASTS_REMOVE
+    TOASTS_REMOVE,
+    USER_LOGOUT,
+    BAN_SET,
+    USER_LOGIN,
+    DIALOGS_GET,
+    APP_SET_STATUS_NETWORK,
+    ROOMS_JOIN_ROOM,
+    ROOMS_GET,
+    ROOMS_GET_ERROR,
+    ROOMS_SET_GET,
+    NOTIFICATIONS_GET
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
 import {playNewMessage, stopBeep, playRington, stopRington} from './SoundController'
+import { setForceTitle } from './FunctionsController'
 
 let socket = false
 let activeLang = false
 let unmuteTimer = false
+let counterConnect = 0
 
 export default { 
     init: (apiToken) => {
@@ -58,6 +70,14 @@ export default {
             return
 
         socket = io(urlApi, {transports: ['websocket', 'polling', 'flashsocket']})
+
+        socket.on('disconnect', () => {
+            store.dispatch({
+                type: APP_SET_STATUS_NETWORK,
+                payload: true
+            })
+        })
+
         socket.on('connect', () => {
             socket.emit('auth', apiToken)
 
@@ -92,6 +112,264 @@ export default {
                     });
                 }
             });
+
+            if(counterConnect > 0) {
+                fetch(`${urlApi}/api/user/me`, {
+                    method: "get",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${apiToken}`,
+                    },
+                  })
+                    .then((response) => response.json())
+                    .then(({user, dialogs, noReadCount, noReadNotifications, ban, numDate, date}) => {
+                      if(ban) {
+                        store.dispatch({
+                          type: BAN_SET,
+                          payload: {numDate, date}
+                        })
+                      } else {
+                        // this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken);
+                        user.apiToken = apiToken
+    
+                        store.dispatch({
+                            type: USER_LOGIN,
+                            payload: user
+                        })
+
+                        for (let i = 0; i < dialogs.length; i++) {
+                            dialogs[i].user = dialogs[i].users.find(user => user._id !== store.getState().user._id)
+
+                            if(!dialogs[i].user)
+                                dialogs[i].user = dialogs[i].users[0]
+
+                            dialogs[i].typing = false
+                            dialogs[i].getted = false
+                            dialogs[i].isLoading = false
+
+                            if(dialogs[i].lastMessage) {
+                                dialogs[i].lastMessage.isLoading = false
+                                dialogs[i].lastMessage.isError = false
+                            }
+
+                            if(dialogs[i].lastMessage && dialogs[i].lastMessage.user._id === store.getState().user._id)
+                                dialogs[i].noRead = 0
+                        }
+
+                        store.dispatch({
+                            type: DIALOGS_GET,
+                            payload: {dialogs, noReadCount}
+                        })
+
+                        store.dispatch({
+                            type: NOTIFICATIONS_SET_NO_READ,
+                            payload: noReadNotifications
+                        })
+
+                        if(window.location.pathname.slice(1, 6) === 'chats') {
+                            let userId = window.location.pathname.slice(7, 31)
+
+                            fetch(`${urlApi}/api/dialog/get`, {
+                                method: "post",
+                                headers: {
+                                    Accept: "application/json",
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${apiToken}`,
+                                },
+                                body: JSON.stringify({
+                                    userId
+                                })
+                            })
+                            .then((response) => response.json())
+                            .then(({dialog, messages}) => {
+                                if(!dialog.error) {
+                                    dialog.user = dialog.users.find(user => user._id !== store.getState().user._id)
+                        
+                                    if(!dialog.user)
+                                        dialog.user = dialog.users[0]
+                        
+                                    dialog.typing = false
+                        
+                                    dialog.getted = true
+                        
+                                    dialog.messages = messages.reverse()
+                                    dialog.lastMessage = false
+                                    dialog.canLoad = messages.length === 50
+                                    dialog.isLoading = false
+                        
+                                    store.dispatch({
+                                        type: DIALOGS_ADD,
+                                        payload: dialog
+                                    })
+                                } else {
+                                    let dialog = {
+                                        getted: true,
+                                        isNotFound: true,
+                                        user: {_id: userId}
+                                    }
+                        
+                                    store.dispatch({
+                                        type: DIALOGS_ADD,
+                                        payload: dialog
+                                    })
+                                }
+                            });
+                        }
+                      }
+                    })
+                    .catch(() => {
+                        localStorage.setItem('drafts', JSON.stringify([]));
+                    //   this.setState({isRender: true})
+                        store.dispatch({
+                            type: USER_LOGOUT
+                        })
+                    })
+
+                if(store.getState().notifications.getted) {
+                    fetch(`${urlApi}/api/notification/get-all`, {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiToken}`,
+                        }
+                    })
+                    .then((response) => response.json())
+                    .then((notifications) => {
+                        store.dispatch({
+                            type: NOTIFICATIONS_GET,
+                            payload: notifications
+                        })
+                    });
+                }
+                
+                if(store.getState().rooms.getted) {
+                    store.dispatch({
+                        type: ROOMS_SET_GET,
+                    })
+                
+                    fetch(`${urlApi}/api/room/get-all`, {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiToken}`,
+                        },
+                        body: JSON.stringify({
+                            lang: store.getState().user.roomLang
+                        })
+                    })
+                    .then((response) => response.json())
+                    .then((rooms) => {
+                        store.dispatch({
+                            type: ROOMS_GET,
+                            payload: rooms
+                        })
+                    })
+                    .catch((err) => {
+                        store.dispatch({
+                            type: ROOMS_GET_ERROR,
+                        })
+                    })
+                }
+                    
+                let activeRoom = store.getState().rooms.activeRoom
+
+                if(!!activeRoom) {
+                    WebRtcController.leaveRoom({roomId: activeRoom._id, lang: activeRoom.lang})
+                    store.dispatch({
+                        type: ROOMS_LEAVE_ROOM
+                    })
+
+                    fetch(`${urlApi}/api/room/get`, {
+                        method: "post",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${apiToken}`,
+                        },
+                        body: JSON.stringify({
+                            id: activeRoom._id,
+                            socketId: socket.id
+                        })
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        if(data.error) {
+                            setForceTitle('Error')
+            
+                            store.dispatch({
+                                type: ROOMS_JOIN_ERROR,
+                                payload: data.errors[0]
+                            })
+                            
+                            return
+                        } else {
+                            let room = data.room
+                            let muted = data.muted
+            
+                            room.dialog.messages = room.dialog.messages.reverse()
+            
+                            room.users.map(x => {
+                                x.speaking = false
+                                return 1
+                            })
+            
+                            setForceTitle(room.title)
+            
+                            store.dispatch({
+                                type: ROOMS_JOIN_ROOM,
+                                payload: {room, canLoad: room.dialog.messages.length === 50, muted}
+                            })
+            
+                            if(unmuteTimer) {
+                                clearTimeout(unmuteTimer)
+                            }
+            
+                            if(muted && (new Date(muted.date).getTime() - new Date().getTime()) <= 86400000) {
+                                unmuteTimer = setTimeout(() => {
+                                    if(store.getState().rooms.activeRoom && 
+                                    store.getState().rooms.activeRoom._id === room._id && 
+                                    !!store.getState().rooms.activeRoom.muted && 
+                                    store.getState().rooms.activeRoom.muted.date === muted.date) {
+                                        store.dispatch({
+                                            type: ROOMS_SET_MUTED,
+                                            payload: false
+                                        })
+                                    }
+                                    // console.log(unmuteTimer)
+                                }, (new Date(muted.date).getTime() - new Date().getTime()) );
+                            }
+
+                            socket.emit('joinRoom', {roomId: room._id, lang: room.lang, userId: store.getState().user._id})
+            
+                            try {
+                                WebRtcController.connectRoom(room._id)
+                            } catch (err) {
+                                socket.emit('leaveRoom', {roomId: room._id, lang: room.lang})
+                                store.dispatch({
+                                    type: ROOMS_JOIN_ERROR,
+                                    payload: {param: 'all', msg: 'something_goes_wrong'}
+                                })
+                            }
+                        }
+                    })
+                    .catch((err) => {
+                        store.dispatch({
+                            type: ROOMS_JOIN_ERROR,
+                            payload: {param: 'all', msg: 'something_goes_wrong'}
+                        })
+                    })
+                }
+
+                store.dispatch({
+                    type: APP_SET_STATUS_NETWORK,
+                    payload: false
+                })
+            }
+
+            counterConnect++
         })
 
         socket.on('createRoom', room => {

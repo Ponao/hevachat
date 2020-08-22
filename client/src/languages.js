@@ -141,7 +141,8 @@ export default {
         email_not_empty: 'Email не может быть пустым',
         password_is_min: 'Пароль должен содержать минимум 8 символов',
         email_or_password_wrong: 'Email или пароль неверный',
-        email_already: 'Email уже занят'   
+        email_already: 'Email уже занят',
+        connecting: 'Подключение'
     },
     en: {
         settings: 'Settings',
@@ -285,6 +286,7 @@ export default {
         email_not_empty: 'Email must not be empty',
         password_is_min: 'Password must contain at least 8 characters ',
         email_or_password_wrong: 'Email or password wrong',
-        email_already: 'Email already uses'   
+        email_already: 'Email already uses',
+        connecting: 'Connecting'
     }
 }

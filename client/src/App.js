@@ -3,7 +3,7 @@ import React from 'react'
 import './App.css'
 import {PageSettings} from './Pages/PageSettings'
 import 'react-toastify/dist/ReactToastify.css';
-import { MultiLang } from "react-multi-language";
+import { MultiLang, withLang } from "react-multi-language";
 
 // Partials
 import UserSidebar from './Partials/UserSidebar'
@@ -11,6 +11,8 @@ import UserSidebar from './Partials/UserSidebar'
 // Router
 import AppRouter from './Router'
 import { connect } from 'react-redux'
+import { CircularProgress } from '@material-ui/core';
+import languages from './languages';
 
 class App extends React.Component {
     constructor(props) {
@@ -30,6 +32,16 @@ class App extends React.Component {
     render() {
         return (
             <PageSettings.Provider value={this.state}>
+                {this.props.user.isAuth && this.props.app.connecting && <div className="app-status-connecting">
+                    <CircularProgress style={{
+                        color: '#fff',
+                        width: 20,
+                        height: 20,
+                        marginRight: 10
+                    }} />
+                    <span>{this.props.langProps.connecting}...</span>
+                </div>}
+
                 <div className="container-fluid">
                     <div className="row">
                         {this.props.user.isAuth && <UserSidebar show={this.state.userHeader} />}
@@ -44,8 +56,9 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.user
+        user: state.user,
+        app: state.app
     }
 }
 
-export default connect(mapStateToProps)(App)
+export default withLang(languages)(connect(mapStateToProps)(App))
