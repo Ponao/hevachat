@@ -274,6 +274,12 @@ export default {
                     })
                 }
                     
+                if(activeLang)
+                    socket.emit('leaveLang', activeLang)
+                
+                socket.emit('joinLang', store.getState().user.roomLang)
+                activeLang = store.getState().user.roomLang
+
                 let activeRoom = store.getState().rooms.activeRoom
 
                 if(!!activeRoom) {
@@ -986,7 +992,7 @@ export default {
     },
     joinLang: lang => {
         if(activeLang)
-            socket.emit('leaveLang', lang)
+            socket.emit('leaveLang', activeLang)
         
         socket.emit('joinLang', lang)
         activeLang = lang

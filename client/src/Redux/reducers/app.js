@@ -6,7 +6,7 @@ const INITIAL_STATE = {
     connecting: false
 }
 
-const ban = (state = INITIAL_STATE, action) => {
+const app = (state = INITIAL_STATE, action) => {
     switch(action.type) {
         case APP_SET_STATUS_NETWORK:
             return { ...state, connecting: action.payload }
@@ -15,4 +15,4 @@ const ban = (state = INITIAL_STATE, action) => {
     }
 }
 
-export default ban
+export default app
