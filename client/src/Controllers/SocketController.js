@@ -52,7 +52,8 @@ import {
     ROOMS_GET,
     ROOMS_GET_ERROR,
     ROOMS_SET_GET,
-    NOTIFICATIONS_GET
+    NOTIFICATIONS_GET,
+    DIALOGS_LOAD
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -183,37 +184,12 @@ export default {
                             })
                             .then((response) => response.json())
                             .then(({dialog, messages}) => {
-                                if(!dialog.error) {
-                                    dialog.user = dialog.users.find(user => user._id !== store.getState().user._id)
+                                dialog.messages = messages.reverse()
                         
-                                    if(!dialog.user)
-                                        dialog.user = dialog.users[0]
-                        
-                                    dialog.typing = false
-                        
-                                    dialog.getted = true
-                        
-                                    dialog.messages = messages.reverse()
-                                    dialog.lastMessage = false
-                                    dialog.canLoad = messages.length === 50
-                                    dialog.isLoading = false
-                        
-                                    store.dispatch({
-                                        type: DIALOGS_ADD,
-                                        payload: dialog
-                                    })
-                                } else {
-                                    let dialog = {
-                                        getted: true,
-                                        isNotFound: true,
-                                        user: {_id: userId}
-                                    }
-                        
-                                    store.dispatch({
-                                        type: DIALOGS_ADD,
-                                        payload: dialog
-                                    })
-                                }
+                                store.dispatch({
+                                    type: DIALOGS_LOAD,
+                                    payload: {dialogId: dialog._id, messages: dialog.messages, canLoad: messages.length === 50}
+                                })
                             });
                         }
                       }
