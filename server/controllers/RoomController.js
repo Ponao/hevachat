@@ -19,6 +19,8 @@ const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} =
 const { sendPushNotification } = require('./PushNotificationsController');
 const User = require('../models/User');
 const languages = require('../languages');
+const Friend = require('../models/Friends');
+const mongoose = require('../database');
 
 module.exports = {
     getAll: async (req, res, next) => {
@@ -322,13 +324,41 @@ module.exports = {
     invite: async (req, res, next) => {
         const { user } = res.locals;
         const { id, selectUsers } = req.body;
+        let error = false
 
         try{
             const room = await Room.findById(id)
 
-            selectUsers.map(async userId => {
+            for (let index = 0; index < selectUsers.length; index++) {
+                let userId = selectUsers[index];
+                
                 let exist = await Notification.findOne({type: 'invite', userId, room: {_id: room._id}})
-                if(!exist) {
+                const friend = await User.aggregate([
+                    { "$match": { "_id": user._id } },
+                    { "$lookup": {
+                      "from": Friend.collection.name,
+                      "let": { "friends": "$friends" },
+                      "pipeline": [
+                        { "$match": {
+                          "recipient": mongoose.Types.ObjectId(userId),
+                          "$expr": { "$in": [ "$_id", "$$friends" ] }
+                        }},
+                        { "$project": { "status": 1 } }
+                      ],
+                      "as": "friends"
+                    }},
+                    { "$addFields": {
+                      "friendsStatus": {
+                        "$ifNull": [ { "$min": "$friends.status" }, 0 ]
+                      }
+                    }}
+                ])
+
+                if(friend[0].friendsStatus !== 3 && !!exist) {
+                    error = true
+                }
+
+                if(friend[0].friendsStatus === 3 || !exist) {
                     if(user._id != userId) {
                         let notification = new Notification()
                         
@@ -366,9 +396,13 @@ module.exports = {
                         await notification.save()
                     }
                 }
-            })
+            }
 
-            return res.json();
+            if(error) {
+                return res.json({error: 'not_friend'});
+            } else {
+                return res.json({error: false});
+            }
         } catch (e) {
             return next(new Error(e));
         }

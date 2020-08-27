@@ -98,9 +98,24 @@ function sendPushNotification(data) {
 };
 
 function removePushNotification(id) {
-    let removeNotification = {...optionsDeleteAndroid}
-    removeNotification.path += `/${id}?app_id=65b74473-51f1-424a-8b11-829a9e203271`
-    let req = https.request(removeNotification, function(res) {  
+    let removeNotification1 = {...optionsDeleteAndroid}
+    removeNotification1.path += `/${id}?app_id=${androidAppId}`
+    let req = https.request(removeNotification1, function(res) {  
+        res.on('data', function(data) {
+            // console.log(JSON.parse(data));
+        });
+    });
+    
+    req.on('error', function(e) {
+        console.log("ERROR:");
+        console.log(e);
+    });
+    
+    req.end();
+
+    let removeNotification2 = {...optionsDeleteIos}
+    removeNotification2.path += `/${id}?app_id=${iosAppId}`
+    let req = https.request(removeNotification2, function(res) {  
         res.on('data', function(data) {
             // console.log(JSON.parse(data));
         });

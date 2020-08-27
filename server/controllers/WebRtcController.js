@@ -88,7 +88,7 @@ function getKurentoClient(callback) {
     }
 
     try {
-        kurento(wsKurentoUri, function(error, _kurentoClient) {
+        kurento.getSingleton(wsKurentoUri, function(error, _kurentoClient) {
             if (error) {
                 console.log("Could not find media server at address " + wsKurentoUri);
                 return callback("Could not find media server at address" + wsKurentoUri
@@ -123,10 +123,12 @@ function roomOfferSdp(roomId, userId, offerSdp, socket, callback) {
     clearCandidatesQueue(userId);
 
     if(Rooms[roomId].MediaPipeline) {
+        console.log('MediaPipeLine isset +')
         try {
             connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback)
         } catch {}
     } else {
+        console.log('MediaPipeLine not isset -')
         try {
             getKurentoClient((error, kurentoClient) => {
                 if(error) {
@@ -177,6 +179,39 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                         }
                     }
 
+                    Rooms[roomId].composite.createHubPort( function(error, hubPort) {
+                        if (error) {
+                            console.log('HubPort created error -')
+                            return callback(error);
+                        }
+
+                        console.log('HubPort created +')
+
+                        try {
+                            Rooms[roomId].users[userId].hubPort = hubPort
+
+                            if(!Rooms[roomId].users[userId].muted) {
+                                Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
+                                    if (error) {
+                                        return callback(error);
+                                    }
+
+                                    console.log('WRTCEP connect to hubport +')
+                                })
+                            }
+
+                            Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
+                                if (error) {
+                                    return callback(error);
+                                }
+
+                                console.log('hubport connect to WRTCEP +')
+                            })
+                        } catch (err) {
+                            console.log(err)
+                        }
+                    });
+
                     webRtcEndpoint.processOffer(offerSdp, function(error, sdpAnswer) {
                         if (error) {
                             stop(roomId, userId);
@@ -189,38 +224,13 @@ function connectToRoomMediaPipeline(roomId, userId, offerSdp, socket, callback) 
                         }
 
                         callback(null, sdpAnswer);
+                        console.log('Offer sent +')
                     });
                     
                     webRtcEndpoint.gatherCandidates(function(error) {
                         if (error) {
                             stop(roomId, userId);
                             return callback(error);
-                        }
-                    });
-
-                    Rooms[roomId].composite.createHubPort( function(error, hubPort) {
-                        if (error) {
-                            return callback(error);
-                        }
-
-                        try {
-                            Rooms[roomId].users[userId].hubPort = hubPort
-
-                            if(!Rooms[roomId].users[userId].muted) {
-                                Rooms[roomId].users[userId].webRtcEndpoint.connect(Rooms[roomId].users[userId].hubPort, "AUDIO", function(error) {
-                                    if (error) {
-                                        return callback(error);
-                                    }
-                                })
-                            }
-
-                            Rooms[roomId].users[userId].hubPort.connect(Rooms[roomId].users[userId].webRtcEndpoint, "AUDIO", function(error) {
-                                if (error) {
-                                    return callback(error);
-                                }
-                            })
-                        } catch (err) {
-                            console.log(err)
                         }
                     });
                 }
