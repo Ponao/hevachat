@@ -100,33 +100,33 @@ function sendPushNotification(data) {
 function removePushNotification(id) {
     let removeNotification1 = {...optionsDeleteAndroid}
     removeNotification1.path += `/${id}?app_id=${androidAppId}`
-    let req = https.request(removeNotification1, function(res) {  
+    let req1 = https.request(removeNotification1, function(res) {  
         res.on('data', function(data) {
             // console.log(JSON.parse(data));
         });
     });
     
-    req.on('error', function(e) {
+    req1.on('error', function(e) {
         console.log("ERROR:");
         console.log(e);
     });
     
-    req.end();
+    req1.end();
 
     let removeNotification2 = {...optionsDeleteIos}
     removeNotification2.path += `/${id}?app_id=${iosAppId}`
-    let req = https.request(removeNotification2, function(res) {  
+    let req2 = https.request(removeNotification2, function(res) {  
         res.on('data', function(data) {
             // console.log(JSON.parse(data));
         });
     });
     
-    req.on('error', function(e) {
+    req2.on('error', function(e) {
         console.log("ERROR:");
         console.log(e);
     });
     
-    req.end();
+    req2.end();
 }
 
 module.exports = {
