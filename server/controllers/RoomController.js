@@ -552,24 +552,34 @@ module.exports = {
                         break
 
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
-                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        let typeSound = req.files['sounds'+i].name.split('.').pop()
+                    if(
+                        typeSound === 'mp3' || 
+                        typeSound === 'ogg' || 
+                        typeSound === 'wav' ||
+                        typeSound === 'flac') {
+                        typeSound = 'mp3'
+                    }
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
                             return res.status(500).send(err);
                         });
 
                         let investment = new Investment()
 
+                        
+
                         investment.dialogId = dialogId
                         investment.type = 'sound'
                         investment.data = {
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         }
                         
                         await investment.save()
                         
                         sounds.push({
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         })
                         nowCount++
@@ -770,7 +780,16 @@ module.exports = {
                         break
 
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
-                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        let typeSound = req.files['sounds'+i].name.split('.').pop()
+                    if(
+                        typeSound === 'mp3' || 
+                        typeSound === 'ogg' || 
+                        typeSound === 'wav' ||
+                        typeSound === 'flac') {
+                        typeSound = 'mp3'
+                    }
+
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
                             return res.status(500).send(err);
                         });
@@ -780,14 +799,14 @@ module.exports = {
                         investment.dialogId = dialogId
                         investment.type = 'sound'
                         investment.data = {
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         }
                         
                         await investment.save()
                         
                         message.sounds.push({
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         })
                         nowCount++

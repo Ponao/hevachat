@@ -225,8 +225,16 @@ module.exports = {
                     if(!req.files['sounds'+i] || nowCount >= maxCount)
                         break
 
+                    let typeSound = req.files['sounds'+i].name.split('.').pop()
+                    if(
+                        typeSound === 'mp3' || 
+                        typeSound === 'ogg' || 
+                        typeSound === 'wav' ||
+                        typeSound === 'flac') {
+                        typeSound = 'mp3'
+                    }
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
-                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
                             return res.status(500).send(err);
                         });
@@ -236,14 +244,14 @@ module.exports = {
                         investment.dialogId = dialogId
                         investment.type = 'sound'
                         investment.data = {
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         }
                         
                         await investment.save()
                         
                         sounds.push({
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         })
                         nowCount++
@@ -476,9 +484,17 @@ module.exports = {
 
                     if(!req.files['sounds'+i] || nowCount >= maxCount)
                         break
+                    let typeSound = req.files['sounds'+i].name.split('.').pop()
+                    if(
+                        typeSound === 'mp3' || 
+                        typeSound === 'ogg' || 
+                        typeSound === 'wav' ||
+                        typeSound === 'flac') {
+                        typeSound = 'mp3'
+                    }
 
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
-                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['sounds'+i].name.split('.').pop(), function(err) {
+                        req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
                             return res.status(500).send(err);
                         });
@@ -488,14 +504,14 @@ module.exports = {
                         investment.dialogId = dialogId
                         investment.type = 'sound'
                         investment.data = {
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         }
                         
                         await investment.save()
                         
                         message.sounds.push({
-                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + req.files['sounds'+i].name.split('.').pop(),
+                            path: process.env.API_URL + '/media/' + user._id + '/'  + fileName + '.' + typeSound,
                             name: req.files['sounds'+i].name
                         })
                         nowCount++
