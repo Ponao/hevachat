@@ -1230,11 +1230,11 @@
 }
 
 /** Used to define container behavior: width, position: fixed etc... **/
-.Toastify__toast-container {
-}
+/* .Toastify__toast-container {
+} */
 
 /** Used to define the position of the ToastContainer **/
-.Toastify__toast-container--top-left {
+/* .Toastify__toast-container--top-left {
 }
 .Toastify__toast-container--top-center {
 }
@@ -1245,7 +1245,7 @@
 .Toastify__toast-container--bottom-center {
 }
 .Toastify__toast-container--bottom-right {
-}
+} */
 
 /** Classes for the displayed toast **/
 .Toastify__toast {
@@ -1260,20 +1260,20 @@
     font-size: 12px!important;
     font-family: Open Sans!important;
 }
-.Toastify__toast--rtl {
+/* .Toastify__toast--rtl {
 }
 .Toastify__toast--dark {
-}
+} */
 .Toastify__toast--default {
     background-color: #fff!important;
     color: #667788!important;
 }
-.Toastify__toast--info {
+/* .Toastify__toast--info {
 }
 .Toastify__toast--success {
 }
 .Toastify__toast--warning {
-}
+} */
 .Toastify__toast--error {
     background-color: #FF3333!important;
 }
@@ -1296,7 +1296,7 @@
 }
 
 /** Classes for the progress bar **/
-.Toastify__progress-bar {
+/* .Toastify__progress-bar {
     display: none;
 }
 .Toastify__progress-bar--animated {
@@ -1304,12 +1304,14 @@
 }
 .Toastify__progress-bar--controlled {
     display: none;
-}
+} */
 .Toastify__progress-bar--rtl {
     display: none;
 }
 .Toastify__progress-bar--default {
-    display: none;
+    /* display: none; */
+    /* opacity: 0; */
+    opacity: 0!important;
 }
 .Toastify__progress-bar--dark {
     display: none;

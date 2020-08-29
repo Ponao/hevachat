@@ -72,7 +72,7 @@ class CreateRoom extends React.Component {
                 position: toast.POSITION.TOP_CENTER,
             });
             if(error) {
-                toast("Вы уже приглашали некоторых пользователей", {
+                toast(this.props.langProps.you_have_invite_users, {
                     position: toast.POSITION.TOP_CENTER,
                 });
             }

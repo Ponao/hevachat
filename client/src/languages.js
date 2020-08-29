@@ -142,7 +142,8 @@ export default {
         password_is_min: 'Пароль должен содержать минимум 8 символов',
         email_or_password_wrong: 'Email или пароль неверный',
         email_already: 'Email уже занят',
-        connecting: 'Подключение'
+        connecting: 'Подключение',
+        you_have_invite_users: "Вы уже приглашали некоторых пользователей"
     },
     en: {
         settings: 'Settings',
@@ -287,6 +288,7 @@ export default {
         password_is_min: 'Password must contain at least 8 characters ',
         email_or_password_wrong: 'Email or password wrong',
         email_already: 'Email already uses',
-        connecting: 'Connecting'
+        connecting: 'Connecting',
+        you_have_invite_users: "You've already invited some users"
     }
 }
