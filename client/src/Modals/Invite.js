@@ -68,7 +68,7 @@ class CreateRoom extends React.Component {
         .then(response => response.json())
         .then(({error}) => {
             this.setState({selectUsers: []})
-            toast("Invited sents!", {
+            toast(this.props.langProps.invited_sents, {
                 position: toast.POSITION.TOP_CENTER,
             });
             if(error) {

@@ -143,7 +143,8 @@ export default {
         email_or_password_wrong: 'Email или пароль неверный',
         email_already: 'Email уже занят',
         connecting: 'Подключение',
-        you_have_invite_users: "Вы уже приглашали некоторых пользователей"
+        you_have_invite_users: "Вы уже приглашали некоторых пользователей",
+        invited_sents: "Приглашения отправленны!"
     },
     en: {
         settings: 'Settings',
@@ -289,6 +290,7 @@ export default {
         email_or_password_wrong: 'Email or password wrong',
         email_already: 'Email already uses',
         connecting: 'Connecting',
-        you_have_invite_users: "You've already invited some users"
+        you_have_invite_users: "You've already invited some users",
+        invited_sents: "Invited sents!"
     }
 }
