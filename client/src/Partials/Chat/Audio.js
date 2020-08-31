@@ -89,8 +89,9 @@ class Audio extends React.Component {
     changeDurationAudio(e) {
         e.stopPropagation()
 
-        let position = e.nativeEvent.layerX * 100 / this.rangeBlock.clientWidth
+        let position = e.nativeEvent.offsetX * 100 / this.rangeBlock.clientWidth
         let time = this.state.audio.duration / 100 * position
+        console.log(e.nativeEvent)
 
         let thisAudio = document.getElementsByName(this.props.src)
 
