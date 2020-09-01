@@ -77,11 +77,12 @@ class Audio extends React.Component {
             audio.pause()
         }
 
-        let thisAudio = document.getElementsByName(this.props.src)
+        let thisAudio = document.getElementById(this.state.randomId)
 
-        for(let audio of thisAudio) {
-            audio.play()
-        }
+        // for(let audio of thisAudio) {
+            thisAudio.play()
+        //     break
+        // }
 
         this.startTimer()
     }

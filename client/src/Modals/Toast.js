@@ -5,24 +5,42 @@ import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../languages';
 import store from '../Redux/store';
-import { TOASTS_REMOVE } from '../Redux/constants';
+import { TOASTS_REMOVE, TOAST_SET_FORCE } from '../Redux/constants';
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 
 class Toast extends React.Component {
     render() {
         return <div className="bell-toast" onClick={() => {
             if(this.props.toast.toastType === 'notification') {
-                if(this.props.toast.type === 'invite')
-                    this.props.history.push(`/rooms/${this.props.toast.room._id}`)
-                if(this.props.toast.type === 'accept' || this.props.toast.type === 'request')
+                if(this.props.toast.type === 'invite') {
+                    if(store.getState().rooms.activeRoom) {
+                        store.dispatch({
+                            type: TOAST_SET_FORCE,
+                            payload: {id: this.props.toast.room._id, type: 'invite'}
+                        })
+                    } else {
+                        this.props.history.push(`/rooms/${this.props.toast.room._id}`)
+                    }
+                }
+
+                if(this.props.toast.type === 'accept' || this.props.toast.type === 'request') {
                     this.props.history.push({
                         search: `?user=${this.props.toast.user._id}`
                     })
+                }
             }
 
             if(this.props.toast.toastType === 'message') {
-                if(`/chats/${this.props.toast.user._id}` !== this.props.history.location.pathname)
-                    this.props.history.push(`/chats/${this.props.toast.user._id}`)
+                if(`/chats/${this.props.toast.user._id}` !== this.props.history.location.pathname) {
+                    if(store.getState().rooms.activeRoom) {
+                        store.dispatch({
+                            type: TOAST_SET_FORCE,
+                            payload: {id: this.props.toast.user._id, type: 'message'}
+                        })
+                    } else {
+                        this.props.history.push(`/chats/${this.props.toast.user._id}`)
+                    }
+                }
             }
 
             store.dispatch({

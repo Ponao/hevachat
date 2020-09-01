@@ -144,7 +144,8 @@ export default {
         email_already: 'Email уже занят',
         connecting: 'Подключение',
         you_have_invite_users: "Вы уже приглашали некоторых пользователей",
-        invited_sents: "Приглашения отправленны!"
+        invited_sents: "Приглашения отправленны!",
+        force_toast_text: 'После перехода вы будете отключены от активной комнаты.'
     },
     en: {
         settings: 'Settings',
@@ -291,6 +292,7 @@ export default {
         email_already: 'Email already uses',
         connecting: 'Connecting',
         you_have_invite_users: "You've already invited some users",
-        invited_sents: "Invited sents!"
+        invited_sents: "Invited sents!",
+        force_toast_text: 'After the transition, you will be disconnected from the active room.'
     }
 }

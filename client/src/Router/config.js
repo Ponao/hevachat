@@ -59,7 +59,7 @@ const routes = [
         exact: true,
         type: 'user',
         title: '',
-        component: () => <Room />
+        component: () => <Room key={window.location.pathname} />
     },
     {
         path: '/payment',

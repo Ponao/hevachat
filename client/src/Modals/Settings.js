@@ -3,6 +3,7 @@ import React from 'react'
 import Modal from 'react-modal';
 
 // Material
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 
 // Redux
 import { connect } from 'react-redux'
@@ -51,6 +52,12 @@ class Settings extends React.Component {
             style={customStylesModal}
             contentLabel="Settings"
         >
+            <span className="modal-back" onClick={(e) => {
+                this.props.history.goBack()
+            }}>
+                <CloseOutlinedIcon style={{color: '#99AABB'}} />
+            </span>
+            
             <h2 className="modal-title">{this.props.langProps.settings}</h2>
 
             <p className="settings-item" onClick={() => {

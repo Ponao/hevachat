@@ -102,6 +102,7 @@ export const BAN_SET = 'BAN_SET'
 // Toasts
 export const TOASTS_ADD = 'TOASTS_ADD'
 export const TOASTS_REMOVE = 'TOASTS_REMOVE'
+export const TOAST_SET_FORCE = 'TOAST_SET_FORCE'
 
 // App
 export const APP_SET_STATUS_NETWORK = 'APP_SET_STATUS_NETWORK'

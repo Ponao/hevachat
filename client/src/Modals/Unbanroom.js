@@ -1,6 +1,7 @@
 // App
 import React from 'react'
 import Modal from 'react-modal';
+import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined';
 
 // Redux
 import { connect } from 'react-redux'
@@ -147,6 +148,11 @@ class Settings extends React.Component {
             style={customStylesModal}
             contentLabel="Contacts"
         >   
+            <span className="modal-back" onClick={(e) => {
+                this.props.history.goBack()
+            }}>
+                <CloseOutlinedIcon style={{color: '#99AABB'}} />
+            </span>
             <h2 className="modal-title">Unban room</h2>
 
             <Scrollbars

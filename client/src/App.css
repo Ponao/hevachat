@@ -1573,3 +1573,10 @@
     font-size: 14px;
     line-height: 14px;
 }
+
+.modal-back {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+}

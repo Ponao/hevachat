@@ -29,6 +29,7 @@ import ForcePlaceCall from './ForcePlaceCall';
 import ForceJoinRoom from './ForceJoinRoom';
 import Ban from './Ban';
 import Toasts from './Toasts';
+import ForceToast from './ForceToast';
 
 class MainModal extends React.Component {
     state = {
@@ -191,6 +192,7 @@ class MainModal extends React.Component {
 
             {this.props.call.user && this.props.call.force.status === 'force-accept' && <ForceAcceptCall isOpen={true} />}
             {this.props.call.force.status === 'force-call' && <ForcePlaceCall isOpen={true} />}
+            {!!this.props.toasts.force.id && <ForceToast isOpen={true} />}
 
             {this.props.call.user && !this.props.call.force.status && <Call isOpen={true} />}
 
@@ -206,6 +208,7 @@ const mapStateToProps = state => {
         dialogs: state.dialogs,
         call: state.call,
         slider: state.slider,
+        toasts: state.toasts
     }
 }
 
