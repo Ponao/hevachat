@@ -53,7 +53,8 @@ import {
     ROOMS_GET_ERROR,
     ROOMS_SET_GET,
     NOTIFICATIONS_GET,
-    DIALOGS_LOAD
+    DIALOGS_LOAD,
+    DIALOGS_UPDATE_ONLINE
 } from '../Redux/constants'
 import WebRtcController from './WebRtcController'
 import {urlApi} from '../config'
@@ -552,6 +553,12 @@ export default {
                     })
                 }, 5000)
             }
+
+            if(message.user._id !== store.getState().user._id)
+                store.dispatch({
+                    type: DIALOGS_UPDATE_ONLINE,
+                    payload: {userId: message.user._id, online: true, onlineAt: Date.now()}
+                })
         })
 
         socket.on('sendNotification', notification => {
