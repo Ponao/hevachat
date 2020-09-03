@@ -307,8 +307,13 @@ function sendMessageDialog({userId, socketId, otherId, message}) {
 }
 
 function readMessageDialog({dialogId, userId, otherId, socketId}) {
-    io.sockets.connected[socketId].to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
-    io.sockets.connected[socketId].to(`user.${userId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+    if(io.sockets.connected[socketId]) {
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+    } else {
+        io.to(`user.${otherId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+        io.to(`user.${userId}`).emit('readMessagesDialog', {dialogId, userId: otherId})
+    }
 }
 
 function editMessageDialog({userId, otherId, message, socketId, dialogId}) {
@@ -348,7 +353,11 @@ function removeNotification({userId, id, read}) {
 }
 
 function readNotification({socketId, userId, id}) {
-    io.sockets.connected[socketId].to(`user.${userId}`).emit('readNotification', id)
+    if(io.sockets.connected[socketId]) {
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('readNotification', id)
+    } else {
+        io.to(`user.${userId}`).emit('readNotification', id)
+    }
 }
 
 // Calls
