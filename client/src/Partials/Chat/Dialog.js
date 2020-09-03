@@ -96,6 +96,7 @@ class Dialog extends React.Component {
         if(this.messagesBlock) {
             this.messagesBlock.view.scrollTop = 100000
         }
+        this.props.readMessages()
     }
 
     componentDidUpdate(prevProps) {
