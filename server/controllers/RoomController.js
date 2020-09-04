@@ -506,17 +506,25 @@ module.exports = {
                         break
 
                     if(req.files['images'+i].size / 1000 <= 10000) {
-                        let mv = (path) => {
+                        let mv = () => {
                             return new Promise((resolve, reject) => {
-                                req.files['images'+i].mv(path, (err) => {
+                                req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), async (err, pathd) => {
                                     if (err)
                                         reject(err);
+                                        
+                                    let options = { responseType: 'base64', width: 50, height: 50 }
+                                    let imageBuffer = fs.readFileSync(__dirname + '/../uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
+                                    let thumbnail = await imageThumbnail(imageBuffer, options);
+
+                                    fs.writeFile(__dirname + '/../uploads/' + user._id + '/' +fileName+'-50.' + req.files['images'+i].name.split('.').pop(), thumbnail, 'base64', function(err) {
+                                        console.log(err);
+                                    });
                                     
                                     resolve()
                                 })
                             })
                         }
-                        await mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
+                        await mv();
                         
                         let dimensions = sizeOf('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
 
@@ -731,17 +739,25 @@ module.exports = {
                         break
 
                     if(req.files['images'+i].size / 1000 <= 10000) {
-                        let mv = (path) => {
+                        let mv = () => {
                             return new Promise((resolve, reject) => {
-                                req.files['images'+i].mv(path, (err) => {
+                                req.files['images'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop(), async (err, pathd) => {
                                     if (err)
                                         reject(err);
+                                        
+                                    let options = { responseType: 'base64', width: 50, height: 50 }
+                                    let imageBuffer = fs.readFileSync(__dirname + '/../uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
+                                    let thumbnail = await imageThumbnail(imageBuffer, options);
+
+                                    fs.writeFile(__dirname + '/../uploads/' + user._id + '/' +fileName+'-50.' + req.files['images'+i].name.split('.').pop(), thumbnail, 'base64', function(err) {
+                                        console.log(err);
+                                    });
                                     
                                     resolve()
                                 })
                             })
                         }
-                        await mv('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
+                        await mv();
                         
                         let dimensions = sizeOf('./uploads/' + user._id + '/' +fileName+'.' + req.files['images'+i].name.split('.').pop());
 
