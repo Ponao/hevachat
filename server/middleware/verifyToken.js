@@ -51,12 +51,19 @@ module.exports = async (req, res, next) => {
 
     // Success: include decoded data in the request
     res.locals.user = await User.findById(user.data.userId).select('+email').select('+lang').select('+role').select('+roomLang').select("-friends")
+    
+    
 
     let ban = await Limit.findOne({userId: user.data.userId, type: 'ban', date: {$gte: new Date()}})
             
     if(ban) {
         return res.json({numDate: ban.numDate, date: ban.date, ban: true})
     }
+    
+    res.locals.user.onlineAt = Date.now()
+    res.locals.user.online = true
+    
+    await res.locals.user.save()
 
     return next()
 }
