@@ -622,6 +622,13 @@ export default {
                 type: DIALOGS_READ_MESSAGES,
                 payload: {dialogId, userId, noRead: userId !== store.getState().user._id, noReadCount: userId !== store.getState().user._id}
             })
+
+            let dialog = store.getState().dialogs.dialogs.find(x => x._id === dialogId)
+            if(userId === store.getState().user._id && !!dialog)
+                store.dispatch({
+                    type: DIALOGS_UPDATE_ONLINE,
+                    payload: {userId: dialog.user._id, online: true, onlineAt: Date.now()}
+                })
         })
 
         socket.on('editMessageDialog', ({message, dialogId}) => {
@@ -659,6 +666,12 @@ export default {
                         payload: {userId, typing: false}
                     })
                 }, 2500)
+
+                if(userId !== store.getState().user._id)
+                    store.dispatch({
+                        type: DIALOGS_UPDATE_ONLINE,
+                        payload: {userId: userId, online: true, onlineAt: Date.now()}
+                    })
             }
         })
 
