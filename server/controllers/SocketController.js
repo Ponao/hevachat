@@ -54,6 +54,7 @@ function initSocket(initIo) {
 
         socket.on('reconnect', async () => {
             if(user) {
+                console.log('reconnect ' + user._id)
                 user.onlineAt = Date.now()
                 user.online = true
                 
@@ -62,7 +63,9 @@ function initSocket(initIo) {
         })
 
         socket.on('disconnect', async () => {
+            
             if(user) {
+                console.log('disconnect ' + user._id)
                 user.onlineAt = Date.now()
                 user.online = false
                 await user.save()
