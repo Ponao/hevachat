@@ -52,6 +52,15 @@ function initSocket(initIo) {
             }
         })
 
+        socket.on('reconnect', async () => {
+            if(user) {
+                user.onlineAt = Date.now()
+                user.online = true
+                
+                await user.save()
+            }
+        })
+
         socket.on('disconnect', async () => {
             if(user) {
                 user.onlineAt = Date.now()
