@@ -390,7 +390,9 @@ module.exports = {
                 };
         
                 sendPushNotification(data).then(async (id) => {
-                    message.pushId = id
+                    if(id)
+                        message.pushId = id
+                        
                     sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
                     await message.save()
                 })
