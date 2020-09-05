@@ -353,6 +353,24 @@ module.exports = {
             await dialog.save()
 
             if(otherUser.pushToken) {
+                if(!text.length) {
+                    if(!!recentMessages.length) {
+                        text = languages[otherUser.lang].attach_message
+                    }
+
+                    if(!!message.sounds.length) {
+                        text = languages[otherUser.lang].sound
+                    }
+
+                    if(!!message.files.length) {
+                        text = languages[otherUser.lang].file
+                    }
+
+                    if(!!message.images.length) {
+                        text = languages[otherUser.lang].photo
+                    }
+                }
+
                 let data = { 
                     text,
                     push_ids: [otherUser.pushToken.id],
