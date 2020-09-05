@@ -47,53 +47,57 @@ const optionsDeleteIos = {
 
 function sendPushNotification(data) {
     return new Promise((resolve) => {
-        let message = {}
-        let options = {}
-        if(data.os === 'android') {
-            options = optionsSendAndroid
-            message = {
-                app_id: androidAppId,
-                android_accent_color: data.color,
-                android_led_color: data.color,
-                include_player_ids: data.push_ids,
-                contents: {"en": data.text},
-                headings: {"en": data.header_text},
-                small_icon: data.icon,
-                large_icon: data.avatar,
-                data: data.additional,
-                send_after: new Date(Date.now()+2500).toISOString(),
-                thread_id: data.group_id,
-                android_group: data.group_name,
-                collapse_id: data.group_id,
-                android_channel_id: data.channel_id,
-                priority: 10,
+        try {
+            let message = {}
+            let options = {}
+            if(data.os === 'android') {
+                options = optionsSendAndroid
+                message = {
+                    app_id: androidAppId,
+                    android_accent_color: data.color,
+                    android_led_color: data.color,
+                    include_player_ids: data.push_ids,
+                    contents: {"en": data.text},
+                    headings: {"en": data.header_text},
+                    small_icon: data.icon,
+                    large_icon: data.avatar,
+                    data: data.additional,
+                    send_after: new Date(Date.now()+2500).toISOString(),
+                    thread_id: data.group_id,
+                    android_group: data.group_name,
+                    collapse_id: data.group_id,
+                    android_channel_id: data.channel_id,
+                    priority: 10,
+                }
+            } else {
+                options = optionsSendIos
+                message = {
+                    app_id: iosAppId,
+                    include_player_ids: data.push_ids,
+                    contents: {"en": data.text},
+                    headings: {"en": data.header_text},
+                    data: data.additional,
+                    send_after: new Date(Date.now()+2500).toISOString(),
+                }
             }
-        } else {
-            options = optionsSendIos
-            message = {
-                app_id: iosAppId,
-                include_player_ids: data.push_ids,
-                contents: {"en": data.text},
-                headings: {"en": data.header_text},
-                data: data.additional,
-                send_after: new Date(Date.now()+2500).toISOString(),
-            }
-        }
 
-        let req = https.request(options, function(res) {  
-            res.on('data', function(data) {
-                console.log(JSON.parse(data));
-                resolve(JSON.parse(data).id)
+            let req = https.request(options, function(res) {  
+                res.on('data', function(data) {
+                    console.log(JSON.parse(data));
+                    resolve(JSON.parse(data).id)
+                });
             });
-        });
-        
-        req.on('error', function(e) {
-            console.log("ERROR:");
-            console.log(e);
-        });
-        
-        req.write(JSON.stringify(message));
-        req.end();
+            
+            req.on('error', function(e) {
+                console.log("ERROR:");
+                console.log(e);
+            });
+            
+            req.write(JSON.stringify(message));
+            req.end();
+        } catch (error) {
+            console.log(error)
+        }
     })
 };
 
