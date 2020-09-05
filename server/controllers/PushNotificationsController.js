@@ -83,14 +83,19 @@ function sendPushNotification(data) {
 
             let req = https.request(options, function(res) {  
                 res.on('data', function(data) {
-                    console.log(JSON.parse(data));
-                    resolve(JSON.parse(data).id)
+                    try {
+                        console.log(JSON.parse(data));
+                        resolve(JSON.parse(data).id)
+                    } catch (error) {
+                        resolve(false)
+                    }
                 });
             });
             
             req.on('error', function(e) {
                 console.log("ERROR:");
                 console.log(e);
+                resolve(false)
             });
             
             req.write(JSON.stringify(message));
