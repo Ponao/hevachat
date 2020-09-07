@@ -98,10 +98,10 @@ class Settings extends React.Component {
         error: false,
         errors: [],
         isFetching: false,
-        rooms: this.props.rooms.activeRoom ? [this.props.rooms.activeRoom] : [],
-        selectRoomId: this.props.rooms.activeRoom ? this.props.rooms.activeRoom._id : false,
+        rooms: [],
+        selectRoomId: false,
         time: 0,
-        q: this.props.rooms.activeRoom ? this.props.rooms.activeRoom.title : '',
+        q: '',
         step: 'room', // room, time
     }
 
@@ -165,7 +165,6 @@ class Settings extends React.Component {
     }
 
     render() {
-        console.log(this.state.selectRoomId)
         return <Modal
             isOpen={true}
             onRequestClose={() => {this.props.close()}}

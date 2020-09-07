@@ -63,7 +63,7 @@ class Toast extends React.Component {
             {this.props.toast.toastType === 'notification' && <>
                 {this.props.toast.type === 'invite' && <p className="text">{this.props.langProps.invited_you_to_the_room}&nbsp;<span style={{color: '#008FF7'}}>{this.props.toast.room.title}</span></p>}
                 {this.props.toast.type === 'accept' && <p className="text">{this.props.langProps.accept_your_friend_request}</p>}
-                {this.props.toast.type === 'request' && <p className="text">{this.props.langProps.send_you_friend_request}&nbsp;<span style={{color: '#008FF7'}}></span></p>}
+                {this.props.toast.type === 'request' && <p className="text">{this.props.langProps.send_you_friend_request}&nbsp;<span style={{color: '#008FF7'}}>23232323</span></p>}
             </>}
         </div>
     }

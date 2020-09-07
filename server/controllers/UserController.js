@@ -667,7 +667,6 @@ module.exports = {
                 await limit.save()
 
                 let ban  = {numDate: limit.numDate, date: limit.date}
-                if(time !== 1)
                 sendBan({userId})
                 return res.json({error: false});
             } else {
