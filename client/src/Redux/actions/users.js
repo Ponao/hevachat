@@ -52,7 +52,9 @@ export const friendsGet = (apiToken) => (dispatch) => {
         let users = []
         
         friends.map(user => {
-            users.push(user.recipient)
+            if(user.recipient !== null)
+                users.push(user.recipient)
+
             return 1
         })
 
@@ -77,7 +79,9 @@ export const requestedGet = (apiToken) => (dispatch) => {
         let users = []
         
         friends.map(user => {
-            users.push(user.recipient)
+            if(user.recipient !== null)
+                users.push(user.recipient)
+
             return 1
         })
 
@@ -102,7 +106,9 @@ export const pendingGet = (apiToken) => (dispatch) => {
         let users = []
         
         friends.map(user => {
-            users.push(user.recipient)
+            if(user.recipient !== null)
+                users.push(user.recipient)
+
             return 1
         })
 
