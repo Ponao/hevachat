@@ -20,7 +20,7 @@ export const loginUser = (user, dialogs, noReadCount, noReadNotifications, apiTo
     })
 
     for (let i = 0; i < dialogs.length; i++) {
-        dialogs[i].user = dialogs[i].users.find(user => user._id !== store.getState().user._id)
+        dialogs[i].user = dialogs[i].users.find(userN => userN._id !== user._id)
 
         if(!dialogs[i].user)
             dialogs[i].user = dialogs[i].users[0]
@@ -34,7 +34,7 @@ export const loginUser = (user, dialogs, noReadCount, noReadNotifications, apiTo
             dialogs[i].lastMessage.isError = false
         }
 
-        if(dialogs[i].lastMessage && dialogs[i].lastMessage.user._id === store.getState().user._id)
+        if(dialogs[i].lastMessage && dialogs[i].lastMessage.user._id === user._id)
             dialogs[i].noRead = 0
     }
 
