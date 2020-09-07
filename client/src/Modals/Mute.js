@@ -98,10 +98,10 @@ class Settings extends React.Component {
         error: false,
         errors: [],
         isFetching: false,
-        rooms: [],
-        selectRoomId: false,
+        rooms: this.props.rooms.activeRoom ? [this.props.rooms.activeRoom] : [],
+        selectRoomId: this.props.rooms.activeRoom ? this.props.rooms.activeRoom._id : false,
         time: 0,
-        q: '',
+        q: this.props.rooms.activeRoom ? this.props.rooms.activeRoom.title : '',
         step: 'room', // room, time
     }
 

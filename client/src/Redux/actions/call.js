@@ -76,6 +76,7 @@ export const accept = (apiToken) => (dispatch) => {
                     payload: call.error
                 })
                 WebRtcController.stopCall()
+                stopRington()
 
                 fetch(`${urlApi}/api/call/stop`, {
                     method: "post",
