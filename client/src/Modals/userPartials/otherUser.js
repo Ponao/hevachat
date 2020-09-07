@@ -28,6 +28,8 @@ import store from '../../Redux/store';
 import { SLIDER_SET } from '../../Redux/constants';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
+import { urlApi } from '../../config';
+import { toast } from 'react-toastify';
 
 const fabStyles = theme => ({
     root: {
@@ -48,6 +50,25 @@ const fabStyles = theme => ({
 const CustomFab = withStyles(fabStyles)(Fab);
 
 class OtherUser extends React.Component {
+    unban() {
+        fetch(`${urlApi}/api/user/ban`, {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${this.props.myUser.apiToken}`,
+            },
+            body: JSON.stringify({
+                userId: this.props.user._id,
+                time: 1
+            })
+        })
+        .then(() => {
+            toast.success("Unban sent", {
+                position: toast.POSITION.TOP_CENTER
+            });
+        })
+    }
     render() {
         return <>
                 <span style={{cursor: 'pointer', borderRadius: 50}} onClick={() => {
@@ -197,6 +218,15 @@ class OtherUser extends React.Component {
                             <BlockIcon style={{color: '#99AABB'}} />
                         </CustomFab>
                         <p>Ban</p>
+                    </div>}
+
+                    {(this.props.myUser.role === 'moder' || this.props.myUser.role === 'admin') && <div className="user-btn">
+                        <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                            this.unban()
+                        }}>
+                            <CheckOutlinedIcon style={{color: '#99AABB'}} />
+                        </CustomFab>
+                        <p>Unban</p>
                     </div>}
                 </>
             </>
