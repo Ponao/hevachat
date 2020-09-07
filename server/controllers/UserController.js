@@ -238,12 +238,8 @@ module.exports = {
                 options: {where: {status: 3}, sort: {updatedAt: 'DESC'}}
             })
 
-            
-
-            if(friends) {
-                let friendsS = friends.friends.filter(x => x !== null)
-                return res.json(friendsS);
-            }
+            if(friends)
+                return res.json(friends.friends);
         } catch (e) {
             return next(new Error(e));
         }
