@@ -12,8 +12,8 @@ app.get('/*', function(req, res) {
 });
 
 const sslCerts = {
-    key: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/romadevtest.tk/fullchain.pem")
+    key: fs.readFileSync("/etc/letsencrypt/live/hevachat.com/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/hevachat.com/fullchain.pem")
 }
 
 https.createServer(sslCerts, app).listen(443);
