@@ -18,8 +18,9 @@ class AuthSocial extends React.Component {
 
             if(this.state.redirect) {
                 window.location.replace(this.state.redirect)
+            } else {
+                window.location.replace('/')
             }
-            window.location.replace('/')
         } else {
             window.location.replace('/')
         }
