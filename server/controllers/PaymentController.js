@@ -4,37 +4,73 @@
  */
 'use strict';
 
-const Payment = require('../models/Payment');
-const Tariff = require('../models/Tariff');
+const request = require('request')
+
+const Payment = require('../models/Payment')
+const Tariff = require('../models/Tariff')
+
+const orderLink = 'https://3dsec.sberbank.ru/payment/rest/registerPreAuth.do'
+const statusLink = "https://3dsec.sberbank.ru/payment/rest/getOrderStatus.do"
+const finishLink = "https://3dsec.sberbank.ru/payment/rest/deposit.do"
 
 module.exports = {
     getAll: async (req, res, next) => {
-        const { user } = res.locals;
+        const { user } = res.locals
 
         try {
-            let payments = await Payment.find({userId: user._id}).populate('tariff')
-            let existDemo = payments.find(x => x.tariff.price === 0)
+            let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
 
-            let tariffs = false
-            if(existDemo) 
-                tariffs = await Tariff.find({active: true, price: {'$ne': 0}})
-            else
-                tariffs = await Tariff.find({active: true})
+            if(!payment) {
+                let payments = await Payment.find({userId: user._id}).populate('tariff')
+                let existDemo = payments.find(x => x.tariff.price === 0)
 
-            return res.json(tariffs);
+                let tariffs = false
+                if(existDemo) 
+                    tariffs = await Tariff.find({active: true, price: {'$ne': 0}})
+                else
+                    tariffs = await Tariff.find({active: true})
+
+                return res.json({tariffs, status: 'can'})
+            } else {
+                return res.json({tariffs: [], status: 'cant'})
+            }
+            
         } catch (e) {
-            return next(new Error(e));
+            return next(new Error(e))
         }
     },
 
+    getMy: async (req, res, next) => {
+        const { user } = res.locals
+
+        let payments = await Payment.find({userId: user._id}).populate('tariff')
+
+        for (let i = 0; i < payments.length; i++) {
+            if(new Date(payments[i].expiriesAt).getTime() < Date.now() && payments[i].status === 'success') {
+                payments[i].status = 'ended'
+            }
+        }
+
+        return res.json(payments)
+    },
+
+    deleteMy: async (req, res, next) => {
+        const { user } = res.locals
+        const { paymentId } = req.body
+
+        await Payment.findOneAndDelete({userId: user._id, _id: paymentId})
+
+        return res.json(true)
+    },
+
     buy: async (req, res ,next) => {
-        const { user } = res.locals;
-        const { tariffId } = req.body;
+        const { user } = res.locals
+        const { tariffId } = req.body
 
         try {
             const payment = new Payment()
 
-            let tariff = await Tariff.findOne({_id: tariffId})
+            let tariff = await Tariff.findOne({_id: tariffId, active: true})
 
             if(tariff) {
                 if(tariff.price === 0) {
@@ -42,38 +78,131 @@ module.exports = {
                     let existDemo = payments.find(x => x.tariff.price === 0)
 
                     if(existDemo) {
-                        const err = {};
-                        err.param = `all`;
-                        err.msg = `already_use_demo`;
-                        return res.status(401).json({ error: true, errors: [err] });
-                    }
-                }
+                        const err = {}
+                        err.param = `all`
+                        err.msg = `already_use_demo`
+                        return res.status(401).json({ error: true, errors: [err] })
+                    } else {
+                        payment.userId = user._id
+                        payment.tariff = tariff
+                        payment.expiriesAt = Date.now() + (tariff.days * 1000 * 60 * 60 * 24)
+                        payment.updateAt = Date.now()
+                        payment.orderId = 'none'
+                        payment.status = 'success'
+                        payment.formUrl = ''
+                        
+                        await payment.save()
 
-                payment.userId = user._id
-                payment.tariff = tariff
-                payment.expiriesAt = Date.now() + (tariff.days * 1000 * 60 * 60 * 24)
-                
-                await payment.save()
+                        return res.json(payment)
+                    }
+                } else {
+                    payment.userId = user._id
+                    payment.tariff = tariff
+                    payment.expiriesAt = Date.now() + (tariff.days * 1000 * 60 * 60 * 24)
+                    payment.updateAt = Date.now()
+                    
+                    await payment.save()
+
+                    let params = {}
+
+                    params.userName = process.env.SB_USERNAME
+                    params.password = process.env.SB_PASSWORD
+
+                    params.orderNumber = payment._id
+                    params.amount = tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+                    params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+                    params.failUrl = `${process.env.CLIENT_URL}`
+
+                    let response = await sendRequest(orderLink, 'GET', params)
+                    
+                    if(response.orderId) {
+                        payment.orderId = response.orderId
+                    }
+
+                    if(response.formUrl) {
+                        payment.formUrl = response.formUrl
+                    }
+
+                    await payment.save()
+
+                    return res.json(response)
+                }
             }
 
-            return res.json(payment);
+            const err = {}
+            err.param = `all`
+            err.msg = `not_found`
+
+            return res.status(404).json({ error: true, errors: [err] })
         } catch (e) {
-            return next(new Error(e));
+            return next(new Error(e))
+        }
+    },
+
+    check: async (req, res ,next) => {
+        const { orderId } = req.query;
+
+        try {   
+            let payment = await Payment.findOne({orderId}).populate('tariff')
+
+            let params = {}
+            params.userName = process.env.SB_USERNAME
+            params.password = process.env.SB_PASSWORD
+            params.orderId = orderId
+
+            let response = await sendRequest(statusLink, 'GET', params)
+
+            if(response.OrderStatus === 1 && payment.status === 'wait') {
+                payment.status = 'hold'
+                payment.updateAt = Date.now()
+
+                await payment.save()
+
+                params.amount = payment.tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+
+                let response = await sendRequest(finishLink, 'GET', params)
+
+                if(response.errorCode === '0') {
+                    payment.status = 'success'
+                    payment.expiriesAt = Date.now() + (payment.tariff.days * 1000 * 60 * 60 * 24)
+                    payment.updateAt = Date.now()
+
+                    await payment.save()
+
+                    res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=true&uuid=${randomInteger(0, 1000000)}` })
+                } else {
+                    res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=false&uuid=${randomInteger(0, 1000000)}` })
+                }
+            } else {
+                res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=false&uuid=${randomInteger(0, 1000000)}` })
+            }
+            
+            return res.end()
+        } catch (error) {
+            return next(new Error(error))
         }
     }
+}
+
+function sendRequest(url, method, params) {
+    return new Promise(resolve => {
+        let link = url + '?';
+
+        for (let i in params) {
+            if (params.hasOwnProperty(i))
+                link += i + '=' + params[i] + '&';
+        }
+
+        if (params)
+            link = link.substr(0, link.length - 1);
+
+        request(link, function (err, res, body) {
+            resolve(JSON.parse(body.toString()))
+        })
+    })
 }
 
 function randomInteger(min, max) {
     let rand = min + Math.random() * (max + 1 - min);
     return Math.floor(rand);
 }
-
-function randomString(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
- }

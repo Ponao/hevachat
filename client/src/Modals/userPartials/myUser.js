@@ -15,6 +15,7 @@ import { bindActionCreators } from 'redux'
 import Avatar from '../../Partials/User/Avatar';
 import { withRouter } from 'react-router-dom';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
+import ListAltRoundedIcon from '@material-ui/icons/ListAltRounded';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
@@ -63,7 +64,18 @@ class MyUser extends React.Component {
 
             <p className="user-profile-name">{this.props.user.name.first} {this.props.user.name.last}</p>
             <p className="user-profile-city">{this.props.user.city ? this.props.user.city : this.props.langProps.not_indicated}</p>
-            
+
+            <div className="user-btn">
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push({
+                        search: `?modal=payments`
+                    })
+                }}>
+                    <ListAltRoundedIcon style={{color: '#99AABB'}} />
+                </CustomFab>
+                <p>{this.props.langProps.my_orders}</p>
+            </div>
+
             <div className="user-btn">
                 <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
                     this.props.history.push({

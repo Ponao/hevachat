@@ -30,6 +30,8 @@ import ForceJoinRoom from './ForceJoinRoom';
 import Ban from './Ban';
 import Toasts from './Toasts';
 import ForceToast from './ForceToast';
+import Payments from './Payments';
+import PaySuccess from './PaySuccess';
 
 class MainModal extends React.Component {
     state = {
@@ -42,6 +44,7 @@ class MainModal extends React.Component {
         unbanroom: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).unbanroom,
         sendwarning: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).sendwarning,
         ban: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).ban,
+        paySuccess: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).paySuccess,
     }
 
     componentDidMount() {
@@ -56,6 +59,7 @@ class MainModal extends React.Component {
                 unbanroom: qs.parse(location.search, { ignoreQueryPrefix: true }).unbanroom,
                 sendwarning: qs.parse(location.search, { ignoreQueryPrefix: true }).sendwarning,
                 ban: qs.parse(location.search, { ignoreQueryPrefix: true }).ban,
+                paySuccess: qs.parse(location.search, { ignoreQueryPrefix: true }).paySuccess,
             })
         })
     }
@@ -129,6 +133,12 @@ class MainModal extends React.Component {
                     search: ""
                 })
             }} />
+
+            {this.state.modal === 'payments' && <Payments isOpen={this.state.modal === 'payments'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
             
             {this.state.modal === 'profile' && <Profile isOpen={this.state.modal === 'profile'} close={() => {
                 this.props.history.push({
@@ -166,6 +176,12 @@ class MainModal extends React.Component {
                     payload: []
                 })
             }} />
+
+            {!!this.state.paySuccess && <PaySuccess isOpen={this.state.paySuccess} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
 
             {this.state.modal === 'slider' && !!this.props.slider.images.length && <Slider index={this.props.slider.index} images={this.props.slider.images} close={() => {
                 this.props.dispatch({

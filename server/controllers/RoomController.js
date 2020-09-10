@@ -41,7 +41,7 @@ module.exports = {
         let { id, socketId } = req.body;
 
         try {
-            let payment = await Payment.findOne({userId: user._id, expiriesAt: {'$gte': Date.now()}})
+            let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
 
             if(!payment && user.role !== 'admin' && user.role !== 'moder') {
                 const err = {};

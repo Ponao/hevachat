@@ -145,7 +145,19 @@ export default {
         connecting: 'Подключение',
         you_have_invite_users: "Вы уже приглашали некоторых пользователей",
         invited_sents: "Приглашения отправленны!",
-        force_toast_text: 'После перехода вы будете отключены от активной комнаты.'
+        force_toast_text: 'После перехода вы будете отключены от активной комнаты.',
+        here_will_your_orders: 'Здесь будут находиться ваши заказы',
+        my_orders: 'Мои заказы',
+        booked: 'Заказан',
+        paid: 'Оплачен',
+        active: 'Активен',
+        ended: 'Закончился',
+        pay_success_true: 'Заказ успешно оплачен',
+        pay_success_false: 'Заказ не был оплачен',
+        pick_a_plan_continue: 'Выберите план что бы продолжить',
+        buy: 'Купить',
+        hi: 'Привет',
+        already_tariff: 'У вас уже есть активный тариф'
     },
     en: {
         settings: 'Settings',
@@ -293,6 +305,19 @@ export default {
         connecting: 'Connecting',
         you_have_invite_users: "You've already invited some users",
         invited_sents: "Invited sents!",
-        force_toast_text: 'After the transition, you will be disconnected from the active room.'
+        force_toast_text: 'After the transition, you will be disconnected from the active room.',
+        here_will_your_orders: 'Your orders will be located here',
+        my_orders: 'My orders',
+        booked: 'Booked',
+        paid: 'Paid',
+        active: 'Active',
+        ended: 'Ended',
+        pay_success_true: '',
+        pay_success_true: 'Order successfully paid',
+        pay_success_false: 'The order was not paid',
+        pick_a_plan_continue: 'Pick a plan to continue',
+        buy: 'Buy',
+        hi: 'Hi',
+        already_tariff: 'You already have an active tariff'
     }
 }

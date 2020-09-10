@@ -9,6 +9,9 @@ import { connect } from 'react-redux'
 import { urlApi } from '../../config';
 import { CircularProgress } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
+import { withLang } from 'react-multi-language';
+import languages from '../../languages';
+import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
 
 class Payment extends React.Component {
     static contextType = PageSettings;
@@ -16,7 +19,8 @@ class Payment extends React.Component {
     state = {
         isFetching: true,
         tariffs: [],
-        redirect: false
+        redirect: false,
+        stats: 'can'
     }
 
     componentDidMount() {
@@ -31,8 +35,8 @@ class Payment extends React.Component {
             }
         })
         .then((response) => response.json())
-        .then((tariffs) => {
-            this.setState({isFetching: false, tariffs})
+        .then(({tariffs, status}) => {
+            this.setState({isFetching: false, tariffs, status})
         })
     }
 
@@ -55,9 +59,14 @@ class Payment extends React.Component {
         })
         .then((response) => response.json())
         .then((answer) => {
+            console.log(answer)
             if(!answer.error) {
-                this.setState({isFetching: false})
-                this.props.history.push('/')
+                if(answer.formUrl) {
+                    window.location.href = answer.formUrl
+                } else {
+                    this.setState({isFetching: false})
+                    this.props.history.push('/')
+                }
             }
         })
     }
@@ -66,8 +75,10 @@ class Payment extends React.Component {
         return (
             <> 
                 <div className="payment-page">
-                    <h2 className="payment-title">Hi {this.props.user.name.first}</h2>
-                    <p className="payment-subtitle">Pick a plan to continue</p>
+                {this.state.status === 'can' && <>
+                    <h2 className="payment-title">{this.props.langProps.hi} {this.props.user.name.first}</h2>
+                    <p className="payment-subtitle">{this.props.langProps.pick_a_plan_continue}</p>
+                </>}
 
                     <div className="payment-tariffs">
                         {this.state.isFetching && <CircularProgress style={{
@@ -88,10 +99,22 @@ class Payment extends React.Component {
 
                                         <button className="button-gray" onClick={() => {
                                             this.buy(tariff._id)
-                                        }} style={{width: '80%', margin: '0 10% 0 10%'}}>Buy</button>
+                                        }} style={{width: '80%', margin: '0 10% 0 10%'}}>{this.props.langProps.buy}</button>
                                     </div>
                                 </div>
                             })}
+                        </div>}
+
+                        {this.state.status === 'cant' && <div className="data-empty">
+                            <CheckCircleOutlineRoundedIcon style={{color: '#fff', fontSize: 54, margin: '0 auto', display: 'block'}} />
+
+                            <p style={{color: '#fff', fontSize: 18, fontWeight: 600}}>{this.props.langProps.already_tariff}</p>
+
+                            <button className="button-gray" onClick={() => {
+                                this.props.history.push('/')
+                            }}>
+                                {this.props.langProps.back}
+                            </button>
                         </div>}
                     </div>
                 </div>        
@@ -106,4 +129,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(withRouter(Payment))
+export default withLang(languages)(connect(mapStateToProps)(withRouter(Payment)))

@@ -17,7 +17,7 @@ module.exports = {
         const { id, socketId } = req.body;
 
         try {
-            let payment = await Payment.findOne({userId: user._id, expiriesAt: {'$gte': Date.now()}})
+            let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
             
             if(!payment) {
                 return res.json({error: 'dont_have_payment'});
@@ -99,7 +99,7 @@ module.exports = {
         const { userId, socketId } = req.body;
 
         try {
-            let payment = await Payment.findOne({userId: user._id, expiriesAt: {'$gte': Date.now()}})
+            let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
             
             if(!payment) {
                 let io = getIO()

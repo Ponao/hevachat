@@ -1413,6 +1413,44 @@
     cursor: default;
 }
 
+.payment-status-active {
+    background-color: #008FF7;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    height: 30px;
+    width: max-content;
+    padding: 0 10px;
+    align-self: center;
+}
+
+.payment-status-inactive {
+    background-color: #EDF0F3;
+    color: #556677;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    height: 30px;
+    width: max-content;
+    padding: 0 10px;
+    align-self: center;
+}
+
+.payment-item {
+    display: flex;
+    width: 100%;
+    padding: 5px 10px;
+    color: #556677;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    height: 60px;
+    flex-direction: row;
+}
+
 .pulse-avatar {
     position: relative;
     width: 120px;
