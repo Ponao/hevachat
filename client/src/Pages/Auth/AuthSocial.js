@@ -8,6 +8,7 @@ import { withRouter } from 'react-router-dom'
 class AuthSocial extends React.Component {
     state = {
         token: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).token,
+        redirect: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).redirect,
     }
 
     componentDidMount() {
@@ -15,6 +16,9 @@ class AuthSocial extends React.Component {
             const { cookies } = this.props
             cookies.set('apiToken', this.state.token, { path: '/' })
 
+            if(this.state.redirect) {
+                window.location.replace(this.state.redirect)
+            }
             window.location.replace('/')
         } else {
             window.location.replace('/')

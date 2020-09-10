@@ -312,7 +312,6 @@ export default {
         paid: 'Paid',
         active: 'Active',
         ended: 'Ended',
-        pay_success_true: '',
         pay_success_true: 'Order successfully paid',
         pay_success_false: 'The order was not paid',
         pick_a_plan_continue: 'Pick a plan to continue',
