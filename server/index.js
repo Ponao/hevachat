@@ -106,7 +106,7 @@ function startServer() {
 
     initSocket(io)
 
-    https.listen(8000);
+    https.listen(process.env.PORT);
   }
 }
 
