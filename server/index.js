@@ -106,7 +106,7 @@ function startServer() {
 
     initSocket(io)
 
-    https.listen(8080);
+    https.listen(8000);
   }
 }
 
