@@ -20,9 +20,12 @@ import MainModal from "../Modals/MainModal";
 import store from "../Redux/store";
 import { BAN_SET } from "../Redux/constants";
 import Ban from "../Pages/User/Ban";
+import qs from 'qs'
+
 class AppRouter extends React.Component {
   state = {
-    isRender: false
+    isRender: false,
+    redirect: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).redirect,
   }
 
   componentDidMount() {
@@ -54,6 +57,9 @@ class AppRouter extends React.Component {
           } else {
             SocketController.init(apiToken)
             this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken);
+            if(this.state.redirect) {
+              window.location.replace(this.state.redirect)
+            }
           }
           this.setState({isRender: true})
         })
