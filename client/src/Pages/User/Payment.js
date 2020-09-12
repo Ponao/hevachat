@@ -12,6 +12,7 @@ import { withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
 import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
+import qs from 'qs'
 
 class Payment extends React.Component {
     static contextType = PageSettings;
@@ -20,7 +21,8 @@ class Payment extends React.Component {
         isFetching: true,
         tariffs: [],
         redirect: false,
-        stats: 'can'
+        status: '',
+        from: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).from,
     }
 
     componentDidMount() {
@@ -54,7 +56,8 @@ class Payment extends React.Component {
                 Authorization: `Bearer ${this.props.user.apiToken}`,
             },
             body: JSON.stringify({
-                tariffId
+                tariffId,
+                from: this.state.from
             })
         })
         .then((response) => response.json())

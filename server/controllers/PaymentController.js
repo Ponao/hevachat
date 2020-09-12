@@ -65,7 +65,7 @@ module.exports = {
 
     buy: async (req, res ,next) => {
         const { user } = res.locals
-        const { tariffId } = req.body
+        const { tariffId, from } = req.body
 
         try {
             const payment = new Payment()
@@ -110,7 +110,13 @@ module.exports = {
 
                     params.orderNumber = payment._id
                     params.amount = tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
-                    params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+
+                    if(from === 'app') {
+                        params.returnUrl = `${process.env.API_URL}/api/payment/check-order?from=app`
+                    } else {
+                        params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+                    }
+                    
                     params.failUrl = `${process.env.CLIENT_URL}`
 
                     let response = await sendRequest(orderLink, 'GET', params)
@@ -140,7 +146,7 @@ module.exports = {
     },
 
     check: async (req, res ,next) => {
-        const { orderId } = req.query;
+        const { orderId, from } = req.query;
 
         try {   
             let payment = await Payment.findOne({orderId}).populate('tariff')
@@ -169,7 +175,10 @@ module.exports = {
 
                     await payment.save()
 
-                    res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=true&uuid=${randomInteger(0, 1000000)}` })
+                    if(from === 'app')
+                        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=true&from=app&uuid=${randomInteger(0, 1000000)}` })
+                    else 
+                        res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=true&uuid=${randomInteger(0, 1000000)}` })
                 } else {
                     res.writeHead(301, { "Location": `${process.env.CLIENT_URL}/?paySuccess=false&uuid=${randomInteger(0, 1000000)}` })
                 }
