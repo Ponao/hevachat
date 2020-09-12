@@ -48,7 +48,7 @@ class AppRouter extends React.Component {
         },
       })
         .then((response) => response.json())
-        .then(({user, dialogs, noReadCount, noReadNotifications, ban, numDate, date}) => {
+        .then(({user, dialogs, noReadCount, noReadNotifications, ban, numDate, date, leftDays}) => {
           if(ban) {
             store.dispatch({
               type: BAN_SET,
@@ -56,7 +56,7 @@ class AppRouter extends React.Component {
             })
           } else {
             SocketController.init(apiToken)
-            this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken);
+            this.props.userActions.loginUser(user, dialogs, noReadCount, noReadNotifications, apiToken, leftDays);
             if(this.state.redirect) {
               window.location.replace(this.state.redirect)
             }

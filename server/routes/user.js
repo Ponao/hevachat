@@ -37,6 +37,9 @@ router.post('/edit', [
     .notEmpty().withMessage('last_name_not_empty')
     .isString().withMessage('last_name_is_string')
     .isLength({ min: 2 }).withMessage('last_name_is_min'),
+  check('email')
+    .isEmail().withMessage('email_is_invalid')
+    .notEmpty().withMessage('email_not_empty'),
 ], verifyToken, UserController.edit)
 router.post('/set-lang', verifyToken, UserController.setLang)
 // router.get('/load-friends', verifyToken, UserController.loadFriends)

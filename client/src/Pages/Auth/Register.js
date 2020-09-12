@@ -56,7 +56,7 @@ class Register extends React.Component {
                     const { cookies } = this.props
                     cookies.set('apiToken', data.token, { path: '/' })
 
-                    this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token)
+                    this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token, 0)
 
                     SocketController.init(data.token)
                 }

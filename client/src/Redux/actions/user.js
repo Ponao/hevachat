@@ -11,8 +11,9 @@ import { toast } from 'react-toastify'
 import { urlApi } from '../../config'
 
 
-export const loginUser = (user, dialogs, noReadCount, noReadNotifications, apiToken) => (dispatch) => {
+export const loginUser = (user, dialogs, noReadCount, noReadNotifications, apiToken, leftDays) => (dispatch) => {
     user.apiToken = apiToken
+    user.leftDays = leftDays
     
     dispatch({
         type: USER_LOGIN,

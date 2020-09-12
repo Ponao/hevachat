@@ -13,6 +13,7 @@ const Notification = require('../models/Notification');
 const Limit = require("../models/Limit");
 const https = require('https');
 const { resolve } = require("path");
+const Payment = require("../models/Payment");
 
 // VK
 const VK_APP_ID = process.env.VK_APP_ID;
@@ -109,7 +110,7 @@ module.exports = {
             
     const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
 
-      return res.json({ token, user: newUser, dialogs, noReadCount, noReadNotifications });
+      return res.json({ token, user: newUser, dialogs, noReadCount, noReadNotifications, leftDays: 0 });
     } catch (e) {
       console.log(e);
       return next(new Error(e));
@@ -181,8 +182,16 @@ module.exports = {
         let oneweekago = new Date() - (7 * 24 * 60 * 60 * 1000);
                 
         const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
+
+        let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
+
+            let leftDays = 0
+
+            if(payment) {
+                leftDays = (new Date(payment.expiriesAt) - Date.now()) / (24 * 60 * 60 * 1000)
+            }
           
-          return res.json({ token, user, dialogs, noReadCount, noReadNotifications });
+          return res.json({ token, user, dialogs, noReadCount, noReadNotifications, leftDays });
         }
       }
     } catch (e) {

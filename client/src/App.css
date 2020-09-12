@@ -1451,6 +1451,19 @@
     flex-direction: row;
 }
 
+.left-days {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    background-color: #008FF7;
+    color: #fff;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
 .pulse-avatar {
     position: relative;
     width: 120px;

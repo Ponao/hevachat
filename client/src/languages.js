@@ -157,7 +157,9 @@ export default {
         pick_a_plan_continue: 'Выберите план что бы продолжить',
         buy: 'Купить',
         hi: 'Привет',
-        already_tariff: 'У вас уже есть активный тариф'
+        already_tariff: 'У вас уже есть активный тариф',
+        you_have_left: 'У вас осталось',
+        until_the_end: 'до окончания тарифа'
     },
     en: {
         settings: 'Settings',
@@ -317,6 +319,8 @@ export default {
         pick_a_plan_continue: 'Pick a plan to continue',
         buy: 'Buy',
         hi: 'Hi',
-        already_tariff: 'You already have an active tariff'
+        already_tariff: 'You already have an active tariff',
+        you_have_left: 'You have left',
+        until_the_end: 'until the end of the tariff'
     }
 }

@@ -17,6 +17,7 @@ const imageThumbnail = require('image-thumbnail');
 const fs = require('fs');
 const { sendPushNotification } = require('./PushNotificationsController');
 const languages = require('../languages');
+const Payment = require('../models/Payment');
 
 module.exports = {
     // Get user data
@@ -65,8 +66,16 @@ module.exports = {
             
             const noReadNotifications = await Notification.find({userId: user._id, isRead: false, createdAt: {"$gte": oneweekago} }).count()
             
+            let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
+
+            let leftDays = 0
+
+            if(payment) {
+                leftDays = (new Date(payment.expiriesAt) - Date.now()) / (24 * 60 * 60 * 1000)
+            }
+
             if (user) {
-                return res.json({user, dialogs, noReadCount, noReadNotifications});
+                return res.json({user, dialogs, noReadCount, noReadNotifications, leftDays});
             }
             const err = new Error(`User ${userId} not found.`);
             err.notFound = true;
@@ -581,7 +590,7 @@ module.exports = {
 
     edit: async (req, res, next) => {
         const { user } = res.locals;
-        const { firstName, lastName, city } = req.body;
+        const { firstName, lastName, city, email } = req.body;
 
         try {
             const errors = validationResult(req);
@@ -589,9 +598,19 @@ module.exports = {
                 return res.status(422).json({ error: true, errors: errors.array() });
             }
 
+            const existingUserEmail = await User.findOne({email: email, _id: {$ne: user._id}});
+
+            if (existingUserEmail) {
+                const err = {};
+                err.param = `email`;
+                err.msg = `email_already`;
+                return res.status(409).json({ error: true, errors: [err] });
+            }
+
             user.name.first = firstName
             user.name.last = lastName
             user.city = city
+            user.email = email
 
             await user.save()
 

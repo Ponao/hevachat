@@ -42,6 +42,14 @@ const fabStyles = theme => ({
     }
 })
 
+function declension(n, text_forms) {  
+    n = Math.abs(n) % 100; var n1 = n % 10;
+    if (n > 10 && n < 20) { return text_forms[2]; }
+    if (n1 > 1 && n1 < 5) { return text_forms[1]; }
+    if (n1 == 1) { return text_forms[0]; }
+    return text_forms[2];
+}
+
 const CustomFab = withStyles(fabStyles)(Fab);
 
 const fabStylesCustom = theme => ({
@@ -220,7 +228,10 @@ class Room extends React.Component {
                 </div>
                 
 
-                <div className={`col-xl-9 col-lg-6 col-md-6 theme-screen ${this.state.act === 'chat' ? 'hide' : 'active'}`}>
+                <div style={{paddingTop: Math.ceil(this.props.user.leftDays) < 8 && Math.ceil(this.props.user.leftDays) !== 0 ? 30 : 0}} className={`col-xl-9 col-lg-6 col-md-6 theme-screen ${this.state.act === 'chat' ? 'hide' : 'active'}`}>
+                    {Math.ceil(this.props.user.leftDays) < 8 && Math.ceil(this.props.user.leftDays) !== 0 && <div className='left-days'>
+                        {this.props.langProps.you_have_left} {Math.ceil(this.props.user.leftDays)} {declension(Math.ceil(this.props.user.leftDays), [this.props.langProps.day_1, this.props.langProps.day_2, this.props.langProps.day_5])} {this.props.langProps.until_the_end}
+                    </div>}
                     {this.props.rooms.activeRoom && <Members users={this.props.rooms.activeRoom.users} />}
 
                     <div className="media-options">

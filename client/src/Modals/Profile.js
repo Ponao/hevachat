@@ -53,7 +53,8 @@ class Settings extends React.Component {
         lastName: this.props.user.name.last,
         city: this.props.user.city,
         error: false,
-        errors: []
+        errors: [],
+        email: this.props.user.email
     }
 
     onSubmit(e) {
@@ -70,7 +71,8 @@ class Settings extends React.Component {
             body: JSON.stringify({
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
-                city: this.state.city
+                city: this.state.city,
+                email: this.state.email.toLowerCase().replace(/\s+/g, ''),
             })
         })
         .then((response) => response.json())
@@ -83,7 +85,8 @@ class Settings extends React.Component {
                     payload: {
                         firstName: this.state.firstName,
                         lastName: this.state.lastName,
-                        city: this.state.city
+                        city: this.state.city,
+                        email: this.state.email.toLowerCase().replace(/\s+/g, ''),
                     }
                 })
             }
@@ -137,8 +140,20 @@ class Settings extends React.Component {
                     placeholder={this.props.langProps.city}
                 />
 
-                {(this.state.firstName !== this.props.user.name.first || this.state.lastName !== this.props.user.name.last || this.state.city !== this.props.user.city) && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 25}}>{this.props.langProps.save}</button>}
-                {(this.state.firstName === this.props.user.name.first && this.state.lastName === this.props.user.name.last && this.state.city === this.props.user.city) && <button className="button-gray" onClick={() => {
+                <input 
+                    value={this.state.email} 
+                    onChange={(e) => {this.setState({email: e.target.value})}} 
+                    className="input-field" 
+                    type="text"
+                    style={{marginBottom: 0}} 
+                    placeholder={'E-mail'}
+                />
+                {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
+                    {this.props.langProps[this.state.errors.find(value => value.param === 'email').msg]} 
+                </span>}
+
+                {(this.state.email !== this.props.user.email || this.state.firstName !== this.props.user.name.first || this.state.lastName !== this.props.user.name.last || this.state.city !== this.props.user.city) && <button className="button-blue" type="submit" style={{width: 'max-content', marginTop: 25}}>{this.props.langProps.save}</button>}
+                {(this.state.email === this.props.user.email && this.state.firstName === this.props.user.name.first && this.state.lastName === this.props.user.name.last && this.state.city === this.props.user.city) && <button className="button-gray" onClick={() => {
                         this.props.history.goBack()
                     }} style={{width: 'max-content', marginTop: 25}}>{this.props.langProps.back}</button>}
             </form>

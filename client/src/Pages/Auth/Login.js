@@ -75,7 +75,7 @@ class Login extends React.Component {
                             payload: {numDate: data.numDate, date: data.date}
                         })
                     } else {
-                        this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token)
+                        this.props.userActions.loginUser(data.user, data.dialogs, data.noReadCount, data.noReadNotifications, data.token, data.leftDays)
 
                         SocketController.init(data.token)
                     }

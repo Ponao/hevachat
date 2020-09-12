@@ -25,7 +25,7 @@ const user = (state = INITIAL_STATE, action) => {
         case USER_SET_AVATAR:
             return { ...state, avatar: action.payload }
         case USER_EDIT:
-            return { ...state, name: {first: action.payload.firstName, last: action.payload.lastName}, city: action.payload.city }
+            return { ...state, name: {first: action.payload.firstName, last: action.payload.lastName}, city: action.payload.city, email: action.payload.email }
         case USER_SET_LANG:
             return { ...state, lang: action.payload }
         case USER_SET_WARNING:
