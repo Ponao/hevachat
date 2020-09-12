@@ -12,6 +12,7 @@ import { withLang } from 'react-multi-language';
 import languages from '../languages';
 import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
 import ErrorOutlineRoundedIcon from '@material-ui/icons/ErrorOutlineRounded';
+import qs from 'qs'
 
 const customStylesModal = {
     overlay: {
@@ -43,6 +44,15 @@ const customStylesModal = {
 };
 
 class Payments extends React.Component {
+    state = {
+        from: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).from,
+    }
+
+    componentDidMount() {
+        if(this.props.isOpen === 'true' && this.state.from === 'app')
+            window.location.replace('hevachat://myorders')
+    }
+
     render() {
         return <Modal
             isOpen={this.props.isOpen}
