@@ -48,11 +48,6 @@ class Payments extends React.Component {
         from: qs.parse(this.props.location.search, { ignoreQueryPrefix: true }).from,
     }
 
-    componentDidMount() {
-        if(this.props.isOpen === 'true' && this.state.from === 'app')
-            window.location.replace('hevachat://myorders')
-    }
-
     render() {
         return <Modal
             isOpen={this.props.isOpen}
@@ -71,6 +66,9 @@ class Payments extends React.Component {
                     <h2 className="modal-title" style={{marginBottom: 10}}>{this.props.langProps.pay_success_false}</h2>
                 </>}
                 <button className="button-blue" onClick={() => {
+                    if(this.props.isOpen === 'true' && this.state.from === 'app')
+                        window.location.replace('hevachat://myorders')
+                    else 
                     this.props.history.push({
                         search: `?modal=payments`
                     })
