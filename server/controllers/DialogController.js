@@ -124,7 +124,8 @@ module.exports = {
         let { lastDialogId, firstDialogId } = req.body;
 
         try {
-            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}, _id: { $gt: lastDialogId, $lt: firstDialogId }}).populate([
+            let dialog = await Dialog.findById(lastDialogId)
+            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}, _id: { $lt: {updatedAt: dialog.updatedAt} }}).populate([
                 {
                     path: 'users',
                     select: ['_id', 'name', 'online', 'color', 'onlineAt']
