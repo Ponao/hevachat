@@ -440,17 +440,17 @@ class Chat extends React.Component {
                     size: e[i].size / 1000
                 }
                 
-                if(file.type === 'png' || file.type === 'jpg' || file.type === 'jpeg' || file.type === 'gif') {
+                if(file.type.toLowerCase() === 'png' || file.type.toLowerCase() === 'jpg' || file.type.toLowerCase() === 'jpeg' || file.type.toLowerCase() === 'gif') {
                     file.id = images.length
                     images.push(file)
                 }
 
-                if(file.type === 'txt' || file.type === 'pdf' || file.type === 'docx' || file.type === 'zip' || file.type === 'doc') {
+                if(file.type.toLowerCase() === 'txt' || file.type.toLowerCase() === 'pdf' || file.type.toLowerCase() === 'docx' || file.type.toLowerCase() === 'zip' || file.type.toLowerCase() === 'doc') {
                     file.id = files.length
                     files.push(file)
                 }
 
-                if(file.type === 'mp3') {
+                if(file.type.toLowerCase() === 'mpeg' || file.type.toLowerCase() === 'mp3' || file.type.toLowerCase() === 'ogg' || file.type.toLowerCase() === 'wav' || file.type.toLowerCase() === 'flac') {
                     file.id = sounds.length
                     sounds.push(file)
                 }
