@@ -239,10 +239,11 @@ module.exports = {
 
                     let typeSound = req.files['sounds'+i].name.split('.').pop()
                     if(
-                        typeSound === 'mp3' || 
-                        typeSound === 'ogg' || 
-                        typeSound === 'wav' ||
-                        typeSound === 'flac') {
+                        typeSound !== 'mp3' || 
+                        typeSound !== 'ogg' || 
+                        typeSound !== 'wav' ||
+                        typeSound !== 'mpeg' ||
+                        typeSound !== 'flac') {
                         typeSound = 'mp3'
                     }
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
@@ -526,10 +527,11 @@ module.exports = {
                         break
                     let typeSound = req.files['sounds'+i].name.split('.').pop()
                     if(
-                        typeSound === 'mp3' || 
-                        typeSound === 'ogg' || 
-                        typeSound === 'wav' ||
-                        typeSound === 'flac') {
+                        typeSound !== 'mp3' || 
+                        typeSound !== 'ogg' || 
+                        typeSound !== 'wav' ||
+                        typeSound !== 'mpeg' ||
+                        typeSound !== 'flac') {
                         typeSound = 'mp3'
                     }
 

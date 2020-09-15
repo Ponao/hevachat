@@ -563,13 +563,14 @@ module.exports = {
 
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
                         let typeSound = req.files['sounds'+i].name.split('.').pop()
-                    if(
-                        typeSound === 'mp3' || 
-                        typeSound === 'ogg' || 
-                        typeSound === 'wav' ||
-                        typeSound === 'flac') {
-                        typeSound = 'mp3'
-                    }
+                        if(
+                            typeSound !== 'mp3' || 
+                            typeSound !== 'ogg' || 
+                            typeSound !== 'wav' ||
+                            typeSound !== 'mpeg' ||
+                            typeSound !== 'flac') {
+                            typeSound = 'mp3'
+                        }
                         req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
                             return res.status(500).send(err);
@@ -799,13 +800,14 @@ module.exports = {
 
                     if(req.files['sounds'+i].size / 1000 <= 10000) {
                         let typeSound = req.files['sounds'+i].name.split('.').pop()
-                    if(
-                        typeSound === 'mp3' || 
-                        typeSound === 'ogg' || 
-                        typeSound === 'wav' ||
-                        typeSound === 'flac') {
-                        typeSound = 'mp3'
-                    }
+                        if(
+                            typeSound !== 'mp3' || 
+                            typeSound !== 'ogg' || 
+                            typeSound !== 'wav' ||
+                            typeSound !== 'mpeg' ||
+                            typeSound !== 'flac') {
+                            typeSound = 'mp3'
+                        }
 
                         req.files['sounds'+i].mv('./uploads/' + user._id + '/' +fileName+'.' + typeSound, function(err) {
                             if (err)
