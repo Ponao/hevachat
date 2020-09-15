@@ -13,6 +13,7 @@ const { validationResult } = require("express-validator");
 const Investment = require('../models/Investment');
 const Payment = require('../models/Payment');
 const sizeOf = require('image-size');
+const imageThumbnail = require('image-thumbnail');
 
 const {sendMessageRoom, deleteMessageRoom, readMessageRoom, editMessageRoom, findBySocketId, sendNotification, editRoom, deleteRoom, muteRoom, unmuteRoom, banRoom} = require('./SocketController')
 const {getUserExistById, addUserRoom, muteUserRoom, unmuteUserRoom, checkBusy} = require('./WebRtcController');
