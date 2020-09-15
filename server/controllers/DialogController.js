@@ -125,7 +125,7 @@ module.exports = {
 
         try {
             let dialog = await Dialog.findById(lastDialogId)
-            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}, _id: { $lt: {updatedAt: dialog.updatedAt} }}).populate([
+            const dialogs = await Dialog.find({'users': {'$all': [user._id]}, 'lastMessage': {$exists: true}, updatedAt: { $lt: dialog.updatedAt }}).populate([
                 {
                     path: 'users',
                     select: ['_id', 'name', 'online', 'color', 'onlineAt']
