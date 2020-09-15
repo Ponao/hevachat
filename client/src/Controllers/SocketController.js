@@ -532,7 +532,7 @@ export default {
                         user: user,
                         getted: false,
                         typing: false,
-                        noRead: 1,
+                        noRead: noRead,
                         messages: []
                     }
                     store.dispatch({
