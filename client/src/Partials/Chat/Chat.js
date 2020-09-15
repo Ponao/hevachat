@@ -394,7 +394,7 @@ class Chat extends React.Component {
                     files.push(file)
                 }
 
-                if(file.type.toLowerCase() === 'mp3') {
+                if(file.type.toLowerCase() === 'mpeg' || file.type.toLowerCase() === 'mp3' || file.type.toLowerCase() === 'ogg' || file.type.toLowerCase() === 'wav' || file.type.toLowerCase() === 'flac') {
                     file.id = sounds.length
                     sounds.push(file)
                 }
