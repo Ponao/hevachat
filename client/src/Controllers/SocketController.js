@@ -485,7 +485,7 @@ export default {
             })
         })
 
-        socket.on('sendMessageDialog', ({message, otherId}) => {
+        socket.on('sendMessageDialog', ({message, otherId, noRead}) => {
             if(store.getState().dialogs.dialogs.find(x => x.user._id === message.user._id) && store.getState().dialogs.dialogs.find(x => x.user._id === message.user._id).typing) {
                 store.dispatch({
                     type: DIALOGS_SET_TYPER,
@@ -508,6 +508,10 @@ export default {
                     payload: {message, dialogId: message.dialogId, noRead: message.user._id !== store.getState().user._id, noReadCount}
                 })
             } else {
+                let noReadCount = false
+                if(noRead === 1 && message.user._id !== store.getState().user._id) {
+                    noReadCount = true
+                }
                 fetch(`${urlApi}/api/user/get`, {
                     method: "post",
                     headers: {
@@ -533,7 +537,7 @@ export default {
                     }
                     store.dispatch({
                         type: DIALOGS_ADD,
-                        payload: dialog
+                        payload: {dialog, noReadCount}
                     })
                 });
             }

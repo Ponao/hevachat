@@ -394,11 +394,11 @@ module.exports = {
                     if(id)
                         message.pushId = id
                         
-                    sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
+                    sendMessageDialog({userId: user._id, otherId: userId, socketId, message, noRead: dialog.noRead})
                     await message.save()
                 })
             } else {
-                sendMessageDialog({userId: user._id, otherId: userId, socketId, message})
+                sendMessageDialog({userId: user._id, otherId: userId, socketId, message, noRead: dialog.noRead})
             }
 
             return res.json(message);

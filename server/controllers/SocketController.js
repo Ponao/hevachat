@@ -309,12 +309,12 @@ function banRoom({roomId, ban, userId}) {
 }
 
 // Chat dialog
-function sendMessageDialog({userId, socketId, otherId, message}) {
+function sendMessageDialog({userId, socketId, otherId, message, noRead}) {
     if(userId != otherId) {
-        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId}))
-        io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', ({message, otherId}))
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId, noRead}))
+        io.sockets.connected[socketId].to(`user.${userId}`).emit('sendMessageDialog', ({message, otherId, noRead}))
     } else {
-        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId}))
+        io.sockets.connected[socketId].to(`user.${otherId}`).emit('sendMessageDialog', ({message, otherId: userId, noRead}))
     }
 }
 

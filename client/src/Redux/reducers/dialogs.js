@@ -29,7 +29,7 @@ const dialogs = (state = INITIAL_STATE, action) => {
             return { ...state, dialogs: action.payload.dialogs, isFetching: false, noReadCount: action.payload.noReadCount, canLoad: action.payload.dialogs.length === 20 }
         }
         case DIALOGS_ADD:
-            return { ...state, dialogs: [ action.payload, ...state.dialogs ]  }
+            return { ...state, dialogs: [ action.payload.dialog, ...state.dialogs ], noReadCount: action.payload.noReadCount ? state.noReadCount+1 : state.noReadCount  }
         case DIALOGS_PRELOAD:
             return { ...state, dialogs: [ ...state.dialogs, ...action.payload ], canLoad: action.payload.length === 20 }
         case DIALOGS_LOAD:

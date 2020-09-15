@@ -128,7 +128,7 @@ export const dialogGet = (userId, apiToken) => (dispatch) => {
 
             dispatch({
                 type: DIALOGS_ADD,
-                payload: dialog
+                payload: {dialog}
             })
         } else {
             let dialog = {
@@ -139,7 +139,7 @@ export const dialogGet = (userId, apiToken) => (dispatch) => {
 
             dispatch({
                 type: DIALOGS_ADD,
-                payload: dialog
+                payload: {dialog}
             })
         }
     });
