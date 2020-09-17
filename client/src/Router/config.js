@@ -10,8 +10,17 @@ import Dialog from '../Pages/User/Dialog';
 import Payment from '../Pages/User/Payment';
 import Ban from '../Pages/User/Ban';
 import AuthSocial from '../Pages/Auth/AuthSocial';
+import Politice from '../Pages/Politice';
+
 
 const routes = [
+    {
+        path: '/politice',
+        exact: true,
+        type: 'all',
+        title: 'Politice',
+        component: () => <Politice />
+    },
     {
         path: '/login',
         exact: true,

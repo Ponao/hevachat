@@ -100,8 +100,15 @@ class AppRouter extends React.Component {
                     to={{
                       pathname: "/",
                     }}
-                  /> 
-
+                  />
+                  case 'all':
+                    return <this.AllRoute
+                        key={index}
+                        path={route.path}
+                        exact={route.exact}
+                    >
+                    <route.component />
+                </this.AllRoute>
                   default:
                       return false
               }            
@@ -115,6 +122,20 @@ class AppRouter extends React.Component {
       </Switch></>
     );
   }
+
+  AllRoute = ({ children, ...rest }) => {
+    return (
+      <Route
+        {...rest}
+        render={() =>
+            <>
+              {children}
+              <MainModal />
+            </>
+        }
+      />
+    );
+  };
 
   PrivateRoute = ({ children, ...rest }) => {
     return (

@@ -17,6 +17,7 @@ import SocketController from '../../Controllers/SocketController'
 import { CircularProgress } from '@material-ui/core'
 import { withLang } from 'react-multi-language'
 import languages from '../../languages'
+import { lime } from '@material-ui/core/colors'
 
 class Register extends React.Component {
     state = {
@@ -108,6 +109,8 @@ class Register extends React.Component {
                     {this.state.errors.find(value => value.param === 'all') && <span style={{marginTop: 30}} className="input-error-label">
                         {this.props.langProps[this.state.errors.find(value => value.param === 'all').msg]} 
                     </span>}
+
+                    <p className="nav-auth">Регестрируясь вы принимаете <Link to="/politice">политику конфиденциальности</Link></p>
 
                     <button type="submit" className="button-gray">Sign up</button>
 

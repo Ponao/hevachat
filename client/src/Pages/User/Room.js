@@ -71,6 +71,44 @@ const fabStylesCustom = theme => ({
 
 const CustomFab2 = withStyles(fabStylesCustom)(Fab);
 
+const Member = withRouter(class Member extends React.Component {
+    div = React.createRef();
+
+    state = {
+        height: 0
+    }
+
+    componentDidMount() {
+        this.setState({
+            height: this.div.current.clientWidth
+        })
+
+        window.addEventListener('resize', this.resize.bind(this))
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.resize.bind(this))
+    }
+
+    resize() {
+        this.setState({
+            height: this.div.current.clientWidth
+        })
+    }
+
+    render() {
+        return <div ref={this.div} style={{cursor: 'pointer', height: this.state.height}} className="member col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3" onClick={() => {
+            this.props.history.push({
+                search: `?user=${this.props.user._id}`
+            })
+        }}>
+            <Avatar avatarStyle={{borderRadius: 0}} avatar={this.props.user.avatar ? this.props.user.avatar : false} name={this.props.user.name.first.charAt(0)+this.props.user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${this.props.user.color})`}}  />
+            {this.props.user.speaking && <span className="speaking"></span>}
+            <span className="user-name">{this.props.user.name.first} {this.props.user.name.last}</span>
+        </div>
+    }
+})
+
 const Members = withRouter((props) => {
     return <Scrollbars
         renderTrackVertical={() => <div className="track-vertical"/>}
@@ -79,15 +117,7 @@ const Members = withRouter((props) => {
         autoHide
     >
         {props.users.map((user, index) => 
-            <div key={index} style={{cursor: 'pointer'}} className="member col-6 col-sm-6 col-md-6 col-lg-4 col-xl-3" onClick={() => {
-                props.history.push({
-                    search: `?user=${user._id}`
-                })
-            }}>
-                <Avatar avatarStyle={{borderRadius: 0}} avatar={user.avatar ? user.avatar : false} name={user.name.first.charAt(0)+user.name.last.charAt(0)} style={{fontSize: 30, borderRadius: 0, width: '100%', height: '100%', backgroundColor: `rgb(${user.color})`}}  />
-                {user.speaking && <span className="speaking"></span>}
-                <span className="user-name">{user.name.first} {user.name.last}</span>
-            </div>
+            <Member key={index} user={user} />
         )}
     </Scrollbars>
 })
