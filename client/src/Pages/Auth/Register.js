@@ -110,7 +110,7 @@ class Register extends React.Component {
                         {this.props.langProps[this.state.errors.find(value => value.param === 'all').msg]} 
                     </span>}
 
-                    <p className="nav-auth">Регестрируясь вы принимаете <Link to="/politice">политику конфиденциальности</Link></p>
+                    <p className="nav-auth">Регестрируясь вы принимаете <Link to="/privacy-policy">политику конфиденциальности</Link></p>
 
                     <button type="submit" className="button-gray">Sign up</button>
 

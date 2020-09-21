@@ -15,10 +15,10 @@ import Politice from '../Pages/Politice';
 
 const routes = [
     {
-        path: '/politice',
+        path: '/privacy-policy',
         exact: true,
         type: 'all',
-        title: 'Politice',
+        title: 'Privacy policy',
         component: () => <Politice />
     },
     {
