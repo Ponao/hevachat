@@ -26,6 +26,7 @@ const formidableMiddleware = require('express-formidable');
 // const errors = require('./middleware/errors');
 
 // Routes
+const statsRoutes = require('./routes/stats');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const roomRoutes = require('./routes/room');
@@ -52,6 +53,7 @@ app
   .use(cors())
   // Enable routes
   .use('/auth', authRoutes)
+  .use('/api/stats', statsRoutes)
   .use('/api/user', userRoutes)
   .use('/api/room', roomRoutes)
   .use('/api/dialog', dialogRoutes)

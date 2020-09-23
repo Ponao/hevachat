@@ -16,6 +16,9 @@ const adminBro = new AdminBro({
     companyName: 'Hevachat',
     softwareBrothers: false,
   },
+  dashboard: {
+    component: AdminBro.bundle('../adminbro/stats')
+  },
   resources: [
     {
         resource: User,
