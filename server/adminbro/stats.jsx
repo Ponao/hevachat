@@ -99,7 +99,7 @@ const Dashboard = () =>  {
                 money.map((y, i) => {
                     if(y.name === x._id.tariff[0]) {
                         if(x._id.status === 'success')
-                        money[i].uv += Number(x._id.price)
+                        money[i].uv += Number(x._id.price * x.count)
                     }
                 })
             })
