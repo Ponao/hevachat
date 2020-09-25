@@ -14,6 +14,7 @@ const Limit = require("../models/Limit");
 const https = require('https');
 const { resolve } = require("path");
 const Payment = require("../models/Payment");
+const { sendMail } = require("./MailController");
 
 // VK
 const VK_APP_ID = process.env.VK_APP_ID;
@@ -309,33 +310,36 @@ module.exports = {
   reset: async (req, res, next) => {
     // This route expects the body parameters:
     //  - email: username's email
-    const { password, token } = req.body;
+    // const { password, token } = req.body;
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ error: true, errors: errors.array() });
-    }
-    try {
-      // Make sure there is an existing user in our database
-      const existingUserEmail = await User.getByResetPasswordToken(token);
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(422).json({ error: true, errors: errors.array() });
+    // }
+    // try {
+    //   // Make sure there is an existing user in our database
+    //   const existingUserEmail = await User.getByResetPasswordToken(token);
       
-      if (existingUserEmail) {
-        existingUserEmail.updatePassword(password);
-        // Сообщение о сбросе пароля
-        return res.json({
-          status: "success"
-        });
-      } else {
-        // Conflict: the resource already exists (HTTP 409)
-        const err = {};
-        err.param = `all`;
-        err.msg = `Неверный токен`;
-        return res.status(409).json({ error: true, errors: [err] });
-      }
-    } catch (e) {
-      console.log(e);
-      return next(new Error(e));
-    }
+    //   if (existingUserEmail) {
+    //     existingUserEmail.updatePassword(password);
+    //     // Сообщение о сбросе пароля
+    //     return res.json({
+    //       status: "success"
+    //     });
+    //   } else {
+    //     // Conflict: the resource already exists (HTTP 409)
+    //     const err = {};
+    //     err.param = `all`;
+    //     err.msg = `Неверный токен`;
+    //     return res.status(409).json({ error: true, errors: [err] });
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    //   return next(new Error(e));
+    // }
+
+    sendMail()
+    return res.json(1)
   },
 };
 

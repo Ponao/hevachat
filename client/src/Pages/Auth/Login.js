@@ -133,6 +133,15 @@ class Login extends React.Component {
                     <button type="submit" className="button-gray">Log in</button>
 
                     <p className="nav-auth">New to the site? <Link to="/register">Sign up</Link></p>
+                    <p className="nav-auth" onClick={() => {
+                        fetch(`${urlApi}/auth/reset`, {
+                            method: "post",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                    }}>RESET</p>
                 </form>
             </div>
         )

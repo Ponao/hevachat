@@ -23,7 +23,7 @@ const languages = {
         photo: 'Фото',
         sound: 'Аудио',
         file: 'Файл',
-        attach_message: 'Прикрепленное сообщение'
+        attach_message: 'Прикрепленное сообщение',
     }
 }
 

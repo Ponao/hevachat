@@ -39,11 +39,11 @@ router.post('/forgot', [
     .notEmpty().withMessage('Email не может быть пустым'),  
 ], AuthController.forgot);
 router.post('/reset', [
-  check('password')
-  .notEmpty().withMessage('Пароль не может быть пустым')
-  .isLength({ min: 8 }).withMessage('Пароль должен содержать минимум 8 символов'), 
-  check('passwordConfirm')
-  .custom((value, { req }) => value === req.body.password).withMessage('Подтверждение должно совпадать с паролем'),  
+  // check('password')
+  // .notEmpty().withMessage('Пароль не может быть пустым')
+  // .isLength({ min: 8 }).withMessage('Пароль должен содержать минимум 8 символов'), 
+  // check('passwordConfirm')
+  // .custom((value, { req }) => value === req.body.password).withMessage('Подтверждение должно совпадать с паролем'),  
 ], AuthController.reset);
 router.get('/login_vk', AuthController.loginVk);
 router.get('/auth_vk', AuthController.authVk);
