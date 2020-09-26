@@ -29,6 +29,8 @@ const UserSchema = new Schema({
   lang: { type: String, default: 'en',  },// false
   color: { type: String },
   pushToken: { type: Schema.Types.Mixed, select: false },
+  resetPasswordExpires: { type: Date, select: false, default: Date.now },
+  resetPasswordToken: { type: String, select: false, default: '' },
   buff: Buffer
 });
 

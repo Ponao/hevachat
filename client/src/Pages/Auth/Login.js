@@ -141,7 +141,7 @@ class Login extends React.Component {
                                 'Content-Type': 'application/json'
                             }
                         })
-                    }}>RESET</p>
+                    }}><Link to="/forgot">Forgot your password?</Link></p>
                 </form>
             </div>
         )

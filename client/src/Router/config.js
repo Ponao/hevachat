@@ -11,6 +11,8 @@ import Payment from '../Pages/User/Payment';
 import Ban from '../Pages/User/Ban';
 import AuthSocial from '../Pages/Auth/AuthSocial';
 import Politice from '../Pages/Politice';
+import Forgot from '../Pages/Auth/Forgot';
+import Reset from '../Pages/Auth/Reset';
 
 
 const routes = [
@@ -27,6 +29,20 @@ const routes = [
         type: 'auth',
         title: 'Авторизация',
         component: () => <Login />
+    },
+    {
+        path: '/forgot',
+        exact: true,
+        type: 'auth',
+        title: 'Забыли пароль?',
+        component: () => <Forgot />
+    },
+    {
+        path: '/reset',
+        exact: true,
+        type: 'auth',
+        title: 'Сброс пароля',
+        component: () => <Reset />
     },
     {
         path: '/register',

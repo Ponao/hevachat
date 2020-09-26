@@ -277,45 +277,66 @@ module.exports = {
     }
     try {
       // Make sure there is an existing user in our database
-      const existingUserEmail = await User.getByEmail(email);
-      if (existingUserEmail) {
-        if (existingUserEmail.user.resetPasswordExpires < Date.now()) {
-          let ResetToken = User.generatePasswordReset(email);
-          //Отправка на почту письма
+      const user = await User.findOne({email}).select('+password').select('+email').select('+roomLang').select('+lang').select('+role').select('+resetPasswordToken').select('+resetPasswordExpires');
+      if (user) {
+        if (user.resetPasswordExpires < Date.now()) {
+          // let ResetToken = User.generatePasswordReset(email);
+          let resetToken = randomString(64)
+          user.resetPasswordToken = resetToken
+          user.resetPasswordExpires = Date.now()+24*60*60*1000
+          await user.save()
+
+          sendMail(email, resetToken)
+
           return res.json({
             status: "sended",
             email: email,
           });
         }
-        //Уже отправлено
         else {
           return res.json({
             status: "waiting",
             email: email,
-            time: existingUserEmail.user.resetPasswordExpires - Date.now(),
+            time: user.resetPasswordExpires - Date.now(),
           });
         }
       } else {
-        // Conflict: the resource already exists (HTTP 409)
         const err = {};
-        err.param = `email`;
-        err.msg = `Пользователь с данной почтой не найден`;
-        return res.status(409).json({ error: true, errors: [err] });
+        err.param = `all`;
+        err.msg = `email_not_found`;
+        return res.status(401).json({ error: true, errors: [err] });
       }
     } catch (e) {
-      console.log(e);
       return next(new Error(e));
     }
   },
   reset: async (req, res, next) => {
     // This route expects the body parameters:
     //  - email: username's email
-    // const { password, token } = req.body;
+    const { password, token } = req.body;
 
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   return res.status(422).json({ error: true, errors: errors.array() });
-    // }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ error: true, errors: errors.array() });
+    }
+
+    const user = await User.findOne({resetPasswordToken: token}).select('+password').select('+email').select('+roomLang').select('+lang').select('+role').select('+resetPasswordToken').select('+resetPasswordExpires');
+    if(user && user.resetPasswordExpires > Date.now()) {
+        user.resetPasswordToken = ''
+        user.resetPasswordExpires = Date.now()
+        user.password = await bcrypt.hash(password, 12)
+        await user.save()
+
+        return res.json({
+          status: "success",
+        });
+    } else {
+        const err = {};
+        err.param = `all`;
+        err.msg = `token_invalid`;
+        return res.status(401).json({ error: true, errors: [err] });
+    }
+
     // try {
     //   // Make sure there is an existing user in our database
     //   const existingUserEmail = await User.getByResetPasswordToken(token);
@@ -338,7 +359,7 @@ module.exports = {
     //   return next(new Error(e));
     // }
 
-    sendMail()
+    // sendMail()
     return res.json(1)
   },
 };
@@ -359,6 +380,16 @@ function generateToken(userId) {
 function randomInteger(min, max) {
   let rand = min + Math.random() * (max + 1 - min);
   return Math.floor(rand);
+}
+
+function randomString(length) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 function getTokenFromVkUser(code) {

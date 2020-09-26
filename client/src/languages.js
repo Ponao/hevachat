@@ -159,7 +159,9 @@ export default {
         hi: 'Привет',
         already_tariff: 'У вас уже есть активный тариф',
         you_have_left: 'У вас осталось',
-        until_the_end: 'до окончания тарифа'
+        until_the_end: 'до окончания тарифа',
+        email_not_found: 'Почта не найдена',
+        token_invalid: 'Недействительная ссылка'
     },
     en: {
         settings: 'Settings',
@@ -321,6 +323,8 @@ export default {
         hi: 'Hi',
         already_tariff: 'You already have an active tariff',
         you_have_left: 'You have left',
-        until_the_end: 'until the end of the tariff'
+        until_the_end: 'until the end of the tariff',
+        email_not_found: 'Mail not found',
+        token_invalid: 'Invalid link'
     }
 }

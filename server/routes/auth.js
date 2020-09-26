@@ -43,7 +43,8 @@ router.post('/reset', [
   // .notEmpty().withMessage('Пароль не может быть пустым')
   // .isLength({ min: 8 }).withMessage('Пароль должен содержать минимум 8 символов'), 
   // check('passwordConfirm')
-  // .custom((value, { req }) => value === req.body.password).withMessage('Подтверждение должно совпадать с паролем'),  
+  // .custom((value, { req }) => value === req.body.password).withMessage('Подтверждение должно совпадать с паролем'), 
+  check('password').isLength({ min: 8 }).withMessage('password_is_min') 
 ], AuthController.reset);
 router.get('/login_vk', AuthController.loginVk);
 router.get('/auth_vk', AuthController.authVk);
