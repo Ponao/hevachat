@@ -161,7 +161,8 @@ export default {
         you_have_left: 'У вас осталось',
         until_the_end: 'до окончания тарифа',
         email_not_found: 'Почта не найдена',
-        token_invalid: 'Недействительная ссылка'
+        token_invalid: 'Недействительная ссылка',
+        about: 'О нас'
     },
     en: {
         settings: 'Settings',
@@ -325,6 +326,7 @@ export default {
         you_have_left: 'You have left',
         until_the_end: 'until the end of the tariff',
         email_not_found: 'Mail not found',
-        token_invalid: 'Invalid link'
+        token_invalid: 'Invalid link',
+        about: 'About us'
     }
 }

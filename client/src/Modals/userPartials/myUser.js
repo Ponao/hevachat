@@ -18,6 +18,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import ListAltRoundedIcon from '@material-ui/icons/ListAltRounded';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { withLang } from 'react-multi-language';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import languages from '../../languages';
 
 const fabStyles = theme => ({
@@ -96,6 +97,15 @@ class MyUser extends React.Component {
                     <BookOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
                 <p>{this.props.langProps.contacts}</p>
+            </div>
+
+            <div className="user-btn">
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push('/about')
+                }}>
+                    <InfoOutlinedIcon style={{color: '#99AABB'}} />
+                </CustomFab>
+                <p>{this.props.langProps.about}</p>
             </div>
         </>
     }

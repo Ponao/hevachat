@@ -11,11 +11,19 @@ import Payment from '../Pages/User/Payment';
 import Ban from '../Pages/User/Ban';
 import AuthSocial from '../Pages/Auth/AuthSocial';
 import Politice from '../Pages/Politice';
+import About from '../Pages/About';
 import Forgot from '../Pages/Auth/Forgot';
 import Reset from '../Pages/Auth/Reset';
 
 
 const routes = [
+    {
+        path: '/about',
+        exact: true,
+        type: 'all',
+        title: 'About us',
+        component: () => <About />
+    },
     {
         path: '/privacy-policy',
         exact: true,
