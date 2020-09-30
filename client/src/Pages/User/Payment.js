@@ -8,7 +8,7 @@ import '../../Css/Partials/Payment.css'
 import { connect } from 'react-redux'
 import { urlApi } from '../../config';
 import { CircularProgress } from '@material-ui/core';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
 import CheckCircleOutlineRoundedIcon from '@material-ui/icons/CheckCircleOutlineRounded';
@@ -78,10 +78,10 @@ class Payment extends React.Component {
         return (
             <> 
                 <div className="payment-page">
-                {this.state.status === 'can' && <>
-                    <h2 className="payment-title">{this.props.langProps.hi} {this.props.user.name.first}</h2>
-                    <p className="payment-subtitle">{this.props.langProps.pick_a_plan_continue}</p>
-                </>}
+                    {this.state.status === 'can' && <>
+                        <h2 className="payment-title">{this.props.langProps.hi} {this.props.user.name.first}</h2>
+                        <p className="payment-subtitle">{this.props.langProps.pick_a_plan_continue}</p>
+                    </>}
 
                     <div className="payment-tariffs">
                         {this.state.isFetching && <CircularProgress style={{
@@ -94,8 +94,8 @@ class Payment extends React.Component {
                         }} />}
 
                         {!this.state.isFetching && <div className="row">
-                            {this.state.tariffs.map(tariff => {
-                                return <div className="col-12 col-md-6 col-lg-3 col-xl-2 payment-tariff-container">
+                            {this.state.tariffs.map((tariff, index) => {
+                                return <div key={index} className="col-12 col-md-6 col-lg-3 col-xl-2 payment-tariff-container">
                                     <div className="payment-tariff">
                                         <p className="payment-tariff-title">{tariff.title}</p>
                                         <p className="payment-tariff-price">{tariff.price === 0 ? "Free" : tariff.price}</p>
@@ -119,6 +119,19 @@ class Payment extends React.Component {
                                 {this.props.langProps.back}
                             </button>
                         </div>}
+                    </div>
+
+                    <div style={{display: 'flex', flex: '1'}}></div>
+
+                    <div className="payemnt-links">
+                        <Link to="/about">О нас</Link>
+                        <Link to="/privacy-policy">Политика конфиденциальности</Link>
+                        <a href="#" onClick={(e) => {
+                            e.preventDefault()
+                            this.props.history.push({
+                                search: '?modal=support'
+                            })
+                        }}>Поддержка</a>
                     </div>
                 </div>        
             </>

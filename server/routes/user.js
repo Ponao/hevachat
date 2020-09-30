@@ -41,6 +41,11 @@ router.post('/edit', [
     .isEmail().withMessage('email_is_invalid')
     .notEmpty().withMessage('email_not_empty'),
 ], verifyToken, UserController.edit)
+router.post('/send-support', verifyToken, [
+check('email')
+  .isEmail().withMessage('email_is_invalid')
+  .notEmpty().withMessage('email_not_empty'),
+], verifyToken, UserController.sendSupport)
 router.post('/set-lang', verifyToken, UserController.setLang)
 // router.get('/load-friends', verifyToken, UserController.loadFriends)
 // router.get('/load-requested', verifyToken, UserController.loadRequested)

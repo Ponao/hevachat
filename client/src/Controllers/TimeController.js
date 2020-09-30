@@ -22,6 +22,7 @@ export function timeAt(date) {
     var time = new Date(date)
 
     var day_diff = new Date().getDate() - time.getDate(),
+        month_diff = new Date().getMonth() - time.getMonth(),
         year_diff = new Date().getFullYear() - time.getFullYear();
     var year = time.getFullYear(),
         month = time.getMonth()+1,
@@ -52,9 +53,9 @@ export function timeAt(date) {
     var r =
     ( 
         (
-            day_diff === 0 && languages[lang].today
+            day_diff === 0 && month_diff === 0 && languages[lang].today
         )
-        || (day_diff === 1 && languages[lang].yerstaday)
+        || (day_diff === 1 && month_diff === 0 && languages[lang].yerstaday)
         || (year_diff === 0 && day + ' ' + arr[month-1])
     );
     return r;
@@ -75,11 +76,11 @@ export function LastMessageDate(timeR) {
     }
 
     var day_diff = new Date().getDate() - time.getDate(),
+        month_diff = new Date().getMonth() - time.getMonth(),
         year_diff = new Date().getFullYear() - time.getFullYear();
     var year = time.getFullYear(),
         month = time.getMonth()+1,
         day = time.getDate();
-        
     if (year_diff > 0)
         return (
             year.toString()+'.'
@@ -105,10 +106,10 @@ export function LastMessageDate(timeR) {
     var r =
     ( 
         (
-            day_diff === 0 && 
+            day_diff === 0 && month_diff === 0 && 
             (hours + ':' +  minutes)
         )
-        || (day_diff === 1 && languages[lang].yerstaday)
+        || (day_diff === 1 && month_diff === 0 && languages[lang].yerstaday)
         || (year_diff === 0 && day + ' ' + arr[month-1])
     );
 

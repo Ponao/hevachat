@@ -162,7 +162,10 @@ export default {
         until_the_end: 'до окончания тарифа',
         email_not_found: 'Почта не найдена',
         token_invalid: 'Недействительная ссылка',
-        about: 'О нас'
+        about: 'О нас',
+        support: 'Поддержка',
+        policy: 'Политика',
+        tariffs: "Тарифы"
     },
     en: {
         settings: 'Settings',
@@ -327,6 +330,9 @@ export default {
         until_the_end: 'until the end of the tariff',
         email_not_found: 'Mail not found',
         token_invalid: 'Invalid link',
-        about: 'About us'
+        about: 'About us',
+        support: 'Support',
+        policy: 'Policy',
+        tariffs: "Tariffs"
     }
 }

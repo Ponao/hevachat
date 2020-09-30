@@ -4,6 +4,8 @@
     height: max-content;
     min-height: 100vh;
     padding: 0 66px;
+    display: flex;
+    flex-direction: column;
 }
 
 .payment-title {

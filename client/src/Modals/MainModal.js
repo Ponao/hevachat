@@ -32,6 +32,7 @@ import Toasts from './Toasts';
 import ForceToast from './ForceToast';
 import Payments from './Payments';
 import PaySuccess from './PaySuccess';
+import Support from './Support';
 
 class MainModal extends React.Component {
     state = {
@@ -135,6 +136,12 @@ class MainModal extends React.Component {
             }} />
 
             {this.state.modal === 'payments' && <Payments isOpen={this.state.modal === 'payments'} close={() => {
+                this.props.history.push({
+                    search: ""
+                })
+            }} />}
+
+            {this.state.modal === 'support' && <Support isOpen={this.state.modal === 'support'} close={() => {
                 this.props.history.push({
                     search: ""
                 })

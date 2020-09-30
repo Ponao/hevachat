@@ -1388,6 +1388,15 @@
     }
 }
 
+@media screen and (max-width: 1200px) {
+    .about-side {
+        display: none!important;
+    }
+    .about-box {
+        padding: 0 24px;
+    }
+}
+
 .settings-item {
     display: flex;
     width: 100%;
@@ -1634,4 +1643,41 @@
     color: #008FF7;
     text-align: center;
     font-weight: 600;
+}
+
+.about-side {
+    padding: 0 24px;
+}
+
+.about-side h1 {
+    font-size: 32px;
+    color: #333;
+    font-weight: 800;
+}
+
+.about-box-text {
+    max-width: 600px;
+}
+
+.about-box h1 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 800;
+}
+
+.about-box p {
+    font-size: 14px;
+    color: #445566;
+}
+
+.payemnt-links {
+    text-align: center;
+    display: flex;
+    flex: 0 1;
+    padding: 40px 0;
+}
+
+.payemnt-links a {
+    color: #fff;
+    margin-right: 20px;
 }

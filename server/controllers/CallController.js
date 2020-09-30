@@ -19,7 +19,7 @@ module.exports = {
         try {
             let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
             
-            if(!payment) {
+            if(!payment && user.role !== 'admin' && user.role !== 'moder') {
                 return res.json({error: 'dont_have_payment'});
             }
 
@@ -101,7 +101,7 @@ module.exports = {
         try {
             let payment = await Payment.findOne({userId: user._id, status: 'success', expiriesAt: {'$gte': Date.now()}})
             
-            if(!payment) {
+            if(!payment && user.role !== 'admin' && user.role !== 'moder') {
                 let io = getIO()
                 stopCall(socketId, user._id, stopUserCall, io, true)
                 return res.json({error: 'dont_have_payment'});

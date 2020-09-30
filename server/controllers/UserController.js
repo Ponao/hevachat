@@ -18,6 +18,7 @@ const fs = require('fs');
 const { sendPushNotification } = require('./PushNotificationsController');
 const languages = require('../languages');
 const Payment = require('../models/Payment');
+const { sendMailToSupport } = require('./MailController');
 
 module.exports = {
     // Get user data
@@ -187,6 +188,23 @@ module.exports = {
 
             if(users)
                 return res.json(users);
+        } catch (err) {
+            return next(new Error(err));
+        }
+    },
+
+    sendSupport: async(req, res, next) => {
+        const { user } = res.locals;
+        const { email, message } = req.body;
+
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ error: true, errors: errors.array() });
+            }
+
+            sendMailToSupport(message, email, user)
+            return res.json({ status: 'success' });
         } catch (err) {
             return next(new Error(err));
         }

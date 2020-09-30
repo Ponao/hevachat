@@ -96,7 +96,8 @@ class AppRouter extends React.Component {
                           <route.component />
                       </this.PrivateRoute>
                   case 'ban':
-                    return this.props.ban.ban ? <Ban /> : <Redirect
+                    return this.props.ban.ban ? <Ban key={index} /> : <Redirect
+                    key={index}
                     to={{
                       pathname: "/",
                     }}

@@ -20,6 +20,9 @@ import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { withLang } from 'react-multi-language';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import languages from '../../languages';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import PolicyOutlinedIcon from '@material-ui/icons/PolicyOutlined';
+import ContactSupportOutlinedIcon from '@material-ui/icons/ContactSupportOutlined';
 
 const fabStyles = theme => ({
     root: {
@@ -77,6 +80,17 @@ class MyUser extends React.Component {
                 <p>{this.props.langProps.my_orders}</p>
             </div>
 
+            
+
+            <div className="user-btn">
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push('/payment')
+                }}>
+                    <AddCircleOutlineIcon style={{color: '#99AABB'}} />
+                </CustomFab>
+                <p>{this.props.langProps.tariffs}</p>
+            </div>
+
             <div className="user-btn">
                 <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
                     this.props.history.push({
@@ -106,6 +120,27 @@ class MyUser extends React.Component {
                     <InfoOutlinedIcon style={{color: '#99AABB'}} />
                 </CustomFab>
                 <p>{this.props.langProps.about}</p>
+            </div>
+
+            
+            <div className="user-btn">
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push('/privacy-policy')
+                }}>
+                    <PolicyOutlinedIcon style={{color: '#99AABB'}} />
+                </CustomFab>
+                <p>{this.props.langProps.policy}</p>
+            </div>
+
+            <div className="user-btn">
+                <CustomFab color="primary" size="small" aria-label="add" onClick={() => {
+                    this.props.history.push({
+                        search: '?modal=support'
+                    })
+                }}>
+                    <ContactSupportOutlinedIcon style={{color: '#99AABB'}} />
+                </CustomFab>
+                <p>{this.props.langProps.support}</p>
             </div>
         </>
     }
