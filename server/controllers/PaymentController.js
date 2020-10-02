@@ -194,24 +194,24 @@ module.exports = {
                 if(response.data.orderId) {
                     payment.orderId = response.data.orderId
 
-                    let params = {}
-                    params.userName = process.env.SB_USERNAME
-                    params.password = process.env.SB_PASSWORD
-                    params.orderId = response.data.orderId
+                    let params1 = {}
+                    params1.userName = process.env.SB_USERNAME
+                    params1.password = process.env.SB_PASSWORD
+                    params1.orderId = response.data.orderId
 
-                    let response = await sendRequest(statusLink, 'GET', params)
+                    let response2 = await sendRequest(statusLink, 'GET', params1)
 
-                    if(response.OrderStatus === 1 && payment.status === 'wait') {
+                    if(response2.OrderStatus === 1 && payment.status === 'wait') {
                         payment.status = 'hold'
                         payment.updateAt = Date.now()
         
                         await payment.save()
         
-                        params.amount = payment.tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+                        params1.amount = payment.tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
         
-                        let response = await sendRequest(finishLink, 'GET', params)
+                        let response3 = await sendRequest(finishLink, 'GET', params1)
         
-                        if(response.errorCode === '0') {
+                        if(response3.errorCode === '0') {
                             payment.status = 'success'
                             payment.expiriesAt = Date.now() + (payment.tariff.days * 1000 * 60 * 60 * 24)
                             payment.updateAt = Date.now()
