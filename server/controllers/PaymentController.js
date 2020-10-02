@@ -191,13 +191,13 @@ module.exports = {
 
                 let response = await sendRequest(orderLinkGooglePay, 'POST', params)
                 
-                if(response.orderId) {
-                    payment.orderId = response.orderId
+                if(response.data.orderId) {
+                    payment.orderId = response.data.orderId
 
                     let params = {}
                     params.userName = process.env.SB_USERNAME
                     params.password = process.env.SB_PASSWORD
-                    params.orderId = response.orderId
+                    params.orderId = response.data.orderId
 
                     let response = await sendRequest(statusLink, 'GET', params)
 
