@@ -301,6 +301,7 @@ function sendRequest(url, method, params) {
 
             
             request(link, function (err, res, body) {
+                console.log(JSON.parse(body.toString()))
                 resolve(JSON.parse(body.toString()))
             })
         }
