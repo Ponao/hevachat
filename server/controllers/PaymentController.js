@@ -304,11 +304,18 @@ function sendRequest(url, method, params) {
                 resolve(JSON.parse(body.toString()))
             })
         }
-        if(method == 'POST')
-            request.post(url, {form: params}, function (err, res, body) {
+        if(method == 'POST') {
+            let options = {
+                uri: url,
+                method,
+                json: params
+            }
+
+            request.post(options, function (err, res, body) {
                 console.log(body)
                 resolve(body)
             })
+        }
     })
 }
 
