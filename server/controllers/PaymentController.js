@@ -306,6 +306,7 @@ function sendRequest(url, method, params) {
         }
         if(method == 'POST')
             request.post(url, {form: params}, function (err, res, body) {
+                console.log(body)
                 resolve(body)
             })
     })
