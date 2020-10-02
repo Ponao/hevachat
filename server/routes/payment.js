@@ -14,5 +14,6 @@ router.post('/buy', verifyToken, PaymentController.buy);
 router.post('/get-my', verifyToken, PaymentController.getMy);
 router.get('/check-order', PaymentController.check)
 router.post('/delete-my', verifyToken, PaymentController.deleteMy)
+router.post('/buy-google-pay', verifyToken, PaymentController.buyGooglePay)
 
 module.exports = router;

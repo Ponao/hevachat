@@ -10,6 +10,7 @@ const Payment = require('../models/Payment')
 const Tariff = require('../models/Tariff')
 
 const orderLink = 'https://3dsec.sberbank.ru/payment/rest/registerPreAuth.do'
+const orderLinkGooglePay = 'https://3dsec.sberbank.ru/payment/google/payment.do'
 const statusLink = "https://3dsec.sberbank.ru/payment/rest/getOrderStatus.do"
 const finishLink = "https://3dsec.sberbank.ru/payment/rest/deposit.do"
 
@@ -145,6 +146,98 @@ module.exports = {
         }
     },
 
+    buyGooglePay: async (req, res ,next) => {
+        const { user } = res.locals
+        const { tariffId, paymentToken } = req.body
+
+        try {
+            const payment = new Payment()
+
+            let tariff = await Tariff.findOne({_id: tariffId, active: true})
+
+            if(tariff) {
+                payment.userId = user._id
+                payment.tariff = tariff
+                payment.expiriesAt = Date.now() + (tariff.days * 1000 * 60 * 60 * 24)
+                payment.updateAt = Date.now()
+                
+                await payment.save()
+
+                let params = {}
+
+                //     {
+                //         paymentToken: base64.encode(JSON.stringify(paymentToken.paymentToken)),
+                //         preAuth: true,
+                //         merchant: 'ikryanka',
+                //         amount: 1500,
+                //         orderNumber: 'asdadsw123123fg5g45',
+                //         returnUrl: 'https://hevachat.com',
+                //         email: 'pffbread@gmail.com'
+                //     }
+
+                params.paymentToken = paymentToken
+                params.preAuth = true
+                params.merchant = 'ikryanka'
+                params.email = 'pffbread@gmail.com'
+
+                params.orderNumber = payment._id
+                params.amount = tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+
+                params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+                
+                params.failUrl = `${process.env.CLIENT_URL}`
+
+                payment.formUrl = ''
+
+                let response = await sendRequest(orderLinkGooglePay, 'POST', params)
+                
+                if(response.orderId) {
+                    payment.orderId = response.orderId
+
+                    let params = {}
+                    params.userName = process.env.SB_USERNAME
+                    params.password = process.env.SB_PASSWORD
+                    params.orderId = response.orderId
+
+                    let response = await sendRequest(statusLink, 'GET', params)
+
+                    if(response.OrderStatus === 1 && payment.status === 'wait') {
+                        payment.status = 'hold'
+                        payment.updateAt = Date.now()
+        
+                        await payment.save()
+        
+                        params.amount = payment.tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+        
+                        let response = await sendRequest(finishLink, 'GET', params)
+        
+                        if(response.errorCode === '0') {
+                            payment.status = 'success'
+                            payment.expiriesAt = Date.now() + (payment.tariff.days * 1000 * 60 * 60 * 24)
+                            payment.updateAt = Date.now()
+        
+                            await payment.save()    
+        
+                            return res.json({success: true})
+                        } else {
+                            return res.json({success: false})
+                        }
+                    }
+                } else {
+                    return res.json({success: false})
+                }
+            }
+
+            const err = {}
+            err.param = `all`
+            err.msg = `not_found`
+
+            return res.status(404).json({ error: true, errors: [err], success: false })
+        } catch (e) {
+            return next(new Error(e))
+        }
+    },
+
     check: async (req, res ,next) => {
         const { orderId, from } = req.query;
 
@@ -195,19 +288,26 @@ module.exports = {
 
 function sendRequest(url, method, params) {
     return new Promise(resolve => {
-        let link = url + '?';
+        if(method == 'GET') {
+            let link = url + '?';
 
-        for (let i in params) {
-            if (params.hasOwnProperty(i))
-                link += i + '=' + params[i] + '&';
+            for(let i in params) {
+                if (params.hasOwnProperty(i))
+                    link += i + '=' + params[i] + '&';
+            }
+
+            if(params)
+                link = link.substr(0, link.length - 1);
+
+            
+            request(link, function (err, res, body) {
+                resolve(JSON.parse(body.toString()))
+            })
         }
-
-        if (params)
-            link = link.substr(0, link.length - 1);
-
-        request(link, function (err, res, body) {
-            resolve(JSON.parse(body.toString()))
-        })
+        if(method == 'POST')
+            request.post(url, params, function (err, res, body) {
+                resolve(JSON.parse(body.toString()))
+            })
     })
 }
 
