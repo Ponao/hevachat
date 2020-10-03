@@ -165,7 +165,9 @@ export default {
         about: 'О нас',
         support: 'Поддержка',
         policy: 'Политика',
-        tariffs: "Тарифы"
+        tariffs: "Тарифы",
+        send_message_to_support: 'Отправить сообщение поддержке',
+        message_to_support_sended: 'Сообщение отправлено поддержке',
     },
     en: {
         settings: 'Settings',
@@ -333,6 +335,8 @@ export default {
         about: 'About us',
         support: 'Support',
         policy: 'Policy',
-        tariffs: "Tariffs"
+        tariffs: "Tariffs",
+        send_message_to_support: 'Send message to support',
+        message_to_support_sended: 'Message to support sended',
     }
 }

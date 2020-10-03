@@ -72,20 +72,20 @@ class Settings extends React.Component {
             },
             body: JSON.stringify({
                 message: this.state.message,
-                email: this.state.email,
+                email: this.state.email.toLowerCase().replace(/\s+/g, ''),
             })
         })
         .then(response => response.json())
         .then((data) => {
             if(data.error) {
-
+                this.setState({error: true, errors: data.errors})
             } else {
                 this.props.history.push({
                     search: `?user=${this.props.user._id}`
                 })
-                // toast.success("Warning sent", {
-                //     position: toast.POSITION.TOP_CENTER
-                // });
+                toast(this.props.langProps.message_to_support_sended, {
+                    position: toast.POSITION.TOP_CENTER
+                });
             }
         })
     }
@@ -102,7 +102,7 @@ class Settings extends React.Component {
             }}>
                 <CloseOutlinedIcon style={{color: '#99AABB'}} />
             </span>
-            <h2 className="modal-title">Send message to support</h2>
+            <h2 className="modal-title">{this.props.langProps.send_message_to_support}</h2>
 
             <textarea 
                 className="input-field"
@@ -120,7 +120,7 @@ class Settings extends React.Component {
                 className="input-field" 
                 type="text"
                 style={{marginBottom: 10}} 
-                placeholder={this.props.langProps.email}
+                placeholder={'E-mail'}
                 maxLength={50}
             />
             {this.state.errors.find(value => value.param === 'email') && <span className="input-error-label">
