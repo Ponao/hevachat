@@ -268,7 +268,7 @@ module.exports = {
                 //         email: 'pffbread@gmail.com'
                 //     }
 
-                params.paymentData = paymentData
+                params.paymentToken = paymentData
                 params.preAuth = true
                 params.merchant = 'ikryanka'
                 params.email = 'pffbread@gmail.com'
