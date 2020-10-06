@@ -271,14 +271,14 @@ module.exports = {
                 params.paymentToken = paymentData
                 params.preAuth = true
                 params.merchant = 'ikryanka'
-                params.email = 'pffbread@gmail.com'
+                // params.email = 'pffbread@gmail.com'
 
                 params.orderNumber = payment._id
                 //params.amount = tariff.price * 100 Умножение на 100 так как стоимость указывается в копейках
 
-                params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+                // params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
                 
-                params.failUrl = `${process.env.CLIENT_URL}`
+                // params.failUrl = `${process.env.CLIENT_URL}`
 
                 payment.formUrl = ''
 
