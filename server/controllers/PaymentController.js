@@ -274,7 +274,7 @@ module.exports = {
                 params.email = 'pffbread@gmail.com'
 
                 params.orderNumber = payment._id
-                params.amount = tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+                //params.amount = tariff.price * 100 Умножение на 100 так как стоимость указывается в копейках
 
                 params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
                 
@@ -284,7 +284,7 @@ module.exports = {
 
                 let response = await sendRequest(orderLinkApplePay, 'POST', params)
                 
-                if(response.data.orderId) {
+                if(response.data && response.data.orderId) {
                     payment.orderId = response.data.orderId
 
                     let params1 = {}
