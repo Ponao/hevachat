@@ -15,5 +15,6 @@ router.post('/get-my', verifyToken, PaymentController.getMy);
 router.get('/check-order', PaymentController.check)
 router.post('/delete-my', verifyToken, PaymentController.deleteMy)
 router.post('/buy-google-pay', verifyToken, PaymentController.buyGooglePay)
+router.post('/buy-apple-pay', verifyToken, PaymentController.buyApplePay)
 
 module.exports = router;

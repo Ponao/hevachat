@@ -11,6 +11,7 @@ const Tariff = require('../models/Tariff')
 
 const orderLink = 'https://3dsec.sberbank.ru/payment/rest/registerPreAuth.do'
 const orderLinkGooglePay = 'https://3dsec.sberbank.ru/payment/google/payment.do'
+const orderLinkApplePay = 'https://3dsec.sberbank.ru/payment/applepay/payment.do'
 const statusLink = "https://3dsec.sberbank.ru/payment/rest/getOrderStatus.do"
 const finishLink = "https://3dsec.sberbank.ru/payment/rest/deposit.do"
 
@@ -190,6 +191,98 @@ module.exports = {
                 payment.formUrl = ''
 
                 let response = await sendRequest(orderLinkGooglePay, 'POST', params)
+                
+                if(response.data.orderId) {
+                    payment.orderId = response.data.orderId
+
+                    let params1 = {}
+                    params1.userName = process.env.SB_USERNAME
+                    params1.password = process.env.SB_PASSWORD
+                    params1.orderId = response.data.orderId
+
+                    let response2 = await sendRequest(statusLink, 'GET', params1)
+
+                    if(response2.OrderStatus === 1 && payment.status === 'wait') {
+                        payment.status = 'hold'
+                        payment.updateAt = Date.now()
+        
+                        await payment.save()
+        
+                        params1.amount = payment.tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+        
+                        let response3 = await sendRequest(finishLink, 'GET', params1)
+        
+                        if(response3.errorCode === '0') {
+                            payment.status = 'success'
+                            payment.expiriesAt = Date.now() + (payment.tariff.days * 1000 * 60 * 60 * 24)
+                            payment.updateAt = Date.now()
+        
+                            await payment.save()    
+        
+                            return res.json({success: true})
+                        } else {
+                            return res.json({success: false})
+                        }
+                    }
+                } else {
+                    return res.json({success: false})
+                }
+            }
+
+            const err = {}
+            err.param = `all`
+            err.msg = `not_found`
+
+            return res.status(404).json({ error: true, errors: [err], success: false })
+        } catch (e) {
+            return next(new Error(e))
+        }
+    },
+
+    buyApplePay: async (req, res ,next) => {
+        const { user } = res.locals
+        const { tariffId, paymentData } = req.body
+
+        try {
+            const payment = new Payment()
+
+            let tariff = await Tariff.findOne({_id: tariffId, active: true})
+
+            if(tariff) {
+                payment.userId = user._id
+                payment.tariff = tariff
+                payment.expiriesAt = Date.now() + (tariff.days * 1000 * 60 * 60 * 24)
+                payment.updateAt = Date.now()
+                
+                await payment.save()
+
+                let params = {}
+
+                //     {
+                //         paymentToken: base64.encode(JSON.stringify(paymentToken.paymentToken)),
+                //         preAuth: true,
+                //         merchant: 'ikryanka',
+                //         amount: 1500,
+                //         orderNumber: 'asdadsw123123fg5g45',
+                //         returnUrl: 'https://hevachat.com',
+                //         email: 'pffbread@gmail.com'
+                //     }
+
+                params.paymentData = paymentData
+                params.preAuth = true
+                params.merchant = 'ikryanka'
+                params.email = 'pffbread@gmail.com'
+
+                params.orderNumber = payment._id
+                params.amount = tariff.price * 100 // *Умножение на 100 так как стоимость указывается в копейках
+
+                params.returnUrl = `${process.env.API_URL}/api/payment/check-order`
+                
+                params.failUrl = `${process.env.CLIENT_URL}`
+
+                payment.formUrl = ''
+
+                let response = await sendRequest(orderLinkApplePay, 'POST', params)
                 
                 if(response.data.orderId) {
                     payment.orderId = response.data.orderId
