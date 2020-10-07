@@ -273,6 +273,7 @@ module.exports = {
                 params.merchant = 'ikryanka'
                 params.language = 'ru'
                 params.additionalParameters = {email: 'test@test.ru'}
+                params.description = 'ОПИСАНИЕ'
                 // params.email = 'pffbread@gmail.com'
 
                 params.orderNumber = payment._id
