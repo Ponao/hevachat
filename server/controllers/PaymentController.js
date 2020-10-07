@@ -280,6 +280,8 @@ module.exports = {
                 
                 // params.failUrl = `${process.env.CLIENT_URL}`
 
+                console.log(JSON.stringify(params))
+
                 payment.formUrl = ''
 
                 let response = await sendRequest(orderLinkApplePay, 'POST', params)
