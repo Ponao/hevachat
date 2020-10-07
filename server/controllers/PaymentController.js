@@ -281,6 +281,7 @@ module.exports = {
                 // params.failUrl = `${process.env.CLIENT_URL}`
 
                 console.log(JSON.stringify(params))
+                console.log(new Date())
 
                 payment.formUrl = ''
 
