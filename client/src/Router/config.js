@@ -14,9 +14,16 @@ import Politice from '../Pages/Politice';
 import About from '../Pages/About';
 import Forgot from '../Pages/Auth/Forgot';
 import Reset from '../Pages/Auth/Reset';
-
+import Support from '../Pages/Support';
 
 const routes = [
+    {
+        path: '/support',
+        exact: true,
+        type: 'all',
+        title: 'Support',
+        component: () => <Support />
+    },
     {
         path: '/about',
         exact: true,

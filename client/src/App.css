@@ -1455,6 +1455,7 @@
 }
 
 .left-days {
+    cursor: pointer;
     position: absolute;
     left: 0;
     top: 0;
@@ -1679,5 +1680,17 @@
 
 .payemnt-links a {
     color: #fff;
+    margin-right: 20px;
+}
+
+.auth-links {
+    text-align: center;
+    display: flex;
+    flex: 0 1;
+    padding: 40px 0;
+}
+
+.auth-links a {
+    color: #008ff7;
     margin-right: 20px;
 }

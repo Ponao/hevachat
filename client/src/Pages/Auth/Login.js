@@ -109,11 +109,11 @@ class Login extends React.Component {
                 <form onSubmit={(e) => {this.onSubmit(e)}} className="form">
                     <a className="social-auth" href={`${urlApi}/auth/login_vk?uuid=${randomInteger(0, 9999999)}`}>
                         <Vkontakte style={{width: 24, height: 24, marginLeft: 20, marginRight: 15, color: '#5181b8'}} />
-                        Вход через VK
+                        Log in with VK
                     </a>
                     <a className="social-auth" href={`${urlApi}/auth/login_fb?uuid=${randomInteger(0, 9999999)}`}>
                         <Facebook style={{marginLeft: 20, marginRight: 15, color: '#4267b2'}} />
-                        Вход через FaceBook
+                        Log in with FaceBook
                     </a>
 
                     <input value={this.state.email} onChange={(e) => {this.setState({email: e.target.value})}} className="input-field" type="text" name="email" placeholder="E-mail" />
@@ -143,6 +143,12 @@ class Login extends React.Component {
                         })
                     }}><Link to="/forgot">Forgot your password?</Link></p>
                 </form>
+
+                <div className="auth-links">
+                    <Link to="/about">About us</Link>
+                    <Link to="/privacy-policy">Privacy policy</Link>
+                    <Link to="/support">Support</Link>
+                </div>
             </div>
         )
     }

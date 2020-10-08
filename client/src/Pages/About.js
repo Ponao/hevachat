@@ -1,5 +1,6 @@
 // App
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 // Router
 // import {
@@ -29,10 +30,13 @@ class Politice extends React.Component {
                         <p>
                             Адрес: Астраханская область с. Икряное, ул. Мира, д. 30 «а»<br />
                             Телефон <a href="tel:support@hevachat.com">+7 964 888-36-09</a><br />
-                            E-mail: <a href="mailto:support@hevachat.com">support@hevachat.com</a><br />
+                            E-mail: <Link to='support'>support@hevachat.com</Link><br /><br />
+                            <strong>Реквизиты</strong><br />
                             ИП Рудаев Федор Владимирович<br />
                             ОГРНИП: 319302500044962<br />
                             ИНН: 300436250455<br />
+                            Юридический адрес: 416370, Россия, Астраханская обл, Икрянинский рай. с. Икряное, ул. Свободы, д. 40<br />
+                            Телефон: <a href="tel:support@hevachat.com">+7 964 888-36-09</a><br />
                         </p>
                         
                         <h1>Способы оплаты</h1>
@@ -63,7 +67,7 @@ class Politice extends React.Component {
                         <p>
                             Все спорные вопросы решаются в индивидуальном порядке – и максимально быстро!<br />
 
-                            Свяжитесь с нами: <a href="mailto:support@hevachat.com">support@hevachat.com</a><br />
+                            Свяжитесь с нами: <Link to='support'>support@hevachat.com</Link><br />
 
                             Отказаться от подписки<br />
                             Возврат переведённых средств, производится на ваш банковский счёт в течение 5-30 рабочих дней

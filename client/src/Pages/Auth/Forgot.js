@@ -99,6 +99,12 @@ class Login extends React.Component {
                     <p className="nav-auth">Already have account? <Link to="/login">Log in</Link></p>
                     <p className="nav-auth">New to the site? <Link to="/register">Sign up</Link></p>
                 </form>
+
+                <div className="auth-links">
+                    <Link to="/about">About us</Link>
+                    <Link to="/privacy-policy">Privacy policy</Link>
+                    <Link to="/support">Support</Link>
+                </div>
             </div>
         )
     }

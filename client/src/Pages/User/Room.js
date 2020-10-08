@@ -259,7 +259,9 @@ class Room extends React.Component {
                 
 
                 <div style={{paddingTop: Math.ceil(this.props.user.leftDays) < 8 && Math.ceil(this.props.user.leftDays) !== 0 ? 30 : 0}} className={`col-xl-9 col-lg-6 col-md-6 theme-screen ${this.state.act === 'chat' ? 'hide' : 'active'}`}>
-                    {Math.ceil(this.props.user.leftDays) < 8 && Math.ceil(this.props.user.leftDays) !== 0 && <div className='left-days'>
+                    {Math.ceil(this.props.user.leftDays) < 8 && Math.ceil(this.props.user.leftDays) !== 0 && <div className='left-days' onClick={() => {
+                        this.props.history.push('/payment')
+                    }}>
                         {this.props.langProps.you_have_left} {Math.ceil(this.props.user.leftDays)} {declension(Math.ceil(this.props.user.leftDays), [this.props.langProps.day_1, this.props.langProps.day_2, this.props.langProps.day_5])} {this.props.langProps.until_the_end}
                     </div>}
                     {this.props.rooms.activeRoom && <Members users={this.props.rooms.activeRoom.users} />}
