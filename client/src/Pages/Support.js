@@ -3,7 +3,7 @@ import React from 'react'
 import { withLang } from 'react-multi-language'
 import { withRouter } from 'react-router-dom'
 import languages from '../languages'
-import Support from '../Modals/Support'
+import SupportNoAuth from '../Modals/SupportNoAuth'
 
 // Router
 // import {
@@ -13,7 +13,7 @@ import Support from '../Modals/Support'
 class SupportPage extends React.Component {
     render() {
         return (
-            <Support isOpen={true} close={() => {
+            <SupportNoAuth isOpen={true} close={() => {
                 this.props.history.goBack()
             }} />
         )

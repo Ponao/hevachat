@@ -78,4 +78,36 @@ module.exports = {
 
         console.log(result);
     },
+
+    sendMailToSupportAll:  async (message, email) => {
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.timeweb.ru',
+            port: 465,
+            secure: true,
+            auth: {
+                user: 'support@hevachat.com',
+                pass: 'H2Uh9ekj'
+            }
+        });
+        
+        let result = await transporter.sendMail({
+            from: '"Hevachat" <support@hevachat.com>',
+            to: `support@hevachat.com`,
+            subject: `Message from no auth user`,
+            // text: "",
+            html: `<div>
+                <h1>Пользователь</h1>
+                <p>
+                    Почта для ответа: <a href="mailto:${email}">${email}</a>
+                </p>
+
+                <h1>Сообщение</h1>
+                <p>
+                    ${message}
+                </p>
+            </div>`
+        });
+
+        console.log(result);
+    },
 }

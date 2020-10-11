@@ -18,7 +18,7 @@ const fs = require('fs');
 const { sendPushNotification } = require('./PushNotificationsController');
 const languages = require('../languages');
 const Payment = require('../models/Payment');
-const { sendMailToSupport } = require('./MailController');
+const { sendMailToSupport, sendMailToSupportAll } = require('./MailController');
 
 module.exports = {
     // Get user data
@@ -204,6 +204,22 @@ module.exports = {
             }
 
             sendMailToSupport(message, email, user)
+            return res.json({ status: 'success' });
+        } catch (err) {
+            return next(new Error(err));
+        }
+    },
+
+    sendSupportAll: async (req, res, next) => {
+        const { email, message } = req.body;
+
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ error: true, errors: errors.array() });
+            }
+
+            sendMailToSupportAll(message, email)
             return res.json({ status: 'success' });
         } catch (err) {
             return next(new Error(err));

@@ -45,7 +45,15 @@ router.post('/send-support', verifyToken, [
 check('email')
   .isEmail().withMessage('email_is_invalid')
   .notEmpty().withMessage('email_not_empty'),
-], verifyToken, UserController.sendSupport)
+], UserController.sendSupport)
+
+
+router.post('/send-support-all', [
+  check('email')
+    .isEmail().withMessage('email_is_invalid')
+    .notEmpty().withMessage('email_not_empty'),
+  ], UserController.sendSupportAll)
+
 router.post('/set-lang', verifyToken, UserController.setLang)
 // router.get('/load-friends', verifyToken, UserController.loadFriends)
 // router.get('/load-requested', verifyToken, UserController.loadRequested)

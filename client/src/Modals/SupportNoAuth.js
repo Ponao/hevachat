@@ -63,12 +63,11 @@ class Settings extends React.Component {
     onSubmit(e) {
         this.setState({error: false, errors: []})
 
-        fetch(`${urlApi}/api/user/send-support`, {
+        fetch(`${urlApi}/api/user/send-support-all`, {
             method: "post",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${this.props.user.apiToken}`,
             },
             body: JSON.stringify({
                 message: this.state.message,
@@ -80,9 +79,7 @@ class Settings extends React.Component {
             if(data.error) {
                 this.setState({error: true, errors: data.errors})
             } else {
-                this.props.history.push({
-                    search: `?user=${this.props.user._id}`
-                })
+                this.props.history.goBack()
                 toast(this.props.langProps.message_to_support_sended, {
                     position: toast.POSITION.TOP_CENTER
                 });
