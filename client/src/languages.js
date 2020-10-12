@@ -168,6 +168,7 @@ export default {
         tariffs: "Тарифы",
         send_message_to_support: 'Отправить сообщение поддержке',
         message_to_support_sended: 'Сообщение отправлено поддержке',
+        copy_link: 'Скопировать ссылку'
     },
     en: {
         settings: 'Settings',
@@ -338,5 +339,6 @@ export default {
         tariffs: "Tariffs",
         send_message_to_support: 'Send message to support',
         message_to_support_sended: 'Message to support sended',
+        copy_link: 'Copy link'
     }
 }

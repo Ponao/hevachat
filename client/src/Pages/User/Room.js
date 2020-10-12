@@ -30,6 +30,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { withLang } from 'react-multi-language';
 import languages from '../../languages';
 import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
+import { toast } from 'react-toastify';
 
 const fabStyles = theme => ({
     root: {
@@ -229,6 +230,20 @@ class Room extends React.Component {
                                         search: '?act=deleteRoom'
                                     })
                                 }
+                            },
+                            {
+                                text: this.props.langProps.copy_link,
+                                action: () => {
+                                    navigator.clipboard.writeText(`https://hevachat.com/rooms/${this.props.rooms.activeRoom._id}`)
+                                        .then(() => {
+                                            toast("Link copied", {
+                                                position: toast.POSITION.TOP_CENTER
+                                            });
+                                        })
+                                        .catch(err => {
+                                            console.log('Something went wrong', err);
+                                        });
+                                }
                             }
                         ] : [
                             {
@@ -242,7 +257,21 @@ class Room extends React.Component {
                                 this.props.history.push({
                                     search: `?modal=investments`
                                 })
-                            }}
+                            }},
+                            {
+                                text: this.props.langProps.copy_link,
+                                action: () => {
+                                    navigator.clipboard.writeText(`https://hevachat.com/rooms/${this.props.rooms.activeRoom._id}`)
+                                        .then(() => {
+                                            toast("Link copied", {
+                                                position: toast.POSITION.TOP_CENTER
+                                            });
+                                        })
+                                        .catch(err => {
+                                            console.log('Something went wrong', err);
+                                        });
+                                }
+                            }
                         ]} from={'dialog-more-actions-'+this.props.rooms.activeRoom._id} />
                     </div>
 
