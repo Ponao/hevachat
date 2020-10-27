@@ -9,11 +9,11 @@ const request = require('request')
 const Payment = require('../models/Payment')
 const Tariff = require('../models/Tariff')
 
-const orderLink = 'https://3dsec.sberbank.ru/payment/rest/registerPreAuth.do'
-const orderLinkGooglePay = 'https://3dsec.sberbank.ru/payment/google/payment.do'
-const orderLinkApplePay = 'https://3dsec.sberbank.ru/payment/applepay/payment.do'
-const statusLink = "https://3dsec.sberbank.ru/payment/rest/getOrderStatus.do"
-const finishLink = "https://3dsec.sberbank.ru/payment/rest/deposit.do"
+const orderLink = 'https://securepayments.sberbank.ru/payment/rest/registerPreAuth.do'
+const orderLinkGooglePay = 'https://securepayments.sberbank.ru/payment/google/payment.do'
+const orderLinkApplePay = 'https://securepayments.sberbank.ru/payment/applepay/payment.do'
+const statusLink = "https://securepayments.sberbank.ru/payment/rest/getOrderStatus.do"
+const finishLink = "https://securepayments.sberbank.ru/payment/rest/deposit.do"
 
 module.exports = {
     getAll: async (req, res, next) => {
