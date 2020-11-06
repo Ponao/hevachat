@@ -178,7 +178,7 @@ module.exports = {
 
                 params.paymentToken = paymentToken
                 params.preAuth = true
-                params.merchant = 'IP Rudaev Fedor Vladimiro'
+                params.merchant = 'hevachat'
                 params.email = 'pffbread@gmail.com'
 
                 params.orderNumber = payment._id
@@ -270,7 +270,7 @@ module.exports = {
 
                 params.paymentToken = paymentData
                 params.preAuth = true
-                params.merchant = 'IP Rudaev Fedor Vladimiro'
+                params.merchant = 'hevachat'
                 params.language = 'ru'
                 params.additionalParameters = {email: 'test@test.ru'}
                 params.description = 'ОПИСАНИЕ'
