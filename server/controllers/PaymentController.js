@@ -386,6 +386,7 @@ module.exports = {
 }
 
 function sendRequest(url, method, params) {
+    console.log(url)
     return new Promise(resolve => {
         if(method == 'GET') {
             let link = url + '?';
@@ -412,6 +413,7 @@ function sendRequest(url, method, params) {
             }
 
             request.post(options, function (err, res, body) {
+                
                 console.log(body)
                 resolve(body)
             })
