@@ -138,7 +138,7 @@ const adminBro = new AdminBro({
       resource: Tariff,
       options: {
         properties: {
-          _id: { isVisible: { list: false, filter: false, show: false, edit: false } },
+          _id: { isVisible: { list: false, filter: false, show: true, edit: false } },
           active: { isVisible: { list: true, filter: true, show: true, edit: true } },
           buff: { isVisible: { list: false, filter: false, show: false, edit: false } },
           createdAt: { isVisible: { list: false, filter: false, show: false, edit: false } },
